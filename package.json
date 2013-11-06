@@ -1,0 +1,19 @@
+{
+  "name": "nko4-nodesque",
+  "version": "0.0.0",
+  "description": "nodesque",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:nko4/nodesque.git"
+  },
+  "dependencies": {
+    "nko": "*"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}
