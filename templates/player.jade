@@ -1,2 +1,8 @@
-img(src="/player_#{role}_default.svg")
-.name= name
+.card
+  .pic(class="color-#{number}")
+    - if (me)
+      img(src="/player_#{role}_default.svg")
+    - else
+      img(src="/player_villager_default.svg")
+  .info
+    .name= name
