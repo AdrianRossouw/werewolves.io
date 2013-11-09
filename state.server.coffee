@@ -36,11 +36,23 @@ State.refreshSession = (sessionId) ->
   @world.sessions.add session,
     merge: true
 
+# handle a request (from wherever) for a specific
+# connect session id.
+#
+# Create sessions record if it doesn't exist,
+# and merge changes if it does.
+State.refreshSocket = (sessionId, socketId) ->
+  session = @refreshSession(sessionId)
+
+  if socketId not in session.sockets
+    session.sockets.push(sockets)
+
+  return session
 
 # Session middleware
-express = require('express')
-RedisStore   = require('connect-redis')(express)
-State.sessionStore = new RedisStore
+express              = require('express')
+RedisStore           = require('connect-redis')(express)
+State.sessionStore   = new RedisStore
 
 State.initMiddleware = (opts) ->
   @use new express.cookieParser(opts.secret)

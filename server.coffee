@@ -4,10 +4,11 @@ _        = require('underscore')
 # The app object inherits all the methods of the express
 # server, allowing us to register middleware more
 # easily.
-http     = require("http")
-express  = require("express")
-_express = express()
-server   = http.createServer(_express)
+http       = require("http")
+express    = require("express")
+_express   = express()
+server     = http.createServer(_express)
+App.server = server
 _.defaults App, _express
 
 
