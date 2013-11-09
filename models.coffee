@@ -48,7 +48,7 @@ class Models.Player extends BaseModel
   @attribute 'vote'
   state s = @::,
     lobby: state, 'initial'
-    spectacting: state
+    spectacte: state
     dead: state
     alive: state
       lynching: state
@@ -67,14 +67,54 @@ class Models.Game extends BaseModel
   @attribute 'rounds'
   @attribute 'phaseTime'
   state s = @::,
-    recruit: state 'initial'
-    begin: state
-    day: state
-    night: state
-    victory: state
+    recruit: state 'initial',
+      startGame: -> @state('-> startup')
+    startup: state
+      nextPhase: -> @state('-> night')
+    day: state 'abstract',
+      first: state
+      next: state
+
+      # methods
+      nextPhase: -> @state('-> night')
+      transitions:
+        FirstDay:
+          origin: 'night.first'
+          action: ->
+            debugger
+            console.log 'the first day breaks'
+        DayBreak:
+          origin: 'night'
+          action: ->
+            debugger
+            console.log 'day breaks'
+
+    night: state 'abstract',
+      first: state
+      next: state
+
+      # methods
+      nextPhase: -> @state('-> day')
+      transitions:
+        FirstNight:
+          origin: 'startup'
+          action: ->
+            debugger
+            console.log 'first night falls'
+        NightFall:
+          origin: 'day'
+          action: ->
+            debugger
+            console.log 'night falls'
+
+    victory: state 'abstract',
       wolves: state
       villagers: state
     cleanup: state 'final'
+    transitions:
+      StartGame: origin: 'recruit', target: 'startup', action: ->
+        console.log "game started"
+
 
 # The world acts as the container for the other
 # pieces of state.
