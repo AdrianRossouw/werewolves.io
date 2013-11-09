@@ -44,7 +44,7 @@ app.listen conf.port, (err) ->
 
   # if run as root, downgrade to the owner of this file
   if process.getuid() is 0
-    fs.stat __filename, (err) ->
+    fs.stat __filename, (err, stats) ->
       process.exit 1 if err
       console.log(stats)
       process.initgroups(stats.uid, stats.gid)
