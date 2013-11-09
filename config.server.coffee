@@ -5,7 +5,6 @@ module.exports =
         port: 8000
     production:
         host: "nodesque.2013.nodeknockout.com"
-        port: 80
     development:
         host: "localhost"
     staging:

@@ -1,9 +1,25 @@
+fs      = require('fs')
 nko     = require('nko')
 http    = require("http")
 _       = require('underscore')
 express = require("express")
 app     = express()
 server  = http.createServer(app)
+
+# set back to non-root permissions
+#
+# we run nginx in our environment since we need
+# https, and it complicates the app too much
+# to implement it directly.
+
+# if run as root, downgrade to the owner of this file
+if process.getuid() is 0
+  stats = fs.statSync __filename
+  process.setuid stats.uid
+  process.setgid stats.gid
+  process.initgroups(stats.uid, stats.gid)
+
+
 
 # figure out config for the current environment
 
@@ -13,6 +29,8 @@ env    = process.env.NODE_ENV
 env   ?= 'development'
 
 _.defaults conf, sConf[env], sConf.defaults
+
+
 
 nko conf.nkoKey
 
@@ -29,14 +47,4 @@ app.get "/*", (req, res, next) ->
         env: env
 
 app.listen conf.port, (err) ->
-  if err
-    console.error err
-    process.exit -1
-  
-  # if run as root, downgrade to the owner of this file
-  if process.getuid() is 0
-    require("fs").stat __filename, (err, stats) ->
-      return console.error(err)  if err
-      process.setuid stats.uid
-
-  console.log "Server running at http://0.0.0.0:" + conf.port + "/"
+   console.log "Server running at http://#{conf.host}:#{conf.port}/"
