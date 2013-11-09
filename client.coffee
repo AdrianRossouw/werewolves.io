@@ -53,7 +53,7 @@ State.on 'load', loader, App
 # figure out config for the current environment
 _conf = require('./config.client.coffee')
 conf    = {}
-env     = process.env.NODE_ENV
+env     = window.NODE_ENV
 env    ?= 'development'
 
 _.defaults conf, _conf.defaults, _conf[env]
