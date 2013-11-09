@@ -7,25 +7,81 @@ html
     else
       link(rel='stylesheet', href='/css/style.css')
   body
-    .navbar.navbar-fixed-top.navbar-default
-      .navbar-header
-        a.navbar-brand(href='/') Werewolves.io
+    .nko
+      iframe(src='https://nodeknockout.com/iframe/nodesque',
+        frameborder='0', scrolling='no',
+        allowtransparency='true', width='115',
+        height='25')
 
-      p.navbar-text.navbar-right
-        iframe(src='https://nodeknockout.com/iframe/nodesque',
-            frameborder='0', scrolling='no',
-            allowtransparency='true', width='115',
-            height='25')
-    
-    #main-region
-      block body
-        | body goes here
+    .lobby
+      .intro-wrap
+        .intro
+          h1 Will the villagers eradicate the werewolves before it's too late?
+          form
+            input(type='text', name='name', value='', placeholder='your name here')
+            input(type='submit', name='join', value='Join')
+          h2 Current game
+          p 18 players, 6 still alive. Approximately 6 minutes to next game starts.
+      .header Werewolves
 
-    if env === 'production'
-      script(src='/js/app.min.js')
-    else
-      script(src='/js/vendor.js')
-      script(src='/js/templates.js')
-      script(src='/js/client.js')
-      script(src="http://#{host}:35729/livereload.js")
+    .status-wrap
+      .status
+        .text
+          strong Day 3
+          | . Population: 6
+        .timer 6 seconds left. Vote!
+
+    .game
+      .main
+        .players
+          .player
+          .player
+          .player
+          .player
+          .player
+          .player
+          .player
+          .player
+          .player
+          .player
+          .player
+          .player
+          .player
+          .player
+          .player
+      .sidebar
+        .me
+        .candidates
+          .candidate
+            .profile
+            .votes
+              .vote
+              .vote
+              .vote
+              .vote
+              .vote
+              .vote
+              .vote
+              .vote
+          .candidate
+            .profile
+            .votes
+              .vote
+              .vote
+              .vote
+              .vote
+              .vote
+          .candidate
+            .profile
+            .votes
+              .vote
+              .vote
+
+  if env === 'production'
+    script(src='/js/app.min.js')
+  else
+    script(src='/js/vendor.js')
+    script(src='/js/templates.js')
+    script(src='/js/client.js')
+    script(src="http://#{host}:35729/livereload.js")
 

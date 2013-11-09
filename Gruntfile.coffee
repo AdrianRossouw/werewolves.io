@@ -26,8 +26,8 @@ module.exports = (grunt) ->
         options:
           file: "server.coffee"
           ignoredFiles: ["README.md", "node_modules/**"]
-          watchedFolders: ['build/js', 'views']
-          watchedExtensions: ["coffee", "jade", 'js']
+          watchedFolders: ['build/js', 'views', 'build/css']
+          watchedExtensions: ["coffee", "jade", 'js', 'css']
 
     concurrent:
       dev:
@@ -37,7 +37,7 @@ module.exports = (grunt) ->
     less:
       dist:
         files:
-          "build/css/style.css": "css/style.less"
+          "build/css/style.css": ["css/style.less"]
         options:
           paths: ["bower_components/bootstrap/less"]
 
