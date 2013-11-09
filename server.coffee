@@ -10,6 +10,16 @@ _express = express()
 server   = http.createServer(_express)
 _.defaults App, _express
 
+
+# Load up the state instances
+State = require('./state.server.coffee')
+App.addInitializer (opts) ->
+  @trigger 'before:state', opts
+  # We initialize this separately because
+  # we don't want it to run just when included
+  State.start(opts)
+  @trigger 'state', opts
+
 # Set up express with some default things.
 App.addInitializer (opts) ->
   @trigger 'before:settings', opts
@@ -41,15 +51,6 @@ App.addInitializer (opts) ->
 
   # mount the router middleware in a predicatable place.
   @use @router
-
-# Load up the state instances
-State = require('./state.server.coffee')
-App.addInitializer (opts) ->
-  @trigger 'before:state', opts
-  # We initialize this separately because
-  # we don't want it to run just when included
-  State.start(opts)
-  @trigger 'state', opts
 
 # Start listening to the ports.
 App.addInitializer (opts) ->
