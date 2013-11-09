@@ -95,7 +95,7 @@ conf    = {}
 env     = process.env.NODE_ENV
 env    ?= 'development'
 
-_.defaults conf, sConf[env], sConf.defaults
+_.defaults conf, sConf.defaults, sConf[env]
 
 # Ping home to show we have been deployed
 nko = require('nko')

@@ -56,6 +56,6 @@ conf    = {}
 env     = process.env.NODE_ENV
 env    ?= 'development'
 
-_.defaults conf, _conf[env], _conf.defaults
+_.defaults conf, _conf.defaults, _conf[env]
 
 App.start(conf)

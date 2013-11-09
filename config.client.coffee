@@ -10,3 +10,4 @@ module.exports =
     port: 8000
   staging:
     hostname: "staging"
+    protocol: 'https'
