@@ -46,6 +46,7 @@ class Models.Player extends BaseModel
   @attribute 'session'
   @attribute 'role'
   @attribute 'vote'
+  @attribute 'name'
   state s = @::,
     lobby: state, 'initial'
     spectacting: state

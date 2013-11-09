@@ -16,66 +16,12 @@ html
     .lobby
       .intro-wrap
         .intro
-          h1 Will the villagers eradicate the werewolves before it's too late?
-          form
-            input(type='text', name='name', value='', placeholder='your name here')
-            input(type='submit', name='join', value='Join')
-          h2 Current game
-          p 18 players, 6 still alive. Approximately 6 minutes to next game starts.
-      .header Werewolves
+      img.header(src='/logo_night.svg')
 
     .status-wrap
-      .status
-        .text
-          strong Day 3
-          | . Population: 6
-        .timer 6 seconds left. Vote!
+      #status.status
 
-    .game
-      .main
-        .players
-          .player
-          .player
-          .player
-          .player
-          .player
-          .player
-          .player
-          .player
-          .player
-          .player
-          .player
-          .player
-          .player
-          .player
-          .player
-      .sidebar
-        .me
-        .candidates
-          .candidate
-            .profile
-            .votes
-              .vote
-              .vote
-              .vote
-              .vote
-              .vote
-              .vote
-              .vote
-              .vote
-          .candidate
-            .profile
-            .votes
-              .vote
-              .vote
-              .vote
-              .vote
-              .vote
-          .candidate
-            .profile
-            .votes
-              .vote
-              .vote
+    #game.game
 
   if env === 'production'
     script(src='/js/app.min.js')

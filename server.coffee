@@ -36,6 +36,7 @@ App.addInitializer (opts) ->
   @use express.compress()
   @use new express.static(__dirname + "/build")
   @use new express.static(__dirname + "/bower_components/bootstrap/dist")
+  @use new express.static(__dirname + "/assets")
   @trigger 'middleware', opts
 
 # Set up express routes.
@@ -44,7 +45,7 @@ App.addInitializer (opts) ->
 
   # Wildcard default route.
   @get "/*", (req, res, next) =>
-    res.render "intro",
+    res.render "layout",
       host: opts.host
       env: env
   @trigger 'routes', opts
