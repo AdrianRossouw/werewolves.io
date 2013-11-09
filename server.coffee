@@ -6,19 +6,6 @@ express = require("express")
 app     = express()
 server  = http.createServer(app)
 
-# set back to non-root permissions
-#
-# we run nginx in our environment since we need
-# https, and it complicates the app too much
-# to implement it directly.
-
-# if run as root, downgrade to the owner of this file
-if process.getuid() is 0
-  stats = fs.statSync __filename
-  process.setuid stats.uid
-  process.setgid stats.gid
-  process.initgroups(stats.uid, stats.gid)
-
 
 
 # figure out config for the current environment
@@ -47,4 +34,20 @@ app.get "/*", (req, res, next) ->
         env: env
 
 app.listen conf.port, (err) ->
-   console.log "Server running at http://#{conf.host}:#{conf.port}/"
+  console.log "Server running at http://#{conf.host}:#{conf.port}/"
+
+  # set back to non-root permissions
+  #
+  # we run nginx in our environment since we need
+  # https, and it complicates the app too much
+  # to implement it directly.
+
+  # if run as root, downgrade to the owner of this file
+  if process.getuid() is 0
+    fs.stat __filename, (err) ->
+      process.exit 1 if err
+      console.log(stats)
+      process.initgroups(stats.uid, stats.gid)
+      process.setuid stats.uid
+      process.setgid stats.gid
+
