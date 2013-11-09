@@ -1,5 +1,5 @@
 # Server side state
-App    = require('./App.coffee')
+App    = require('./app.coffee')
 State  = require('./state.coffee')
 Models = require('./models.coffee')
 
@@ -15,12 +15,12 @@ RedisStore   = require('connect-redis')(express)
 State.sessionStore = new RedisStore
 
 State.initMiddleware = (opts) ->
-  App.use opts.secret
-  App.use = new express.cookieParser(opts.secret)
-  App.use new express.session
+  @use opts.secret
+  @use = new express.cookieParser(opts.secret)
+  @use new express.session
     store: State.sessionStore
     secret:opts.secret
 
-App.on 'middleware', State.initMiddleware, State
+App.on 'middleware', State.initMiddleware, App
 
 module.exports = State
