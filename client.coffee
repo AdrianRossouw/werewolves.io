@@ -12,8 +12,12 @@ Backbone.$    = Marionette.$ = require("jquery")
 
 App.addInitializer (opts) ->
   # Initialize the main content regions on the page.
+  ###
   @addRegions
-     mainRegion: "#main-region"
+   statusRegion: "#status"
+   mainRegion: "#main"
+   sidebarRegion: "#sidebar"
+  ###
 
 
 # Load up the state instances
@@ -27,8 +31,14 @@ App.addInitializer (opts) ->
 
 
 App.on 'state', (opts) ->
-  @mainRegion.show new Views.Sidebar
-     model: State.player
+  @addRegions
+    game: '#game'
+
+  @gameView = new Views.Game el: $('#game')
+  @gameView.render()
+
+  #@gameLayout.contenders.show @contenders
+
 
 
 
