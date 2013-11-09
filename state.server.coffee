@@ -3,51 +3,19 @@ App    = require('./app.coffee')
 State  = require('./state.coffee')
 Models = require('./models.coffee')
 
-#todo: load/save to redis.
-#todo: keep track of sessions.
-
-
-
-State.addInitializer (opts) ->
-  @world = new Models.World()
-  @world.game = new Models.Game()
-  @world.sessions = new Models.Sessions()
-  
-
 # generates useful 'random' values
 Nonsense     = require('Nonsense')
 ns           = new Nonsense()
 
 
-# handle a request (from wherever) for a specific
-# connect session id.
-#
-# Create sessions record if it doesn't exist,
-# and merge changes if it does.
-State.refreshSession = (sessionId) ->
-  session = @world.sessions.findWhere
-    session: sessionId
+#todo: load/save to redis.
+#todo: keep track of sessions.
 
-  session ?=
-    session: sessionId
-    id: ns.uuid()
-    name: ns.name()
+fixture = require('./test/fixture/game1.coffee')
 
-  @world.sessions.add session,
-    merge: true
-
-# handle a request (from wherever) for a specific
-# connect session id.
-#
-# Create sessions record if it doesn't exist,
-# and merge changes if it does.
-State.refreshSocket = (sessionId, socketId) ->
-  session = @refreshSession(sessionId)
-
-  if socketId not in session.sockets
-    session.sockets.push(sockets)
-
-  return session
+State.addInitializer (opts) ->
+  State.load(fixture)
+  @trigger 'load', opts, @
 
 # Session middleware
 express              = require('express')
@@ -58,11 +26,11 @@ State.initMiddleware = (opts) ->
   @use new express.cookieParser(opts.secret)
   @use new express.session
     store: State.sessionStore
-    secret:opts.secret
+    secret: opts.secret
 
   # Register with the sessions collection
   @use (req, res, next) ->
-    State.refreshSession req.session.id if req.session
+    State.world.sessions.refreshSession req.session.id if req.session
     next()
 
 

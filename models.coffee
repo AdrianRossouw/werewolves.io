@@ -7,11 +7,25 @@ Backbone = require('backbone')
 state = require('state')
 Models = App.module "Models"
 
+# generates useful 'random' values
+Nonsense     = require('Nonsense')
+ns           = new Nonsense()
+
+
 # Create model attribute getter/setter property.
 # From : http://srackham.wordpress.com/2011/10/16/getters-and-setters-for-backbone-model-attributes/
 class BaseModel extends Backbone.Model
-  @attribute = (attr) ->
+  _attributes: []
 
+  initialize: (attrs = {}, options = {}) ->
+    @initAttribute attr, val for val, attr in attrs
+    
+  initAttribute: (attr, value) ->
+    @set(attr, value)
+
+  @attribute = (attr) ->
+    @_attributes ?= []
+    @_attributes.push attr
     Object.defineProperty @prototype, attr,
       get: -> @get attr
       set: (value) ->
@@ -36,9 +50,21 @@ class Models.Session extends BaseModel
       sip: state
       voice: state
 
-
 class Models.Sessions extends Backbone.Collection
   model: Models.Session
+  refreshSession: (sessionId) ->
+    model = @findWhere session: sessionId
+    model ?= id: ns.uuid(), name: ns.name()
+    model = @add model, merge: true
+    model.session = sessionId
+    return model
+
+  refreshSocket: (sessionId, socketId) ->
+    model = @refreshSession(sessionId)
+    model.sockets ?= []
+    if socketId not in model.sockets
+      model.sockets.push(socketId)
+    return model
 
 # A player who has joined an active or upcoming
 # game.

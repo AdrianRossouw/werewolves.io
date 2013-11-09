@@ -11,15 +11,20 @@ server     = http.createServer(_express)
 App.server = server
 _.defaults App, _express
 
-
 # Load up the state instances
+State = require('./state.server.coffee')
 App.addInitializer (opts) ->
-  State = require('./state.server.coffee')
   @trigger 'before:state', opts
+
   # We initialize this separately because
   # we don't want it to run just when included
+
   State.start(opts)
   @trigger 'state', opts
+
+# Load up the web sockets
+Socket = require('./socket.server.coffee')
+
 
 # Set up express with some default things.
 App.addInitializer (opts) ->

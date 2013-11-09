@@ -2,6 +2,7 @@
 # This gets processed with browserify to find straggling dependencies.
 App = require('./app.coffee')
 Views = require('./views.coffee')
+
 window.App = App
 
 # Anchor libraries.
@@ -9,15 +10,17 @@ window.App = App
 Backbone      = require("backbone")
 Marionette    = require("backbone.marionette")
 Backbone.$    = Marionette.$ = require("jquery")
+_             = require('underscore')
 
+
+###
 App.addInitializer (opts) ->
   # Initialize the main content regions on the page.
-  ###
   @addRegions
    statusRegion: "#status"
    mainRegion: "#main"
    sidebarRegion: "#sidebar"
-  ###
+###
 
 
 # Load up the state instances
@@ -27,10 +30,16 @@ App.addInitializer (opts) ->
   # We initialize this separately because
   # we don't want it to run just when included
   State.start(opts)
-  @trigger 'state', opts
 
 
-App.on 'state', (opts) ->
+
+# Load up the state instances
+Socket = require('./socket.client.coffee')
+App.addInitializer (opts) ->
+  @trigger 'before:socket', opts
+  Socket.start(opts)
+
+loader = (opts) ->
   @addRegions
     game: '#game'
 
@@ -38,9 +47,15 @@ App.on 'state', (opts) ->
   @gameView.render()
 
   #@gameLayout.contenders.show @contenders
+ 
+State.on 'load', loader, App
 
+# figure out config for the current environment
+_conf = require('./config.client.coffee')
+conf    = {}
+env     = process.env.NODE_ENV
+env    ?= 'development'
 
+_.defaults conf, _conf[env], _conf.defaults
 
-
-conf = require('./config.client.coffee')
 App.start(conf)

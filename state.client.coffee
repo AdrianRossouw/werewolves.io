@@ -9,54 +9,16 @@ Models = require('./models.coffee')
 # TODO: set the world state based on a dump given to us
 # TODO: provide mechanisms to apply partial state updates
 
-App.addInitializer (opts) ->
-  @world = new Models.World()
-  @world.game = new Models.Game
-    state: 'day'
-    round: 1
-    phaseTime: 300000
-    players: new Models.Players()
-    startTime: Date.now - 650000
+State.load = (data) ->
+   
+  @world ?= new Models.World()
+  @world.sessions ?= new Models.Sessions()
+  @world.game = new Models.Game data.startup
+  @world.game.players = new Models.Players data.startup.players
 
-  @world.game.players.add
-    name: 'Edward'
-    role: 'werewolf'
-    vote: 'Gaylord'
+  @player = @world.game.players.at(0)
+  @trigger 'load', data
 
-  @world.game.players.add
-     name: 'Gaylord'
-     role: 'seer'
-     vote: 'Edward'
-     seen: ['Colwyn']
-
-   @world.game.players.add
-     name: 'Arturo'
-     role: 'villager'
-     vote: 'Colwyn'
-
-   @world.game.players.add
-     name: 'Dafydd'
-     role: 'villager'
-     vote: 'Juniper'
-
-
-   @world.game.players.add
-     name: 'Florence'
-     role: 'villager'
-     vote: 'Colwyn'
-
-
-   @world.game.players.add
-     name: 'Juniper'
-     role: 'villager'
-     vote: 'Colwyn'
-
-
-   @world.game.players.add
-     name: 'Colwyn'
-     role: 'villager'
-     vote: 'Juniper'
-
-   @player = @world.game.players.at(0)
+  
 
 module.exports = State

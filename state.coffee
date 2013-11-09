@@ -8,11 +8,22 @@
 # from the interface.
 App      = require("./app.coffee")
 Backbone = require('backbone')
+Models   = require('./models.coffee')
 State    = App.module "State",
   startWithParent: false
 
 # Noop implementations of some methods.
-State.load = ->
+State.load = (data) ->
+  
+  @world ?= new Models.World()
+  @world.sessions ?= new Models.Sessions()
+  @world.game = new Models.Game data.startup
+  @world.game.players = new Models.Players data.startup.players
+
+  @trigger 'load', data
+
+  
+
 State.sync = ->
 
 module.exports = State

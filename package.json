@@ -58,7 +58,8 @@
     "markdown": "~0.5.0",
     "connect-redis": "~1.4.5",
     "Nonsense": "~0.1.2",
-    "state": "~0.2.0"
+    "state": "~0.2.0",
+    "session.socket.io": "~0.1.6"
   },
   "engines": {
     "node": "0.10.x"
