@@ -7,6 +7,18 @@ Backbone = require('backbone')
 
 Models = App.module "Models"
 
+# Create model attribute getter/setter property.
+# From : http://srackham.wordpress.com/2011/10/16/getters-and-setters-for-backbone-model-attributes/
+class BaseModel extends Backbone.Model
+  @attribute = (attr) ->
+
+    Object.defineProperty @prototype, attr,
+      get: -> @get attr
+      set: (value) ->
+        attrs = {}
+        attrs[attr] = value
+        @set attrs
+
 # Singular representation of all the various
 # contact mechanisms available.
 #
@@ -15,38 +27,36 @@ Models = App.module "Models"
 #
 # Sessions might or might not be listening in to the
 # current game.
-class Models.Session extends Backbone.Model {}
+class Models.Session extends BaseModel
+  @attribute 'state'
 
 class Models.Sessions extends Backbone.Collection
   model: Models.Session
 
 # A player who has joined an active or upcoming
 # game.
-class Models.Player extends Models.Session
-  defaults:
-    session: null
-    role: null
-    state: null
-    vote: null
+class Models.Player extends BaseModel
+  @attribute 'session'
+  @attribute 'role'
+  @attribute 'vote'
+  @attribute 'state'
 
 class Models.Players extends Models.Sessions
   model: Models.Player
 
 # A game that is running or will be starting.
-class Models.Game extends Backbone.Model
-  defaults:
-    players: new Models.Players()
-    startTime: null
-    round: 0
-    phaseTime: 0
-    state: null
+class Models.Game extends BaseModel
+  @attribute 'players'
+  @attribute 'startTime'
+  @attribute 'round'
+  @attribute 'phaseTime'
+  @attribute 'state'
 
 # The world acts as the container for the other
 # pieces of state.
-class Models.World extends Backbone.Model
-  defaults:
-    game: null
-    state: null
-    sessions: new Models.Sessions()
+class Models.World extends BaseModel
+  @attribute 'game'
+  @attribute 'state'
+  @attribute 'sessions'
 
 module.exports = Models
