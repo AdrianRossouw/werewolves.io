@@ -29,25 +29,26 @@ app.use new express.static(__dirname + "/build")
 app.use new express.static(__dirname + "/bower_components/bootstrap/dist")
 
 app.get "/*", (req, res, next) ->
-    res.render "intro",
-        host: conf.host
-        env: env
+  res.render "intro",
+    host: conf.host
+    env: env
 
 app.listen conf.port, (err) ->
   console.log "Server running at http://#{conf.host}:#{conf.port}/"
+  if err
+    console.error err
+    process.exit -1
 
   # set back to non-root permissions
   #
   # we run nginx in our environment since we need
   # https, and it complicates the app too much
   # to implement it directly.
-
+ 
   # if run as root, downgrade to the owner of this file
   if process.getuid() is 0
     fs.stat __filename, (err, stats) ->
-      process.exit 1 if err
-      console.log(stats)
-      process.initgroups(stats.uid, stats.gid)
+      return console.error(err)  if err
       process.setuid stats.uid
-      process.setgid stats.gid
-
+      #process.setgid stats.gid
+      #process.initgroups(stats.uid, stats.gid)
