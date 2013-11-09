@@ -15,6 +15,7 @@ App.addInitializer (opts) ->
     state: 'day'
     round: 1
     phaseTime: 300000
+    players: new Models.Players()
     startTime: Date.now - 650000
 
   @world.game.players.add
@@ -55,5 +56,7 @@ App.addInitializer (opts) ->
      name: 'Colwyn'
      role: 'villager'
      vote: 'Juniper'
+
+   @player = @world.game.players.at(0)
 
 module.exports = State
