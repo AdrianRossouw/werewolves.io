@@ -11,4 +11,4 @@ module.exports =
   staging:
     hostname: "staging"
     protocol: 'https'
-    port: 80
+    port: null 
