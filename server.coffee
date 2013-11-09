@@ -12,8 +12,8 @@ _.defaults App, _express
 
 
 # Load up the state instances
-State = require('./state.server.coffee')
 App.addInitializer (opts) ->
+  State = require('./state.server.coffee')
   @trigger 'before:state', opts
   # We initialize this separately because
   # we don't want it to run just when included
@@ -70,6 +70,8 @@ App.addInitializer (opts) ->
 # we run nginx in our environment since we need
 # https, and it complicates the app too much
 # to implement it directly.
+fs = require('fs')
+
 downgradePerms = ->
   if process.getuid() is 0
     fs.stat __filename, (err, stats) ->

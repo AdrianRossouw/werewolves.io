@@ -15,8 +15,7 @@ RedisStore   = require('connect-redis')(express)
 State.sessionStore = new RedisStore
 
 State.initMiddleware = (opts) ->
-  @use opts.secret
-  @use = new express.cookieParser(opts.secret)
+  @use new express.cookieParser(opts.secret)
   @use new express.session
     store: State.sessionStore
     secret:opts.secret
