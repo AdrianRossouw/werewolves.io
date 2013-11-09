@@ -1,12 +1,11 @@
 # Base logic for the entire werewolves.io application stack
 #
-# This file is the entry point for all the shared log that the application uses.
+# This file is the entry point for all the shared code that the application uses.
 # Each of the entry points (server.coffee/client.coffee) start off by including
 # this file.
 #
 # It returns a backbone.marionette application object, that will be started separately
 # after all the code has been loaded.
-
 
 # All the dependencies used across the whole system
 Backbone   = require("backbone")

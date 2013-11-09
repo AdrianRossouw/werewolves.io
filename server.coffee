@@ -12,33 +12,55 @@ _.defaults App, _express
 
 # Set up express with some default things.
 App.addInitializer (opts) ->
+  @trigger 'before:settings', opts
   @set 'views', __dirname + '/views'
   @set "view engine", "jade"
+  @trigger 'settings', opts
 
 # Setup express middleware.
 App.addInitializer (opts) ->
+  # no-op, to get around express auto-mounting the
+  # router when the first verb is called.
+  @router
+  @trigger 'before:middleware', opts
   @use express.compress()
   @use new express.static(__dirname + "/build")
   @use new express.static(__dirname + "/bower_components/bootstrap/dist")
-
+  @trigger 'middleware', opts
 
 # Set up express routes.
 App.addInitializer (opts) ->
+  @trigger 'before:routes', opts
+
   # Wildcard default route.
   @get "/*", (req, res, next) =>
     res.render "intro",
       host: opts.host
       env: env
+  @trigger 'routes', opts
+
+  # mount the router middleware in a predicatable place.
+  @use @router
+
+# Load up the state instances
+State = require('./state.server.coffee')
+App.addInitializer (opts) ->
+  @trigger 'before:state', opts
+  # We initialize this separately because
+  # we don't want it to run just when included
+  State.start(opts)
+  @trigger 'state', opts
 
 # Start listening to the ports.
 App.addInitializer (opts) ->
+  @trigger 'before:listen', opts
   server.listen opts.port, (err) =>
     if err
       console.error err
       process.exit -1
 
     console.log "Server running at http://#{opts.host}:#{opts.port}/"
-    @trigger "listen"
+    @trigger "listen", opts
 
 # set back to non-root permissions
 #
