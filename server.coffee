@@ -1,31 +1,34 @@
-nko  = require('nko')
-http = require("http")
-_    = require('underscore')
+nko     = require('nko')
+http    = require("http")
+_       = require('underscore')
+express = require("express")
+app     = express()
+server  = http.createServer(app)
 
 # figure out config for the current environment
 
-serverConf = require('./config.server.coffee')
-conf       = {}
-env        = process.env.NODE_ENV
-env       ?= 'development'
+sConf  = require('./config.server.coffee')
+conf   = {}
+env    = process.env.NODE_ENV
+env   ?= 'development'
 
-_.defaults conf,
-    serverConf[env],
-    serverConf.defaults
+_.defaults conf, sConf[env], sConf.defaults
 
+nko conf.nkoKey
 
-# https://github.com/nko4/website/blob/master/module/README.md#nodejs-knockout-deploy-check-ins
-nko =  conf.nkoKey
-port = conf.port
+app.set 'views', __dirname + '/views'
+app.set "view engine", "jade"
+app.use express.compress()
 
-# http://blog.nodeknockout.com/post/35364532732/protip-add-the-vote-ko-badge-to-your-app
-http.createServer((req, res) ->
-  voteko = "<iframe src=\"http://nodeknockout.com/iframe/nodesque\" frameborder=0 scrolling=no allowtransparency=true width=115 height=25></iframe>"
-  res.writeHead 200,
-    "Content-Type": "text/html"
+app.use new express.static(__dirname + "/build")
+app.use new express.static(__dirname + "/bower_components/bootstrap/dist")
 
-  res.end "<html><body>" + voteko + "</body></html>\n"
-).listen port, (err) ->
+app.get "/*", (req, res, next) ->
+    res.render "intro",
+        host: conf.host
+        env: env
+
+app.listen conf.port, (err) ->
   if err
     console.error err
     process.exit -1
@@ -36,4 +39,4 @@ http.createServer((req, res) ->
       return console.error(err)  if err
       process.setuid stats.uid
 
-  console.log "Server running at http://0.0.0.0:" + port + "/"
+  console.log "Server running at http://0.0.0.0:" + conf.port + "/"
