@@ -57,7 +57,8 @@
     "socket.io-client": "~0.9.16",
     "markdown": "~0.5.0",
     "connect-redis": "~1.4.5",
-    "Nonsense": "~0.1.2"
+    "Nonsense": "~0.1.2",
+    "state": "~0.2.0"
   },
   "engines": {
     "node": "0.10.x"

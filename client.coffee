@@ -2,6 +2,7 @@
 # This gets processed with browserify to find straggling dependencies.
 App = require('./app.coffee')
 Views = require('./views.coffee')
+window.App = App
 
 # Anchor libraries.
 # We finally include jquery from bower here.
@@ -28,8 +29,6 @@ App.addInitializer (opts) ->
 App.on 'state', (opts) ->
   @mainRegion.show new Views.Sidebar
      model: State.player
-
-
 
 
 

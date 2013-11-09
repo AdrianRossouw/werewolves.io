@@ -4,7 +4,7 @@
 # by the front-end and/or backend.
 App = require('./app.coffee')
 Backbone = require('backbone')
-
+state = require('state')
 Models = App.module "Models"
 
 # Create model attribute getter/setter property.
@@ -19,6 +19,7 @@ class BaseModel extends Backbone.Model
         attrs[attr] = value
         @set attrs
 
+
 # Singular representation of all the various
 # contact mechanisms available.
 #
@@ -28,7 +29,13 @@ class BaseModel extends Backbone.Model
 # Sessions might or might not be listening in to the
 # current game.
 class Models.Session extends BaseModel
-  @attribute 'state'
+  state s = @::,
+    offline: state 'initial'
+    online: state
+      socket: state
+      sip: state
+      voice: state
+
 
 class Models.Sessions extends Backbone.Collection
   model: Models.Session
@@ -39,7 +46,16 @@ class Models.Player extends BaseModel
   @attribute 'session'
   @attribute 'role'
   @attribute 'vote'
-  @attribute 'state'
+  state s = @::,
+    lobby: state, 'initial'
+    spectacting: state
+    dead: state
+    alive: state
+      lynching: state
+      seeing: state
+      eating: state
+      sleeping: state
+        
 
 class Models.Players extends Models.Sessions
   model: Models.Player
@@ -48,15 +64,25 @@ class Models.Players extends Models.Sessions
 class Models.Game extends BaseModel
   @attribute 'players'
   @attribute 'startTime'
-  @attribute 'round'
+  @attribute 'rounds'
   @attribute 'phaseTime'
-  @attribute 'state'
+  state s = @::,
+    recruit: state 'initial'
+    begin: state
+    day: state
+    night: state
+    victory: state
+      wolves: state
+      villagers: state
+    cleanup: state 'final'
 
 # The world acts as the container for the other
 # pieces of state.
 class Models.World extends BaseModel
   @attribute 'game'
-  @attribute 'state'
   @attribute 'sessions'
+  state s = @::,
+    attract: state 'initial'
+    gameplay: state
 
 module.exports = Models
