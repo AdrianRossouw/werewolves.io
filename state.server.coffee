@@ -25,7 +25,7 @@ ns           = new Nonsense()
 # Create sessions record if it doesn't exist,
 # and merge changes if it does.
 State.refreshSession = (sessionId) ->
-  session = @callers.findWhere
+  session = @world.sessions.findWhere
     session: sessionId
 
   session ?=
@@ -51,13 +51,10 @@ State.initMiddleware = (opts) ->
   # Register with the sessions collection
   @use (req, res, next) ->
     State.refreshSession req.session.id if req.session
+    next()
 
 
 App.on 'middleware', State.initMiddleware, App
-
-
-
-
 
 
 module.exports = State
