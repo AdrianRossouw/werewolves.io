@@ -1,0 +1,27 @@
+{
+  "name": "werewolves.io",
+  "version": "0.0.1",
+  "homepage": "nodesque.2013.nodeknockout.com",
+  "authors": [
+    "Nodesque <nodesque@daemon.co.za>"
+  ],
+  "description": "werewolves over webrtc",
+  "keywords": [
+    "werewolves",
+    "webrtc",
+    "socket.io"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.0.2",
+    "jquery": "~2.0.3"
+  }
+}

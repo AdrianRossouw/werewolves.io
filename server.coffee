@@ -1,8 +1,22 @@
-# https://github.com/nko4/website/blob/master/module/README.md#nodejs-knockout-deploy-check-ins
-require("nko") "XttLxcKtsOS2vf3i"
-isProduction = (process.env.NODE_ENV is "production")
+nko  = require('nko')
 http = require("http")
-port = ((if isProduction then 80 else 8000))
+_    = require('underscore')
+
+# figure out config for the current environment
+
+serverConf = require('./config.server.coffee')
+conf       = {}
+env        = process.env.NODE_ENV
+env       ?= 'development'
+
+_.defaults conf,
+    serverConf[env],
+    serverConf.defaults
+
+
+# https://github.com/nko4/website/blob/master/module/README.md#nodejs-knockout-deploy-check-ins
+nko =  conf.nkoKey
+port = conf.port
 
 # http://blog.nodeknockout.com/post/35364532732/protip-add-the-vote-ko-badge-to-your-app
 http.createServer((req, res) ->
