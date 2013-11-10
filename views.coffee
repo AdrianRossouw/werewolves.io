@@ -32,7 +32,7 @@ class Views.Game extends Backbone.Marionette.ItemView
     round: "#round"
 
   onRender: ->
-    console.clear()
+    #console.clear()
     players = State.world.game.players
     for player, i in players.models
       player.set 'number', i+1
