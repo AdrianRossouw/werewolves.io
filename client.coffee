@@ -30,7 +30,6 @@ mySound = new buzz.sound( "assets/audio/Introduction", {
 })
 
 mySound.play()
-    .fadeIn()
     .unloop()
       
 ###
