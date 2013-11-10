@@ -24,7 +24,6 @@ State.load = (data) ->
 
   @trigger 'load', data
 
-  
 
 State.sync = ->
 
