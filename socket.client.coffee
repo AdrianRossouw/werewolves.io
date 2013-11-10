@@ -27,6 +27,12 @@ registerHandlers = (opts) ->
   @io.on 'round:action', (data) =>
     @round.choose data.id, data.action, data.target
 
+  State.world.game.on 'game:join', ->
+    @io.emit 'game:join'
+
+  @io.on 'player:add', (player) ->
+    State.world.game.players.add player
+
 State.on 'load', registerHandlers, Socket
 
 Socket.addInitializer (opts) ->

@@ -25,19 +25,27 @@ sessionInit = (opts) ->
 App.on "listen", sessionInit, Socket
 
 onConnection = (socket, session) ->
-  State.world.sessions.refreshSession session.id
-  State.world.sessions.refreshSocket socket.id
+  model = State.world.sessions.refreshSocket socket.id
  
   obj = State.world.toJSON()
+  obj.playerId = model.id
 
-  socket.emit('world:state', _(obj).pick 'game')
-
-  listener = (data) ->
-    round S
+  socket.emit('world:state', _(obj).pick 'game', 'playerId')
 
   socket.on 'disconnect', =>
 
     @trigger 'disconnect', socket, session
+
+joinGame = (socket, session) ->
+  model = State.world.sessions.findBySocketId(socket)
+  listener = ->
+    State.world.game.players.add id:model.id
+
+  socket.on 'game:join', listener
+  socket.on 'disconnect', =>
+    socket.removeListener 'game:join', listener
+
+  addPlayer = (model) -> socket.emit 'player:add', model
 
 
 roundListener = (socket, session) ->
@@ -55,7 +63,6 @@ roundListener = (socket, session) ->
     @listenTo @round.actions, 'add', publishAction
     @listenTo @round.actions, 'change', publishAction
 
-
   @listenTo State.world.game.rounds, 'add', subscribeActions
   subscribeActions State.world.game.rounds.last()
 
@@ -67,6 +74,7 @@ roundListener = (socket, session) ->
     socket.removeListener 'round:action', publishAction
 
 Socket.on "connection", onConnection, Socket
+Socket.on "connection", joinGame, Socket
 Socket.on "connection", roundListener, Socket
 
 module.exports = Socket
