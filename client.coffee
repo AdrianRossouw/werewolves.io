@@ -22,7 +22,7 @@ Backbone.$    = Marionette.$ = require("jquery")
 
 buzz = require('buzz')
 
-if env is not 'development'
+if env != 'development'
   require('./voice.client.coffee')
   mySound = new buzz.sound( "/assets/howling", {
       formats: [ "ogg", "mp3"]
