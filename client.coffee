@@ -20,17 +20,16 @@ Backbone      = require("backbone")
 Marionette    = require("backbone.marionette")
 Backbone.$    = Marionette.$ = require("jquery")
 
-if env is not 'development'
-  require('./voice.client.coffee')
-  buzz = require('buzz')
+require('./voice.client.coffee')
+buzz = require('buzz')
 
-  mySound = new buzz.sound( "/howling", {
-      formats: [ "ogg" ]
-  })
+mySound = new buzz.sound( "/howling", {
+    formats: [ "ogg" ]
+})
 
-  mySound.play()
-      .fadeIn()
-      .unloop()
+mySound.play()
+    .fadeIn()
+    .unloop()
       
 ###
 App.addInitializer (opts) ->
