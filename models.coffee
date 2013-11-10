@@ -4,6 +4,7 @@
 # by the front-end and/or backend.
 App = require('./app.coffee')
 Backbone = require('backbone')
+_ = require('underscore')
 state = require('state')
 Models = App.module "Models"
 
@@ -90,9 +91,32 @@ class Models.Player extends BaseModel
       eating: state
       sleeping: state
 
+getRoles = (numPlayers) ->
+  #werewolf, seer, villager
+  # rules:
+  # < 12: 2
+  # < 18: 3
+  # 18: 4
+
+  roles = ['seer', 'werewolf', 'werewolf']
+  if numPlayers > 11
+    roles.push 'werewolf'
+  if numPlayers > 17
+    roles.push 'werewolf'
+
+  while roles.length < numPlayers
+    roles.push 'villager'
+
+  roles = _.shuffle roles
+  roles
 
 class Models.Players extends Models.Sessions
   model: Models.Player
+
+  assignRoles: ->
+    roles = getRoles(@length)
+    @each (player) ->
+      player.set('role', roles.shift())
 
 # A game that is running or will be starting.
 class Models.Game extends BaseModel
