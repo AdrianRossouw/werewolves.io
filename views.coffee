@@ -29,7 +29,8 @@ class Views.Game extends Backbone.Marionette.ItemView
   ui:
     players: "#players"
     player: "#player"
-    round: "#round"
+    sidebar: "#sidebar"
+    #round: "#round"
 
   onRender: ->
     #console.clear()
@@ -66,8 +67,9 @@ class Views.Game extends Backbone.Marionette.ItemView
   syncRoundView: (a, b, c)->
     contestants = getContestants(@players, @round)
     @roundView.close() if @roundView
-    @roundView = new Views.Round collection: contestants, el: @ui.round
+    @roundView = new Views.Round collection: contestants
     @roundView.render()
+    @ui.sidebar.append @roundView.el
 
 class Views.Status extends Backbone.Marionette.ItemView
   render: -> this
@@ -130,11 +132,6 @@ class Views.Round extends Backbone.Marionette.CollectionView
   buildItemView: (item, ItemView) ->
     view = new Views.Contestant model: item, collection: item.votes
     view
-
-  remove: ->
-    # HACK: close() automatically calls remove(). I want to reuse the same div
-    # so the replacement gets added to the same place.
-    @$el.html ''
 
 # also: GameLog
 
