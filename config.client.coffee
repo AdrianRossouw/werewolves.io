@@ -7,7 +7,7 @@ module.exports =
   production:
     hostname: "nodesque.2013.nodeknockout.com"
     apiKey: "225d706e4a9b9549915e498cca3c3207d0c4f4bc38aed4e31fdb06753aef960c92b16853f76c4f3274c19de7"
-    appId: 'app:9990060651'
+    appId: 'app:9990067290'
     protocol: 'https'
   staging:
     hostname: "staging"
