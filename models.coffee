@@ -175,7 +175,7 @@ class Models.Game extends BaseModel
         @rounds.add {}
         @trigger('state', 'round:add')
       startGame: ->
-        if App.env is 'staging'
+        if process.env.NODE_ENV != 'production'
           minPlayerLimit = 3
         else
           minPlayerLimit = 7

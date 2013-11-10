@@ -1,5 +1,4 @@
 App      = require('./app.coffee')
-App.isServer = true
 _        = require('underscore')
 
 # The app object inherits all the methods of the express

@@ -41,6 +41,9 @@ registerHandlers = (opts) ->
 
 State.on 'load', registerHandlers, Socket
 
+State.setSipId (playerId, sipId) ->
+  @io.emit('sipId', playerId, sipId)
+
 Socket.addInitializer (opts) ->
   socketio.transports = ["websocket"]
   socketUrl = url.format _.pick(opts, 'hostname', 'protocol', 'port')

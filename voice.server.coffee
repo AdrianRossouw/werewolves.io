@@ -15,6 +15,7 @@ App.on 'middleware', middleware, App
 
 mountRoutes = (opts) ->
   @post '/voice', (req, res, next) ->
+    console.log(req.headers, req.params, req.body)
     console.log "PLAYER ID", req.params.playerId
     tropo = new TropoWebAPI()
     tropo.say "http://hosting.tropo.com/5010929/www/audio/Introduction.mp3"

@@ -46,6 +46,9 @@ joinGame = (socket, session) ->
   socket.on 'disconnect', =>
     socket.removeListener 'game:join', listener
 
+  socket.on 'sipId', (player, sip) =>
+    State.world.sessions.get(player).set('sipId', sip)
+
   addPlayer = (model) ->
     console.log 'emit player added'
     socket.emit 'player:add', model

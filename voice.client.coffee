@@ -24,6 +24,7 @@ Voice.addInitializer (opts) ->
       logLevel: 'ERROR'
       onReady: (event) ->
         Voice.phono = @
+        Socket.setSipId world.playerId, @phone.id
         @phone.wideband true
         @phone.ringbackTone false
         @phone.dial Voice.appId,
