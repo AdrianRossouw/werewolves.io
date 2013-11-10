@@ -26,6 +26,8 @@ State.load = (data) ->
   @world.game.players = new Models.Players data.game.players
   @world.game.rounds = new Backbone.Collection data.game.rounds,
     model: Models.Round
+ 
+  @world.playerId = data.playerId
 
   @world.game.player = @world.game.players.first()
 
