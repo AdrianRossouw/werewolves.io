@@ -115,6 +115,7 @@ class Models.Player extends BaseModel
     super
     @set('name', ns.name()) unless @name
     @set('occupation', ns.jobTitle()) unless @occupation
+    @set('role', 'villager') unless @villager
     @set('timeAdded', Date.now())
 
   state s = @::,

@@ -2,6 +2,7 @@
 App    = require('./app.coffee')
 State  = require('./state.coffee')
 Models = require('./models.coffee')
+Backbone = require('backbone')
 
 # generates useful 'random' values
 Nonsense     = require('Nonsense')
@@ -14,7 +15,19 @@ ns           = new Nonsense()
 fixture = require('./test/fixture/game1.coffee')
 
 State.addInitializer (opts) ->
-  State.load(fixture)
+    
+  @world ?= new Models.World()
+  @world.sessions ?= new Models.Sessions()
+  @world.game = new Models.Game
+  @world.game.players = new Models.Players [{id: 'narrator'}]
+  @world.game.rounds = new Backbone.Collection [{}],
+    model: Models.Round
+
+  @trigger 'load', @world.toJSON()
+
+
+#
+  #State.load(fixture)
   @trigger 'load', opts, @
 
 # Session middleware
