@@ -39,7 +39,6 @@ App.addInitializer (opts) ->
   # router when the first verb is called.
   @router
   @trigger 'before:middleware', opts
-  @use express.logger()
   @use express.compress()
   @use new express.static(__dirname + "/build")
   @use new express.static(__dirname + "/bower_components/bootstrap/dist")

@@ -16,10 +16,10 @@ getContestants = (players, round) ->
    .value()
   contestants = new Backbone.Collection
   for grouper, votes of grouped
-    player = players.findWhere id: grouper
+    player = players.get grouper
     player.votes = new Backbone.Collection
     for vote in votes
-      player.votes.add players.findWhere id: vote.get('player')
+      player.votes.add players.get vote.id
     contestants.add player
   contestants
 
@@ -142,6 +142,13 @@ class Views.PlayerLog extends Backbone.Marionette.ItemView
   className: 'playerlog'
 
   template: require('./templates/playerlog.jade')
+
+  serializeData: ->
+    json =
+      player: @model
+      pages: pages
+
+    json
 
 
 module.exports = Views

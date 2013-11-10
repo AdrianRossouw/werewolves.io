@@ -4,6 +4,7 @@
 # by the front-end and/or backend.
 App = require('./app.coffee')
 Backbone = require('backbone')
+_ = require('underscore')
 state = require('state')
 Models = App.module "Models"
 
@@ -78,6 +79,7 @@ class Models.Player extends BaseModel
   initialize: ->
     super
     @set('id', ns.uuid()) unless @id
+    @set('name', ns.name()) unless @name
     @set('occupation', ns.jobTitle()) unless @occupation
 
   state s = @::,
@@ -90,9 +92,32 @@ class Models.Player extends BaseModel
       eating: state
       sleeping: state
 
+getRoles = (numPlayers) ->
+  #werewolf, seer, villager
+  # rules:
+  # < 12: 2
+  # < 18: 3
+  # 18: 4
+
+  roles = ['seer', 'werewolf', 'werewolf']
+  if numPlayers > 11
+    roles.push 'werewolf'
+  if numPlayers > 17
+    roles.push 'werewolf'
+
+  while roles.length < numPlayers
+    roles.push 'villager'
+
+  roles = _.shuffle roles
+  roles
 
 class Models.Players extends Models.Sessions
   model: Models.Player
+
+  assignRoles: ->
+    roles = getRoles(@length)
+    @each (player) ->
+      player.set('role', roles.shift())
 
 # A game that is running or will be starting.
 class Models.Game extends BaseModel
@@ -151,7 +176,6 @@ class Models.Game extends BaseModel
 
 
 class Models.Action extends BaseModel
-  @attribute 'user'
   @attribute 'action'
   @attribute 'target'
 
@@ -169,17 +193,19 @@ class Models.Round extends BaseModel
     obj.actions = @actions.toJSON()
     obj
 
-  choose: (me, actionName, target) ->
+  choose: (me, actionName, target, opts = {}) ->
     action = @actions.findWhere
-      user:me
+      id:me
       action:actionName
 
     action ?=
-      user:me
+      id:me
       action:actionName
       target:target
 
-    @actions.add action, merge: true
+    _.extend opts, merge: true
+
+    @actions.add action, opts
     
 
 class Models.Rounds extends Backbone.Collection

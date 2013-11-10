@@ -8,62 +8,8 @@ html
     else
       link(rel='stylesheet', href='/css/style.css')
   body
-    .lobby
-      .intro-wrap
-        .intro
-          .row
-            .cell.span2
-              h1 Will the villagers survive the night?
-              .nko
-                iframe(src='https://nodeknockout.com/iframe/nodesque',
-                  frameborder='0', scrolling='no',
-                  allowtransparency='true', width='115',
-                  height='25')
-            .cell
-              button.play-now Play Now
-              <p class="small">[ <a href="/" title="Watch (and listen) other people play" class="spectate">or watch the carnage</a> ]</p>
-          .row
-            .cell
-              h2 Were-what now?
-              p Based on the <a href="http://maxistentialism.com/werewolf/" title="Maxistentialism - Werewolves rules">party game</a> created by Andrew Plotkin for seven or more players, now available online. Play with friends anywhere in the world as if they’re next to you in the same village.
-            .cell
-              h2 Meet the team
-              p Created for the annual <a href="http://nodeknockout.com/teams/nodesque" title="Nodesque team page on Node Knockout">Node Knockout 2013</a> contest by <a href="http://daemon.co.za" title="Adrian's home page">Adrian Rossouw</a>, <a href="http://twitter.com/lerouxb" title="Le Roux's twitter stream">Le Roux Bodenstein</a>, <a href="http://twitter.com/fondleshark" title="Sean's twitter stream">Sean McDonald</a> and <a href="http://twitter.com/uberellis" title="Andr&eacute;'s twitter stream">Andr&eacute; Ellis</a>.
-            .cell
-              .logos
-                a.logo(href="http://socket.io/", title="Socket home page")
-                  img(src="/assets/logo_socket_io_ondark.svg", alt="Socket.IO logo")
-                a.logo(href="https://www.tropo.com/", title="Tropo home page")
-                  img(src="/assets/logo_tropo_ondark.svg", alt="Tropo logo")
-                a.logo(href="http://phono.com/", title="Phone home page")
-                  img(src="/assets/logo_phono_ondark.svg")
-              p Also using <a href="http://nodejs.org/" title="Node.js home page">Node.js</a>, <a href="http://browserify.org/" title="Browserify home page">Browserify</a>, <a href="http://gruntjs.com/" title="Grunt home page">Grunt</a>, <a href="http://backbonejs.org/" title="Backbone home page">Backbone</a>, <a href="marionettejs.com" title="Marionette home page">Marionette</a>, <a href="http://coffeescript.org/" title="CoffeeScript home page">CoffeeScript</a> and <a href="http://jade-lang.com/" title="Jade home page">Jade</a>.
 
-      .header
-        img(src='/assets/logo_night.svg')
-
-    .status-wrap
-      #status.status
-
-    #game.game
-
-    .footer
-      hr
-      .row
-        .cell.span2
-          img.our-logo(src="/assets/logo_werewolves_lowcontrast.svg")
-
-          p Based on the<a href="http://maxistentialism.com/werewolf/" title="Maxistentialism - Werewolves rules">party game</a> created by Andrew Plotkin for seven or more players, now available online. Play with friends anywhere in the world as if they’re next to you in the same village.
-
-        .cell
-          .logos
-            a.logo(href="http://socket.io/", title="Socket home page")
-              img(src="/assets/logo_socket_io_lowcontrast.svg", alt="Socket.IO logo")
-            a.logo(href="https://www.tropo.com/", title="Tropo home page")
-              img(src="/assets/logo_tropo_lowcontrast.svg", alt="Tropo logo")
-            a.logo(href="http://phono.com/", title="Phone home page")
-              img(src="/assets/logo_phono_lowcontrast.svg")
-          p Also using <a href="http://nodejs.org/" title="Node.js home page">Node.js</a>, <a href="http://browserify.org/" title="Browserify home page">Browserify</a>, <a href="http://gruntjs.com/" title="Grunt home page">Grunt</a>, <a href="http://backbonejs.org/" title="Backbone home page">Backbone</a>, <a href="marionettejs.com" title="Marionette home page">Marionette</a>, <a href="http://coffeescript.org/" title="CoffeeScript home page">CoffeeScript</a> and <a href="http://jade-lang.com/" title="Jade home page">Jade</a>.
+    include intro
 
   script.
     window.NODE_ENV = '#{env}'
@@ -75,4 +21,3 @@ html
     script(src='/js/templates.js')
     script(src='/js/client.js')
     script(src="//#{host}:35729/livereload.js")
-

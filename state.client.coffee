@@ -17,7 +17,6 @@ Models.Players::initialize = (data={}, opts={}) ->
   selectOne = new Backbone.Picky.SingleSelect @
   _.extend @, selectOne
 
-
 # TODO: set the world state based on a dump given to us
 # TODO: provide mechanisms to apply partial state updates
 
@@ -37,6 +36,5 @@ State.load = (data) ->
 
   @trigger 'load', data
 
-  
 
 module.exports = State
