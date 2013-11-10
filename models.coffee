@@ -17,6 +17,9 @@ ns           = new Nonsense()
 # From : http://srackham.wordpress.com/2011/10/16/getters-and-setters-for-backbone-model-attributes/
 class BaseModel extends Backbone.Model
   _attributes: []
+  toState: (state) ->
+    @state('-> %{state}')
+    @trigger 'state', state
 
   initialize: (attrs = {}, options = {}) ->
     @initAttribute attr, val for val, attr in attrs
