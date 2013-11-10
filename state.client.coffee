@@ -7,11 +7,21 @@ State = require('./state.coffee')
 Models = require('./models.coffee')
 Backbone = require('backbone')
 
+Picky = require('backbone.picky')
+
+Models.Player::initialize = (data={}, opts={}) ->
+  selectable = new Backbone.Picky.Selectable @
+  _.extend @, selectable
+
+Models.Players::initialize = (data={}, opts={}) ->
+  selectOne = new Backbone.Picky.SingleSelect @
+  _.extend @, selectOne
+
+
 # TODO: set the world state based on a dump given to us
 # TODO: provide mechanisms to apply partial state updates
 
 State.load = (data) ->
-  console.log(JSON.stringify(data, null, 2))
   @world ?= new Models.World()
   @world.game = new Models.Game data.game
   @world.game.players = new Models.Players data.game.players
