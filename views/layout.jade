@@ -7,17 +7,41 @@ html
     else
       link(rel='stylesheet', href='/css/style.css')
   body
-    .nko
-      iframe(src='https://nodeknockout.com/iframe/nodesque',
-        frameborder='0', scrolling='no',
-        allowtransparency='true', width='115',
-        height='25')
-
     .lobby
       .intro-wrap
         .intro
-          h1 Were-what now?
-          | Based on the party game created by Andrew Plotkin for seven or more players, now available online. Play with friends anywhere in the world as if they’re next to you in the same village.
+          .row
+            .cell.span2
+              h1 Will the villagers survive the night?
+              .nko
+                iframe(src='https://nodeknockout.com/iframe/nodesque',
+                  frameborder='0', scrolling='no',
+                  allowtransparency='true', width='115',
+                  height='25')
+            .cell
+              input(type="text", name="name", value="", placeholder="your name")
+              button.play-now Play Now
+              button.spectate [ or watch the carnage ]
+          .row
+            .cell
+              h2 Where-what now?
+              p Based on the <a href="">party game</a> created by Andrew Plotkin for seven or
+              more players, now available online. Play with friends anywhere in
+              the world as if they’re next to you in the same village.
+            .cell
+              h2 Meet the team
+              p Created for the annual <a href="">Node Knockout</a> contest by
+              <a href="">Adrian Rossouw</a>, <a href="">Le Roux Bodenstein</a>,
+              <a href="">Sean McDonald</a> and <a href="">André Ellis</a>.
+            .cell
+              a
+                img
+              a
+                img
+              a
+                img
+              p <a href="/">Node.js</a>, <a href="/">Browserify</a>, <a href="/">Grunt</a>, <a href="/">Backbone</a>, <a href="/">Marionette</a>, <a href="/">Coffeescript</a>, <a href="/">Jade</a>.
+
       img.header(src='/assets/logo_night.svg')
 
     .status-wrap
