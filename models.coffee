@@ -19,6 +19,9 @@ class BaseModel extends Backbone.Model
   _attributes: []
   toState: (state) ->
     @state('-> %{state}')
+    @triggerState state
+
+  triggerState: (state) ->
     @trigger 'state', state
 
   initialize: (attrs = {}, options = {}) ->
@@ -104,6 +107,9 @@ class Models.Player extends BaseModel
   @attribute 'role'
   @attribute 'living'
   @attribute 'occupation'
+
+  triggerState: (state) ->
+    @trigger @id, state, living
 
   initialize: ->
     super
