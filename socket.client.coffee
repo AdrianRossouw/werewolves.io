@@ -11,7 +11,6 @@ registerHandlers = (opts) ->
 
   publishAction = (model) ->
     action = _(model).pick 'id', 'action', 'target'
-    debugger
     @io.emit 'round:action', action
 
   subscribeActions = (newRound) =>

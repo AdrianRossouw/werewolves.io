@@ -175,10 +175,15 @@ class Models.Game extends BaseModel
         @rounds.add {}
         @trigger('state', 'round:add')
       startGame: ->
+        if App.env is 'staging'
+          minPlayerLimit = 3
+        else
+          minPlayerLimit = 7
+
         if App.isServer
           checkStart = ->
             thirtySecondsLast = _(players).max (m) -> (m.timeAdded - 20000)
-            waitMore = (@players.length > 7) and (thirtySecondsLast < Date.now())
+            waitMore = (@players.length >= minPlayerLimit) and (thirtySecondsLast < Date.now())
             if (not waitMore) or @players.length = 16
               @nextPhase()
 
