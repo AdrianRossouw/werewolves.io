@@ -143,5 +143,12 @@ class Views.PlayerLog extends Backbone.Marionette.ItemView
 
   template: require('./templates/playerlog.jade')
 
+  serializeData: ->
+    json =
+      player: @model
+      pages: pages
+
+    json
+
 
 module.exports = Views
