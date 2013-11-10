@@ -198,14 +198,15 @@ class Models.Round extends BaseModel
       id:me
       action:actionName
 
-    action ?=
-      id:me
-      action:actionName
-      target:target
+    if not action
+      action ?=
+        id:me
+        action:actionName
+        target:target
 
-    _.extend opts, merge: true
-
-    @actions.add action, opts
+      @actions.add action, opts
+    else
+      action.target = target
     
 
 class Models.Rounds extends Backbone.Collection
