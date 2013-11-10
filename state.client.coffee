@@ -37,6 +37,5 @@ State.load = (data) ->
 
   @trigger 'load', data
 
-  
 
 module.exports = State

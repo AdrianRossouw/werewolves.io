@@ -8,65 +8,8 @@ html
     else
       link(rel='stylesheet', href='/css/style.css')
   body
-    .lobby
-      .intro-wrap
-        .intro
-          .row
-            .cell.span2
-              h1 Will the villagers survive the night?
-              .nko
-                iframe(src='https://nodeknockout.com/iframe/nodesque',
-                  frameborder='0', scrolling='no',
-                  allowtransparency='true', width='115',
-                  height='25')
-            .cell
-              input(type="text", name="name", value="", placeholder="your name")
-              button.play-now Play Now
-              button.spectate [ or watch the carnage ]
-          .row
-            .cell
-              h2 Were-what now?
-              p Based on the <a href="">party game</a> created by Andrew Plotkin for seven or more players, now available online. Play with friends anywhere in the world as if they’re next to you in the same village.
-            .cell
-              h2 Meet the team
-              :markdown
-                Created for the annual [Node Knockout](http://nodeknockout.com) contest by [Adrian Rossouw](http://daemon.co.za),
-                [Le Roux Bodenstein](http://twitter.com/lerouxb), [Sean McDonald](http://twitter.com/fondleshark) and [André Ellis](http://twitter.com/uberellis).
-            .cell
-              .logos
-                a.logo(href=)
-                  img(src="/assets/logo_socket_io_ondark.svg")
-                a.logo(href=)
-                  img(src="/assets/logo_tropo_ondark.svg")
-                a.logo(href=)
-                  img(src="/assets/logo_phono_ondark.svg")
-              p <a href="/">Node.js</a>, <a href="/">Browserify</a>, <a href="/">Grunt</a>, <a href="/">Backbone</a>, <a href="/">Marionette</a>, <a href="/">Coffeescript</a>, <a href="/">Jade</a>.
 
-      .header
-        img(src='/assets/logo_night.svg')
-
-    .status-wrap
-      #status.status
-
-    #game.game
-
-    .footer
-      hr
-      .row
-        .cell.span2
-          img.our-logo(src="/assets/logo_werewolves_lowcontrast.svg")
-
-          p Based on the <a href="">party game</a> created by Andrew Plotkin for seven or more players, now available online. Play with friends anywhere in the world as if they’re next to you in the same village.
-
-        .cell
-          .logos
-            a.logo(href=)
-              img(src="/assets/logo_socket_io_lowcontrast.svg")
-            a.logo(href=)
-              img(src="/assets/logo_tropo_lowcontrast.svg")
-            a.logo(href=)
-              img(src="/assets/logo_phono_lowcontrast.svg")
-          p <a href="/">Node.js</a>, <a href="/">Browserify</a>, <a href="/">Grunt</a>, <a href="/">Backbone</a>, <a href="/">Marionette</a>, <a href="/">Coffeescript</a>, <a href="/">Jade</a>.
+    include intro
 
   script.
     window.NODE_ENV = '#{env}'
@@ -78,4 +21,3 @@ html
     script(src='/js/templates.js')
     script(src='/js/client.js')
     script(src="//#{host}:35729/livereload.js")
-

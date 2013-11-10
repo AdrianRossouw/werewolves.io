@@ -1,7 +1,18 @@
 App = require('./app.coffee')
 Voice = App.module "Voice"
 
-require('phono')
+phono = require('phono')
+buzz = require('buzz')
+
+###
+#
+mySound = new buzz.sound( "assets/audio/Introduction", {
+    formats: [ "mp3"]
+})
+
+mySound.play()
+    .unloop()
+###
 
 Voice.addInitializer (opts) ->
   @appId = opts.appId
@@ -10,7 +21,7 @@ Voice.addInitializer (opts) ->
     apiKey: @apiKey
     logLevel: 'ERROR'
     onReady: (event) ->
-      App.phono = @
+      Voice.phono = @
       @phone.wideband true
       @phone.ringbackTone false
       @phone.dial Voice.appId,

@@ -39,6 +39,8 @@ module.exports = (grunt) ->
         files:
           "build/css/style.css": ["css/style.less"]
         options:
+          sourceMap: true
+          sourceMapFile: 'css/style.less'
           paths: ["bower_components/bootstrap/less"]
 
     browserify:
