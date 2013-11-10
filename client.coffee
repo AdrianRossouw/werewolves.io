@@ -11,7 +11,7 @@ Backbone      = require("backbone")
 Marionette    = require("backbone.marionette")
 Backbone.$    = Marionette.$ = require("jquery")
 _             = require('underscore')
-
+buzz = require('buzz')
 
 ###
 App.addInitializer (opts) ->
@@ -35,9 +35,6 @@ App.addInitializer (opts) ->
 
 # Load up the state instances
 Socket = require('./socket.client.coffee')
-App.addInitializer (opts) ->
-  @trigger 'before:socket', opts
-  Socket.start(opts)
 
 loader = (opts) ->
   @addRegions
@@ -56,6 +53,6 @@ conf    = {}
 env     = window.NODE_ENV
 env    ?= 'development'
 
-_.defaults conf, _conf.defaults, _conf[env]
+_.defaults conf, _conf[env], _conf.defaults
 
 App.start(conf)
