@@ -1,8 +1,13 @@
 # Client-side entry point
 # This gets processed with browserify to find straggling dependencies.
 App = require('./app.coffee')
+Models = require('./models.coffee')
+
+
 Views = require('./views.coffee')
 _             = require('underscore')
+
+
 
 # figure out config for the current environment
 _conf = require('./config.client.coffee')

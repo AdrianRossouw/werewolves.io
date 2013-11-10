@@ -7,7 +7,7 @@ module.exports = (grunt) ->
     "socket.io-client", "underscore.deferred"
   ]
 
-  shim = ["jquery", "buzz", "phono"]
+  shim = ["jquery", "buzz", "phono", "backbone.picky"]
 
   vAlias = for pkg in _.difference(vPkg, shim)
     "#{pkg}:"
