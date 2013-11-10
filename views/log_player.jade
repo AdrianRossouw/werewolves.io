@@ -1,0 +1,26 @@
+h1.clearfix Player log
+
+.log.playerlog
+  .row.clearfix
+    .playerpic
+      .pic(class="color-1")
+        img(src="/assets/player_villager_default.svg")
+    .log-votedfor
+      .pic(class="color-2")
+        img(src="/assets/player_villager_default.svg", alt="Player name", width="60")
+      .votecount
+        p 4
+      .lynched
+        p
+          img(src="/assets/lynched.svg")
+    .log-votedby
+       p No votes
+       .votes
+
+  .row.clearfix
+    .wrapper.clearfix
+      .info
+        .name Some name
+        .occupation Some occupation
+      .pager
+        p.previous Previous Day 4 Next
