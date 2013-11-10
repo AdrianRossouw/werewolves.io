@@ -7,8 +7,8 @@ Views = App.module "Views"
 Models = App.module "Models"
 
 getContestants = (players, round) ->
-  #grouped = round.actions.groupBy('target')
   grouped = round.actions.chain()
+   .where(action: 'lynch')
    .groupBy('target')
    .map((val, key) -> [key, val])
    .sortBy((o) -> -o[1].length)
