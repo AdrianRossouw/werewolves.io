@@ -37,15 +37,19 @@ onConnection = (socket, session) ->
     @trigger 'disconnect', socket, session
 
 joinGame = (socket, session) ->
-  model = State.world.sessions.findBySocketId(socket)
-  listener = ->
-    State.world.game.players.add id:model.id
+
+  listener = (playerId) ->
+    State.world.game.players.add id: playerId
+    console.log 'added player'
 
   socket.on 'game:join', listener
   socket.on 'disconnect', =>
     socket.removeListener 'game:join', listener
 
-  addPlayer = (model) -> socket.emit 'player:add', model
+  addPlayer = (model) ->
+    console.log 'emit player added'
+    socket.emit 'player:add', model
+  State.world.game.players.on 'add', addPlayer
 
 
 roundListener = (socket, session) ->
