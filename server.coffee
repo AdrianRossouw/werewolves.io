@@ -43,7 +43,7 @@ App.addInitializer (opts) ->
   @use express.compress()
   @use new express.static(__dirname + "/build")
   @use new express.static(__dirname + "/bower_components/bootstrap/dist")
-  @use new express.static(__dirname + "/assets")
+  @use '/assets', new express.static(__dirname + "/assets")
   @trigger 'middleware', opts
 
 # Set up express routes.

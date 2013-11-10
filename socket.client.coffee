@@ -10,9 +10,11 @@ socketio            = require("socket.io-client")
 Socket.addInitializer (opts) ->
   socketio.transports = ["websocket"]
   socketUrl = url.format _.pick(opts, 'hostname', 'protocol', 'port')
- 
-  @io = socketio.connect(socketUrl)
 
+  if opts.protocol == 'https'
+    @io = socketio.connect(socketUrl, { secure: true })
+  else
+    @io = socketio.connect(socketUrl)
   @io.on 'world:state', (data) =>
     State.load data
   
