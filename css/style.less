@@ -210,13 +210,16 @@ video {
 
 .game {
   .flex-display(flex);
-  .align-items(flex-start);
+  .align-items(stretch);
   max-width: @maxWidth;
   margin: 0 auto;
   .box-sizing(border-box);
   padding: @maxWidthPadding;
   padding-bottom: 20px;
   .box-sizing(border-box);
+
+  min-height: 100vh;
+  .align-content(stretch);
 }
 
 .main {
@@ -256,6 +259,9 @@ video {
       padding: 10px;
       font-size: 14px;
     }
+    .occupation {
+      font-size: 13px;
+    }
   }
 }
 
@@ -267,12 +273,10 @@ video {
   padding-top: 20px;
 
   &.selected .card {
-    //box-shadow: 0 0 0 4px #000;
     background-color: #fc0;
   }
 
   .card {
-    //border-radius: 4px;
     background-color: #fff;
     padding: 10px;
     .clearfix();
@@ -288,11 +292,12 @@ video {
 
     .info {
       background-color: #e6e6e6;
-      //color: #333;
-      //border-radius: 4px;
       padding: 10px;
-      //font-size: 14px;
       text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .occupation {
+      font-size: 13px;
     }
   }
 }
@@ -329,6 +334,7 @@ strong {
   margin-top: 20px;
   .pic {
     width: 75px;
+    height: 80px;
     img {
       width: 100%;
     }
