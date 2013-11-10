@@ -2,6 +2,7 @@ App = require('./app.coffee')
 State = require('./state.server.coffee')
 express = require('express')
 
+_ = require('underscore')
 Socket = App.module "Socket"
 socketio     = require("socket.io")
 SessionIo    = require("session.socket.io")
@@ -30,7 +31,7 @@ onConnection = (socket, session) ->
  
   obj = State.world.toJSON()
 
-  socket.emit('world:state', {startup: obj.game})
+  socket.emit('world:state', _(obj).pick 'game')
 
 
 Socket.on "connection", onConnection, Socket

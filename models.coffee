@@ -143,6 +143,40 @@ class Models.Game extends BaseModel
         console.log "game started"
 
 
+class Models.Action extends BaseModel
+  @attribute 'user'
+  @attribute 'action'
+  @attribute 'target'
+
+class Models.Round extends BaseModel
+  @attribute 'death'
+  @attribute 'phase'
+  initialize: (data = {}, opts = {}) ->
+    @actions ?= new Backbone.Collection [],
+      model: Models.Action
+    data.actions ?= []
+    @actions.add data.actions
+
+  toJSON: ->
+    obj = super
+    obj.actions = @actions.toJSON()
+    obj
+
+  choose: (me, actionName, target) ->
+    action = @actions.findWhere
+      user:me
+      action:actionName
+
+    action ?=
+      user:me
+      action:actionName
+      target:target
+
+    @actions.add action, merge: true
+    
+
+class Models.Rounds extends Backbone.Collection
+
 # The world acts as the container for the other
 # pieces of state.
 class Models.World extends BaseModel

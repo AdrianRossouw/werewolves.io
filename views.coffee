@@ -18,13 +18,13 @@ class Views.Game extends Backbone.Marionette.ItemView
       player.set 'number', i+1
     others = State.world.game.players.filter (p) =>
       #p.get('name') != State.player.get('name')
-      p.name != State.player.name
+      p.name != State.world.game.player.name
     otherPlayers = new Backbone.Collection others
 
 
     @status = new Views.Status el: @ui.status
     @players = new Views.Players collection: otherPlayers, el: @ui.players
-    @player = new Views.Player model: State.player, el: @ui.player, me: true
+    @player = new Views.Player model: State.world.game.player, el: @ui.player, me: true
 
     @status.render()
     @players.render()

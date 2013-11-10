@@ -17,8 +17,10 @@ State.load = (data) ->
   
   @world ?= new Models.World()
   @world.sessions ?= new Models.Sessions()
-  @world.game = new Models.Game data.startup
-  @world.game.players = new Models.Players data.startup.players
+  @world.game = new Models.Game data
+  @world.game.players = new Models.Players data.players
+  @world.game.rounds = new Backbone.Collection data.rounds,
+    model: Models.Round
 
   @trigger 'load', data
 
