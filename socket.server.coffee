@@ -47,13 +47,17 @@ roundListener = (socket, session) ->
     action = _(model).pick 'id', 'action', 'target'
     socket.broadcast.emit 'round:action', action
 
-  @listenTo State.world.game.rounds, 'add', (newRound) =>
+  subscribeActions = (newRound) =>
     @stopListening @round.actions if @round
 
     @round = newRound
 
     @listenTo @round.actions, 'add', publishAction
     @listenTo @round.actions, 'change', publishAction
+
+
+  @listenTo State.world.game.rounds, 'add', subscribeActions
+  subscribeActions State.world.game.rounds.last()
 
   socket.on 'round:action', (data) =>
     @round.choose data.id, data.action, data.target,
