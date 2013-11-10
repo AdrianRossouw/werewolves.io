@@ -11,10 +11,9 @@ Voice.addInitializer (opts) ->
     logLevel: 'ERROR'
     onReady: (event) ->
       App.phono = @
-      @phone
-        .wideband true
-        .ringbackTone false
-        .dial Voice.appId,
+      @phone.wideband true
+      @phone.ringbackTone false
+      @phone.dial Voice.appId,
           volume: 100
           headset: false
 
