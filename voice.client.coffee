@@ -28,8 +28,7 @@ Voice.addInitializer (opts) ->
         @phone.ringbackTone false
         @phone.dial Voice.appId,
           volume: 100
-          headset: false
-          playerId: world.playerId
+
   State.on 'load', loader, Voice
 
 module.exports = Voice
