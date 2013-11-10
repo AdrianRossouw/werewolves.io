@@ -106,7 +106,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .row {
-  .clearfix();
+  overflow: hidden;
 }
 
 .row + .row {
@@ -127,7 +127,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .logos {
-  .clearfix();
+  overflow: hidden;
 }
 .logo {
   float: left;
@@ -210,13 +210,16 @@ video {
 
 .game {
   .flex-display(flex);
-  .align-items(flex-start);
+  .align-items(stretch);
   max-width: @maxWidth;
   margin: 0 auto;
   .box-sizing(border-box);
   padding: @maxWidthPadding;
   padding-bottom: 20px;
   .box-sizing(border-box);
+
+  min-height: 100vh;
+  .align-content(stretch);
 }
 
 .main {
@@ -230,7 +233,7 @@ video {
   padding: 20px;
 }
 .players {
-  .clearfix();
+  overflow: hidden;
 }
 .player {
   img {
@@ -256,6 +259,9 @@ video {
       padding: 10px;
       font-size: 14px;
     }
+    .occupation {
+      font-size: 13px;
+    }
   }
 }
 
@@ -267,15 +273,13 @@ video {
   padding-top: 20px;
 
   &.selected .card {
-    //box-shadow: 0 0 0 4px #000;
     background-color: #fc0;
   }
 
   .card {
-    //border-radius: 4px;
     background-color: #fff;
     padding: 10px;
-    .clearfix();
+    overflow: hidden;
     cursor: pointer;
     box-shadow: 0px 3px 8px #efefef;
     border: 1px solid #ccc;
@@ -288,11 +292,13 @@ video {
 
     .info {
       background-color: #e6e6e6;
-      //color: #333;
-      //border-radius: 4px;
       padding: 10px;
-      //font-size: 14px;
       text-overflow: ellipsis;
+      overflow: hidden;
+      font-size: 14px;
+    }
+    .occupation {
+      font-size: 13px;
     }
   }
 }
@@ -329,6 +335,7 @@ strong {
   margin-top: 20px;
   .pic {
     width: 75px;
+    height: 80px;
     img {
       width: 100%;
     }
@@ -336,7 +343,7 @@ strong {
 }
 .votes {
   .flex(1);
-  .clearfix();
+  overflow: hidden;
 }
 
 .vote {
