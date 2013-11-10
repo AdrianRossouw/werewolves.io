@@ -13,9 +13,10 @@ App.on 'middleware', middleware, App
 mountRoutes = (opts) ->
   @post '/voice', (req, res, next) ->
     tropo = new TropoWebAPI()
-#    tropo.say "http://hosting.tropo.com/completion.mp3"
-    tropo.say "welcome to werewolves dot io"
-    tropo.say "we aren't taking calls right now, but we will get back to you"
+    tropo.say "http://nodesque.2013.nodeknockout.com:8000/assets/audio/Introduction.mp3"
+    #tropo.say "welcome to werewolves dot io"
+
+    #tropo.say "we aren't taking calls right now, but we will get back to you"
     tropo.hangup
     res.send TropoJSON(tropo)
 

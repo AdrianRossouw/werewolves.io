@@ -24,15 +24,15 @@ buzz = require('buzz')
 
 if env != 'development'
   require('./voice.client.coffee')
-  mySound = new buzz.sound( "/assets/howling", {
-      formats: [ "ogg", "mp3"]
-  })
 
-  mySound.play()
-      .fadeIn()
-      .unloop()
-      
 ###
+mySound = new buzz.sound( "assets/audio/Introduction", {
+    formats: [ "mp3"]
+})
+
+mySound.play()
+    .unloop()
+      
 App.addInitializer (opts) ->
   # Initialize the main content regions on the page.
   @addRegions
