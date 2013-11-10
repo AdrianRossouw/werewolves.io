@@ -2,13 +2,13 @@ game =
   phaseTime: 300000
   startTime: 1384027686714
   players: [
-    { name: 'Edward', role: 'werewolf' }
-    { name: 'Gaylord', role: 'seer' }
-    { name: 'Arturo', role: 'villager' }
-    { name: 'Dafydd', role: 'villager' }
-    { name: 'Florence', role: 'villager' }
-    { name: 'Juniper', role: 'villager' }
-    { name: 'Colwyn', role: 'villager' }
+    { id: 'Edward', name: 'Edward', role: 'werewolf' }
+    { id: 'Gaylord', name: 'Gaylord', role: 'seer' }
+    { id: 'Arturo', name: 'Arturo', role: 'villager' }
+    { id: 'Dafydd', name: 'Dafydd', role: 'villager' }
+    { id: 'Florence', name: 'Florence', role: 'villager' }
+    { id: 'Juniper', name: 'Juniper', role: 'villager' }
+    { id: 'Colwyn', name: 'Colwyn', role: 'villager' }
   ]
   rounds: []
 
