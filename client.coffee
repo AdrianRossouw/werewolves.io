@@ -25,7 +25,7 @@ buzz = require('buzz')
 if env is not 'development'
   require('./voice.client.coffee')
   mySound = new buzz.sound( "/assets/howling", {
-      formats: [ "ogg" ]
+      formats: [ "ogg", "mp3"]
   })
 
   mySound.play()
