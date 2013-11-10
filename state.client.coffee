@@ -30,9 +30,11 @@ State.load = (data) ->
   @world.game.player = @world.game.players.at(0)
 
   @listenTo @world.game.players, 'select:one', (model) =>
+    id = @world.game.player.id
     round = @world.game.rounds.last()
-    console.log @world.game.player.id, 'lynch', model.id
-    round.choose @world.game.player.id, 'lynch', model.id
+    console.log id, model, arguments
+    round.choose id, 'lynch', model.id
+    console.log id, model
 
   @trigger 'load', data
 
