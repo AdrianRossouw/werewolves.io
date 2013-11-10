@@ -11,7 +11,6 @@ Socket.addInitializer (opts) ->
   socketio.transports = ["websocket"]
   socketUrl = url.format _.pick(opts, 'hostname', 'protocol', 'port')
  
-  alert(JSON.stringify(opts))
   @io = socketio.connect(socketUrl)
 
   @io.on 'world:state', (data) =>
