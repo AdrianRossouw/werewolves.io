@@ -34,6 +34,12 @@ registerHandlers = (opts) ->
   @io.on 'player:add', (player) =>
     State.world.game.players.add player
 
+  @io.on 'game:state', (state) ->
+    State.world.game.toState(state)
+
+  @io.on 'player:state', (id, state) ->
+    State.world.game.players.get(id).toState(state)
+
 State.on 'load', registerHandlers, Socket
 
 Socket.addInitializer (opts) ->

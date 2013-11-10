@@ -155,54 +155,76 @@ class Models.Game extends BaseModel
   @attribute 'rounds'
   @attribute 'phaseTime'
   state s = @::,
-
-
-
+    phaseAction: -> console.log('phase action')
+    wolvesWin: ->
+      wolves = @players.where role:'werewolf'
+      villagers = @players.filter (m) -> m.role is 'villager' or 'seer'
 
     recruit: state 'initial',
       nextPhase: ->
-        @trigger('state', 'night.first')
-        @state('-> night.first')
-
+        @trigger('state', 'round.night.first')
+        @state('-> round.night.first')
+      addRound: ->
+        @rounds.add {}
+        @trigger('state', 'round:add')
       startGame: ->
         if App.isServer
-          thirtySecondsLast = _(players).max (m) -> m.timeAdded
-          thirtySecondsLast += 30000
+          checkStart = ->
+            thirtySecondsLast = _(players).max (m) -> (m.timeAdded - 20000)
+            waitMore = (@players.length > 7) and (thirtySecondsLast < Date.now())
+            if (not waitMore) or @players.length = 16
+              @nextPhase()
 
-          if (@players.length > 7) and (thirtySecondsLast < Date.now())
-            @players.assignRoles()
-            @nextPhase()
+          _.debounce checkStart, 30000
           
       joinGame: ->  @trigger 'game:join'
+    round: state 'abstract',
+      night: state 'abstract',
+        first: state
+          nextPhase: ->
+            @state('-> round.day.first')
+            @trigger('state', 'round.day.first')
+        next: state
+          nextPhase: ->
+            @state('-> round.day.next')
+            @trigger('state', 'round.day.next')
 
-    night: state 'abstract',
-      first: state
-        nextPhase: ->
-          @state('-> day.first')
-          @trigger('state', 'day.first')
-      next: state
-        nextPhase: ->
-          @state('-> day.next')
-          @trigger('state', 'day.next')
-
-
-    day: state 'abstract',
-      first: state
-      next: state
-        nextPhase: () ->
-            @state('-> night.first')
+      day: state 'abstract',
+        first: state
+          nextPhase: () ->
+            @toState('round.night.next')
+        next: state
+          nextPhase: () ->
+            @state('-> round.night.first')
 
 
     victory: state 'abstract',
       wolves: state
       villagers: state
     cleanup: state 'final'
+    endRound:  ->
+        if App.isServer
+          checkRound = ->
+            thirtySecondsLast = _(players).max (m) -> m.timeCast
+            waitMore = (thirtySecondsLast < (Date.now() - 150000))
+            if (not waitMore)
+              @phaseAction()
+
+              if @wolvesWin()
+                @toState('victory.wolves')
+              else if @villagersWin()
+                @toState('victory.villagers')
+              else
+                @nextPhase()
+              
+          _.debounce checkRound, 152000
 
 
 
 class Models.Action extends BaseModel
   @attribute 'action'
   @attribute 'target'
+  @attribute 'timeCast'
 
 class Models.Round extends BaseModel
   @attribute 'death'
@@ -228,10 +250,14 @@ class Models.Round extends BaseModel
         id:me
         action:actionName
         target:target
+        timeCast: Date.now()
 
       @actions.add action, opts
     else
       action.target = target
+      action.timeCast= Date.now()
+
+    _.debounce State.world.game.endRound, 150000
     
 
 class Models.Rounds extends Backbone.Collection
