@@ -11,7 +11,13 @@ html, body {
 }
 html {
   background-color: #fff;
+  color: #333;
   font-family: "Helvetica Neue", helvetica, arial, sans-serif;
+}
+
+body {
+  font-size: 16px;
+  line-height: 22px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -56,26 +62,6 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 20px;
   }
 
-  .row {
-    overflow: hidden;
-  }
-
-  .row + .row {
-    margin-top: 40px;
-  }
-  .cell {
-    width: 33.3333333%;
-    float: left;
-
-    .box-sizing(border-box);
-
-    padding-right: 40px;
-
-    &.span2 {
-      width: 66.6666666%;
-    }
-  }
-
   input[type=text] {
     margin: 0;
     border: none;
@@ -108,22 +94,43 @@ h1, h2, h3, h4, h5, h6 {
     text-decoration: underline;
   }
 
-  .logos {
-    overflow: hidden;
-  }
-  .logo {
-    float: left;
-    img {
-      display: block;
-    }
-  }
-  .logo + .logo {
-    margin-left: 10px;
-  }
-
   .nko {
     margin-top: 20px;
   }
+}
+
+.row {
+  overflow: hidden;
+}
+
+.row + .row {
+  margin-top: 40px;
+}
+
+.cell {
+  width: 33.3333333%;
+  float: left;
+
+  .box-sizing(border-box);
+
+  padding-right: 40px;
+
+  &.span2 {
+    width: 66.6666666%;
+  }
+}
+
+.logos {
+  overflow: hidden;
+}
+.logo {
+  float: left;
+  img {
+    display: block;
+  }
+}
+.logo + .logo {
+  margin-left: 10px;
 }
 
 video {
@@ -140,7 +147,7 @@ video {
   max-width: @maxWidth;
   margin: 40px auto;
   .box-sizing(border-box);
-  padding: 0 @maxWidthPadding;
+  padding: @maxWidthPadding;
 
   /*display: none;*/
 }
@@ -152,12 +159,40 @@ video {
   width: 100%;
   margin: 0 auto;
   .box-sizing(border-box);
-  padding: 0 @maxWidthPadding;
+  padding: @maxWidthPadding;
 
   img {
     max-width: 600px;
     height: auto;
     float: left;
+  }
+}
+
+.footer {
+  max-width: @maxWidth;
+  margin: 0 auto;
+  padding: 0 20px;
+  padding-bottom: 40px;
+
+  hr {
+    height: 2px;
+    border: none;
+    margin: 0;
+    padding: 0;
+    background-color: #ccc;
+    margin: 20px 0;
+  }
+
+  a {
+    color: #333;
+  }
+
+  img {
+    display: block;
+  }
+
+  .logos {
+    margin-bottom: 5px;
   }
 }
 
@@ -167,7 +202,7 @@ video {
   max-width: @maxWidth;
   margin: 0 auto;
   .box-sizing(border-box);
-  padding: 0 @maxWidthPadding;
+  padding: @maxWidthPadding;
   padding-bottom: 20px;
   .box-sizing(border-box);
 }
