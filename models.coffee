@@ -156,9 +156,6 @@ class Models.Game extends BaseModel
   @attribute 'phaseTime'
   state s = @::,
 
-
-
-
     recruit: state 'initial',
       nextPhase: ->
         @trigger('state', 'night.first')
@@ -166,12 +163,14 @@ class Models.Game extends BaseModel
 
       startGame: ->
         if App.isServer
-          thirtySecondsLast = _(players).max (m) -> m.timeAdded
-          thirtySecondsLast += 30000
+          checkStart = ->
+            thirtySecondsLast = _(players).max (m) -> m.timeAdded
+            waitMore = (@players.length > 7) and (thirtySecondsLast < Date.now())
+            if (not waitMore) or @players.length = 16
+              @players.assignRoles()
+              @nextPhase()
 
-          if (@players.length > 7) and (thirtySecondsLast < Date.now())
-            @players.assignRoles()
-            @nextPhase()
+          _.debounce checkStart, 30000
           
       joinGame: ->  @trigger 'game:join'
 
