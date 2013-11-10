@@ -79,6 +79,7 @@ class Models.Player extends BaseModel
   initialize: ->
     super
     @set('id', ns.uuid()) unless @id
+    @set('name', ns.name()) unless @name
     @set('occupation', ns.jobTitle()) unless @occupation
 
   state s = @::,
