@@ -3,11 +3,11 @@ _ = require('underscore')
 module.exports = (grunt) ->
   vPkg = [
     "jquery", "underscore", "state", "buzz", "phono"
-    "backbone", "backbone.marionette", "url",
+    "backbone", "backbone.marionette", "url", "backbone.picky"
     "socket.io-client", "underscore.deferred"
   ]
 
-  shim = ["jquery", "buzz", "phono"]
+  shim = ["jquery", "buzz", "phono", "backbone.picky"]
 
   vAlias = for pkg in _.difference(vPkg, shim)
     "#{pkg}:"
@@ -61,6 +61,12 @@ module.exports = (grunt) ->
               exports: "phono"
               depends:
                 jquery: "$"
+            "backbone.picky":
+              path: "bower_components/backbone.picky/lib/backbone.picky.js"
+              exports: "Backbone"
+              depends:
+                backbone: "Backbone"
+                underscore: "_"
 
       templates:
         files:

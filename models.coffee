@@ -73,6 +73,7 @@ class Models.Player extends BaseModel
   @attribute 'role'
   @attribute 'vote'
   @attribute 'name'
+  idAttribute: 'name'
   state s = @::,
     lobby: state, 'initial'
     spectacte: state
@@ -82,7 +83,7 @@ class Models.Player extends BaseModel
       seeing: state
       eating: state
       sleeping: state
-        
+
 
 class Models.Players extends Models.Sessions
   model: Models.Player

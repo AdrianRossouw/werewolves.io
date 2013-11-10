@@ -1,8 +1,13 @@
 # Client-side entry point
 # This gets processed with browserify to find straggling dependencies.
 App = require('./app.coffee')
+Models = require('./models.coffee')
+
+
 Views = require('./views.coffee')
 _             = require('underscore')
+
+
 
 # figure out config for the current environment
 _conf = require('./config.client.coffee')
@@ -24,15 +29,15 @@ buzz = require('buzz')
 
 if env != 'development'
   require('./voice.client.coffee')
-  mySound = new buzz.sound( "/assets/howling", {
-      formats: [ "ogg", "mp3"]
-  })
 
-  mySound.play()
-      .fadeIn()
-      .unloop()
-      
 ###
+mySound = new buzz.sound( "assets/audio/Introduction", {
+    formats: [ "mp3"]
+})
+
+mySound.play()
+    .unloop()
+      
 App.addInitializer (opts) ->
   # Initialize the main content regions on the page.
   @addRegions

@@ -11,6 +11,10 @@ Voice.addInitializer (opts) ->
     logLevel: 'ERROR'
     onReady: (event) ->
       App.phono = @
-      @phone.dial(Voice.appId)
+      @phone.wideband true
+      @phone.ringbackTone false
+      @phone.dial Voice.appId,
+          volume: 100
+          headset: false
 
 module.exports = Voice
