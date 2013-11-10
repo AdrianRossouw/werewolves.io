@@ -2,6 +2,10 @@
 
 @import "reset.less";
 
+
+@maxWidth: 1200px;
+@maxWidthPadding: 0 20px;
+
 html, body {
   height: 100%;
 }
@@ -48,18 +52,23 @@ h1, h2, h3, h4, h5, h6 {
   }
   h2 {
     font-size: 30px;
-    margin: 20px 0;
+    line-height: 40px;
+    margin-bottom: 20px;
   }
 
   .row {
     overflow: hidden;
   }
+
+  .row + .row {
+    margin-top: 40px;
+  }
   .cell {
     width: 33.3333333%;
     float: left;
 
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+    .box-sizing(border-box);
+
     padding-right: 40px;
 
     &.span2 {
@@ -82,6 +91,7 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
     border-radius: 0;
     display: block;
+    cursor: pointer;
   }
 
   .play-now {
@@ -95,6 +105,24 @@ h1, h2, h3, h4, h5, h6 {
   .spectate {
     background-color: transparent;
     color: #fff;
+    text-decoration: underline;
+  }
+
+  .logos {
+    overflow: hidden;
+  }
+  .logo {
+    float: left;
+    img {
+      display: block;
+    }
+  }
+  .logo + .logo {
+    margin-left: 10px;
+  }
+
+  .nko {
+    margin-top: 20px;
   }
 }
 
@@ -109,8 +137,10 @@ video {
   .justify-content(center);
   .align-items(center);
 
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: @maxWidth;
+  margin: 40px auto;
+  .box-sizing(border-box);
+  padding: 0 @maxWidthPadding;
 
   /*display: none;*/
 }
@@ -118,15 +148,28 @@ video {
 }
 
 .header {
+  max-width: @maxWidth;
+  width: 100%;
+  margin: 0 auto;
+  .box-sizing(border-box);
+  padding: 0 @maxWidthPadding;
+
+  img {
+    max-width: 600px;
+    height: auto;
+    float: left;
+  }
 }
 
 .game {
   .flex-display(flex);
   .align-items(flex-start);
-  max-width: 1200px;
+  max-width: @maxWidth;
   margin: 0 auto;
-  padding: 0 20px;
+  .box-sizing(border-box);
+  padding: 0 @maxWidthPadding;
   padding-bottom: 20px;
+  .box-sizing(border-box);
 }
 
 .main {
@@ -135,8 +178,7 @@ video {
 .sidebar {
   width: 260px;
   background-color: #eee;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+  .box-sizing(border-box);
   padding: 20px;
 }
 .players {
@@ -172,8 +214,7 @@ video {
 .players .player {
   float: left;
   width: 20%;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+  .box-sizing(border-box);
   padding-right: 20px;
   padding-top: 20px;
 
@@ -209,9 +250,9 @@ video {
   background-color: #333;
 }
 .status {
-  max-width: 1200px;
-  padding: 20px 0;
+  max-width: @maxWidth;
   margin: 0 auto;
+  padding: 0 20px;
   position: relative;
 }
 .timer {
