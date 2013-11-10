@@ -93,11 +93,19 @@ h1, h2, h3, h4, h5, h6 {
 
     max-width: 220px;
     width: 100%;
+    &:focus {
+      outline: none;
+    }
   }
   .spectate {
     background-color: transparent;
     color: #fff;
     text-decoration: underline;
+    display: inline-block;
+    line-height: 22px;
+    &:focus {
+      outline: none;
+    }
   }
 
   .nko {
@@ -210,13 +218,16 @@ video {
 
 .game {
   .flex-display(flex);
-  .align-items(flex-start);
+  .align-items(stretch);
   max-width: @maxWidth;
   margin: 0 auto;
   .box-sizing(border-box);
   padding: @maxWidthPadding;
   padding-bottom: 20px;
   .box-sizing(border-box);
+
+  min-height: 100vh;
+  .align-content(stretch);
 }
 
 .main {
@@ -256,6 +267,9 @@ video {
       padding: 10px;
       font-size: 14px;
     }
+    .occupation {
+      font-size: 13px;
+    }
   }
 }
 
@@ -267,13 +281,11 @@ video {
   padding-top: 20px;
 
   &.selected .card {
-    //box-shadow: 0 0 0 4px #000;
     background-color: #fc0;
   }
 
   .card {
-    //border-radius: 4px;
-    background-color: fff;
+    background-color: #fff;
     padding: 10px;
     overflow: hidden;
     cursor: pointer;
@@ -287,11 +299,14 @@ video {
     }
 
     .info {
-      background-color: #fff;
-      color: #333;
-      border-radius: 4px;
+      background-color: #e6e6e6;
       padding: 10px;
+      text-overflow: ellipsis;
+      overflow: hidden;
       font-size: 14px;
+    }
+    .occupation {
+      font-size: 13px;
     }
   }
 }
@@ -437,6 +452,7 @@ strong {
   margin-top: 20px;
   .pic {
     width: 75px;
+    height: 80px;
     img {
       width: 100%;
     }
@@ -464,11 +480,13 @@ strong {
     margin: 0;
   }
 }
-.in-lobby .status,
-.in-lobby .game {
-  display: none;
+.in-lobby {
+  .status, .game, .footer {
+    display: none;
+  }
 }
 .in-game .lobby {
+  min-height: 0;
   height: auto;
 }
 .in-game .intro-wrap {

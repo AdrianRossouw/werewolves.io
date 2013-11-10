@@ -27,7 +27,7 @@ State.load = (data) ->
   @world.game.rounds = new Backbone.Collection data.game.rounds,
     model: Models.Round
 
-  @world.game.player = @world.game.players.at(0)
+  @world.game.player = @world.game.players.first()
 
   @listenTo @world.game.players, 'select:one', (model) =>
     id = @world.game.player.id
@@ -37,6 +37,5 @@ State.load = (data) ->
     console.log id, model
 
   @trigger 'load', data
-
 
 module.exports = State

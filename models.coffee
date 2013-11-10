@@ -53,19 +53,45 @@ class Models.Session extends BaseModel
 
 class Models.Sessions extends Backbone.Collection
   model: Models.Session
+  defaultSession: -> id: ns.uuid(),
+
+  findBySessionId: (sessionId) ->
+    @findWhere session: sessionId
+  findBySocketId: (socketId) ->
+    @findWhere socket: socketId
+  findBySipID: (sipId) ->
+    @findWhere sip: sipId
+
   refreshSession: (sessionId) ->
-    model = @findWhere session: sessionId
-    model ?= id: ns.uuid(), name: ns.name()
-    model = @add model, merge: true
+    model = @findBySessionId sessionId
+    if not model
+      model = @defaultSession()
+      model = @add model, merge: true
+
+    model.state('-> online.session')
     model.session = sessionId
     return model
 
-  refreshSocket: (sessionId, socketId) ->
-    model = @refreshSession(sessionId)
-    model.sockets ?= []
-    if socketId not in model.sockets
-      model.sockets.push(socketId)
+  refreshSocket: (socketId) ->
+    model = @findBySocketId socketId
+    if not model
+      model = @defaultSession()
+      model = @add model, merge: true
+
+    model.state('-> online.socket')
+    model.socket = socketId
     return model
+
+  refreshSip: (sipId) ->
+    model = @findBySipId sipId
+    if not model
+      model = @defaultSession()
+      model = @add model, merge: true
+
+    model.state('-> online.sip')
+    model.sip = sipId
+    return model
+
 
 # A player who has joined an active or upcoming
 # game.
@@ -78,9 +104,9 @@ class Models.Player extends BaseModel
 
   initialize: ->
     super
-    @set('id', ns.uuid()) unless @id
     @set('name', ns.name()) unless @name
     @set('occupation', ns.jobTitle()) unless @occupation
+    @set('timeAdded', Date.now())
 
   state s = @::,
     lobby: state, 'initial'
@@ -126,53 +152,49 @@ class Models.Game extends BaseModel
   @attribute 'rounds'
   @attribute 'phaseTime'
   state s = @::,
-    recruit: state 'initial',
-      startGame: -> @state('-> startup')
-    startup: state
-      nextPhase: -> @state('-> night')
-    day: state 'abstract',
-      first: state
-      next: state
 
-      # methods
-      nextPhase: -> @state('-> night')
-      transitions:
-        FirstDay:
-          origin: 'night.first'
-          action: ->
-            debugger
-            console.log 'the first day breaks'
-        DayBreak:
-          origin: 'night'
-          action: ->
-            debugger
-            console.log 'day breaks'
+
+
+
+    recruit: state 'initial',
+      nextPhase: ->
+        @trigger('state', 'night.first')
+        @state('-> night.first')
+
+      startGame: ->
+        if App.isServer
+          thirtySecondsLast = _(players).max (m) -> m.timeAdded
+          thirtySecondsLast += 30000
+
+          if (@players.length > 7) and (thirtySecondsLast < Date.now())
+            @players.assignRoles()
+            @nextPhase()
+          
+      joinGame: ->  @trigger 'game:join'
 
     night: state 'abstract',
       first: state
+        nextPhase: ->
+          @state('-> day.first')
+          @trigger('state', 'day.first')
       next: state
+        nextPhase: ->
+          @state('-> day.next')
+          @trigger('state', 'day.next')
 
-      # methods
-      nextPhase: -> @state('-> day')
-      transitions:
-        FirstNight:
-          origin: 'startup'
-          action: ->
-            debugger
-            console.log 'first night falls'
-        NightFall:
-          origin: 'day'
-          action: ->
-            debugger
-            console.log 'night falls'
+
+    day: state 'abstract',
+      first: state
+      next: state
+        nextPhase: () ->
+            @state('-> night.first')
+
 
     victory: state 'abstract',
       wolves: state
       villagers: state
     cleanup: state 'final'
-    transitions:
-      StartGame: origin: 'recruit', target: 'startup', action: ->
-        console.log "game started"
+
 
 
 class Models.Action extends BaseModel

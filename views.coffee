@@ -27,25 +27,21 @@ class Views.Game extends Backbone.Marionette.ItemView
   template: require('./templates/game.jade')
 
   ui:
-    players: "#players"
+    main: "#main"
     player: "#player"
     sidebar: "#sidebar"
-    #round: "#round"
 
   onRender: ->
     #console.clear()
     @players = State.world.game.players
-    for player, i in @players.models
-      player.set 'number', i+1
-    others = @players.filter (p) =>
-      p.id != State.world.game.player.id
-    otherPlayers = new Backbone.Collection others
+    @listenTo @players, 'add', @syncPlayersView
+    @listenTo @players, 'delete', @syncPlayersView
+
+    @syncPlayersView()
 
     @statusView = new Views.Status el: @ui.status
-    @playersView = new Views.Players collection: otherPlayers, el: @ui.players
     @playerView = new Views.Player model: State.world.game.player, el: @ui.player
 
-    @statusView.render()
     @playersView.render()
     @playerView.render()
 
@@ -53,6 +49,20 @@ class Views.Game extends Backbone.Marionette.ItemView
     # TODO: change round sync round again
 
     this
+
+  syncPlayersView: ->
+    @playersView.close() if @playersView
+
+    # TODO: move to server
+    for player, i in @players.models
+      player.set 'number', i+1
+
+    others = @players.filter (p) =>
+      p.id != State.world.game.player.id
+    otherPlayers = new Backbone.Collection others
+
+    @playersView = new Views.Players collection: otherPlayers
+    @ui.main.append @playersView.render().el
 
   syncRound: ->
     @stopListening @round.actions if @round
@@ -68,8 +78,7 @@ class Views.Game extends Backbone.Marionette.ItemView
     contestants = getContestants(@players, @round)
     @roundView.close() if @roundView
     @roundView = new Views.Round collection: contestants
-    @roundView.render()
-    @ui.sidebar.append @roundView.el
+    @ui.sidebar.append @roundView.render().el
 
 class Views.Status extends Backbone.Marionette.ItemView
   render: -> this
@@ -104,6 +113,8 @@ class Views.Player extends Backbone.Marionette.ItemView
     json
 
 class Views.Players extends Backbone.Marionette.CollectionView
+  className: 'players'
+
   itemView: Views.Player
 
 class Views.Voter extends Backbone.Marionette.ItemView
