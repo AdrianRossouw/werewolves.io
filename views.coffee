@@ -16,10 +16,10 @@ getContestants = (players, round) ->
    .value()
   contestants = new Backbone.Collection
   for grouper, votes of grouped
-    player = players.findWhere name: grouper
+    player = players.findWhere id: grouper
     player.votes = new Backbone.Collection
     for vote in votes
-      player.votes.add players.findWhere name: vote.get('player')
+      player.votes.add players.findWhere id: vote.get('player')
     contestants.add player
   contestants
 
@@ -33,28 +33,41 @@ class Views.Game extends Backbone.Marionette.ItemView
 
   onRender: ->
     #console.clear()
-    players = State.world.game.players
-    for player, i in players.models
+    @players = State.world.game.players
+    for player, i in @players.models
       player.set 'number', i+1
-    others = players.filter (p) =>
-      p.name != State.world.game.player.name
+    others = @players.filter (p) =>
+      p.id != State.world.game.player.id
     otherPlayers = new Backbone.Collection others
 
-    round = App.State.world.game.rounds.last()
-    contestants = getContestants(players, round)
+    @statusView = new Views.Status el: @ui.status
+    @playersView = new Views.Players collection: otherPlayers, el: @ui.players
+    @playerView = new Views.Player model: State.world.game.player, el: @ui.player
 
-    @status = new Views.Status el: @ui.status
-    @players = new Views.Players collection: otherPlayers, el: @ui.players
-    @player = new Views.Player model: State.world.game.player, el: @ui.player
-    @round = new Views.Round collection: contestants, el: @ui.round
+    @statusView.render()
+    @playersView.render()
+    @playerView.render()
 
-    @status.render()
-    @players.render()
-    @player.render()
-    @round.render()
+    @syncRound()
+    # TODO: change round sync round again
 
     this
 
+  syncRound: ->
+    @stopListening @round.actions if @round
+
+    @round = App.State.world.game.rounds.last()
+    @listenTo @round.actions, 'add', @syncRoundView
+    @listenTo @round.actions, 'delete', @syncRoundView
+    @listenTo @round.actions, 'change', @syncRoundView
+
+    @syncRoundView()
+
+  syncRoundView: (a, b, c)->
+    contestants = getContestants(@players, @round)
+    @roundView.close() if @roundView
+    @roundView = new Views.Round collection: contestants, el: @ui.round
+    @roundView.render()
 
 class Views.Status extends Backbone.Marionette.ItemView
   render: -> this
@@ -78,13 +91,13 @@ class Views.Player extends Backbone.Marionette.ItemView
     @$el.removeClass 'selected'
 
   choose: ->
-    return if @model.name == App.State.world.game.player.name
+    return if @model.id == App.State.world.game.player.id
     # TODO: also don't allow choose when you're not allowed to vote
     @model.collection.select @model
 
   serializeData: ->
     json = super
-    json.me = @model.name == App.State.world.game.player.name
+    json.me = @model.id == App.State.world.game.player.id
     #json.selected = @model.collection.selected == @model
     json
 
@@ -117,5 +130,18 @@ class Views.Round extends Backbone.Marionette.CollectionView
   buildItemView: (item, ItemView) ->
     view = new Views.Contestant model: item, collection: item.votes
     view
+
+  remove: ->
+    # HACK: close() automatically calls remove(). I want to reuse the same div
+    # so the replacement gets added to the same place.
+    @$el.html ''
+
+# also: GameLog
+
+class Views.PlayerLog extends Backbone.Marionette.ItemView
+  className: 'playerlog'
+
+  template: require('./templates/playerlog.jade')
+
 
 module.exports = Views

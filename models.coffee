@@ -19,7 +19,7 @@ class BaseModel extends Backbone.Model
 
   initialize: (attrs = {}, options = {}) ->
     @initAttribute attr, val for val, attr in attrs
-    
+
   initAttribute: (attr, value) ->
     @set(attr, value)
 
@@ -70,10 +70,16 @@ class Models.Sessions extends Backbone.Collection
 # game.
 class Models.Player extends BaseModel
   @attribute 'session'
-  @attribute 'role'
-  @attribute 'vote'
   @attribute 'name'
-  idAttribute: 'name'
+  @attribute 'role'
+  @attribute 'living'
+  @attribute 'occupation'
+
+  initialize: ->
+    super
+    @set('id', ns.uuid()) unless @id
+    @set('occupation', ns.jobTitle()) unless @occupation
+
   state s = @::,
     lobby: state, 'initial'
     spectacte: state
