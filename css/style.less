@@ -69,6 +69,9 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 20px;
     font-family: inherit;
     padding: 10px;
+    .box-sizing(border-box);
+    max-width: 220px;
+    width: 100%;
   }
 
   button {
@@ -87,6 +90,9 @@ h1, h2, h3, h4, h5, h6 {
     padding: 10px 40px;
     border: 3px solid #f05a23;
     margin: 10px 0;
+
+    max-width: 220px;
+    width: 100%;
   }
   .spectate {
     background-color: transparent;
@@ -127,6 +133,7 @@ h1, h2, h3, h4, h5, h6 {
   float: left;
   img {
     display: block;
+    margin-right: 5px;
   }
 }
 .logo + .logo {
@@ -174,6 +181,7 @@ video {
   padding: 0 20px;
   padding-bottom: 40px;
   .box-sizing(border-box);
+  color: #ccc;
 
   hr {
     height: 2px;
@@ -182,6 +190,10 @@ video {
     padding: 0;
     background-color: #ccc;
     margin: 20px 0;
+  }
+
+  p {
+    font-size: 11px
   }
 
   a {
@@ -194,6 +206,7 @@ video {
 
   .logos {
     margin-bottom: 5px;
+    line-height: 60px;
   }
 }
 
@@ -265,6 +278,7 @@ video {
     padding: 10px;
     overflow: hidden;
     cursor: pointer;
+    box-shadow: 1px 0px 4px #ababab;
 
     .pic {
       padding: 10px;

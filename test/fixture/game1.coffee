@@ -33,4 +33,23 @@ game.rounds.push
   ]
   death: 'Arturo'
 
+game.rounds.push
+  phase: 'night'
+  actions: [
+    { action: 'seen', player: 'Gaylord', target: 'Edward'}
+    { action: 'eaten', player: 'Edward', target: 'Arturo'}
+  ]
+  death: 'Arturo'
+
+game.rounds.push
+  phase: 'day'
+  actions: [
+    { action: 'lynch', player: 'Juniper', target: 'Edward'}
+    { action: 'lynch', player: 'Edward', target: 'Juniper'}
+    { action: 'lynch', player: 'Florence', target: 'Dafydd'}
+    { action: 'lynch', player: 'Dafydd', target: 'Florence'}
+    { action: 'lynch', player: 'Gaylord', target: 'Edward'}
+  ]
+  death: 'Edward'
+
 module.exports = game
