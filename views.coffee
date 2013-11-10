@@ -7,7 +7,13 @@ Views = App.module "Views"
 Models = App.module "Models"
 
 getContestants = (players, round) ->
-  grouped = round.actions.groupBy('target')
+  #grouped = round.actions.groupBy('target')
+  grouped = round.actions.chain()
+   .groupBy('target')
+   .map((val, key) -> [key, val])
+   .sortBy((o) -> -o[1].length)
+   .object()
+   .value()
   contestants = new Backbone.Collection
   for grouper, votes of grouped
     player = players.findWhere name: grouper
