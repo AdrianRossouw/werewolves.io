@@ -7,7 +7,13 @@ Views = App.module "Views"
 Models = App.module "Models"
 
 getContestants = (players, round) ->
-  grouped = round.actions.groupBy('target')
+  grouped = round.actions.chain()
+   .where(action: 'lynch')
+   .groupBy('target')
+   .map((val, key) -> [key, val])
+   .sortBy((o) -> -o[1].length)
+   .object()
+   .value()
   contestants = new Backbone.Collection
   for grouper, votes of grouped
     player = players.findWhere name: grouper
@@ -26,7 +32,7 @@ class Views.Game extends Backbone.Marionette.ItemView
     round: "#round"
 
   onRender: ->
-    console.clear()
+    #console.clear()
     players = State.world.game.players
     for player, i in players.models
       player.set 'number', i+1
@@ -58,9 +64,28 @@ class Views.Player extends Backbone.Marionette.ItemView
 
   template: require('./templates/player.jade')
 
+  events:
+    click: 'choose'
+
+  initialize: ->
+    @listenTo @model, 'selected', @selected
+    @listenTo @model, 'deselected', @deselected
+
+  selected: ->
+    @$el.addClass 'selected'
+
+  deselected: ->
+    @$el.removeClass 'selected'
+
+  choose: ->
+    return if @model.name == App.State.world.game.player.name
+    # TODO: also don't allow choose when you're not allowed to vote
+    @model.collection.select @model
+
   serializeData: ->
     json = super
     json.me = @model.name == App.State.world.game.player.name
+    #json.selected = @model.collection.selected == @model
     json
 
 class Views.Players extends Backbone.Marionette.CollectionView
