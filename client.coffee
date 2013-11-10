@@ -8,7 +8,6 @@ Views = require('./views.coffee')
 _             = require('underscore')
 
 
-
 # figure out config for the current environment
 _conf = require('./config.client.coffee')
 conf    = {}
@@ -25,26 +24,9 @@ Backbone      = require("backbone")
 Marionette    = require("backbone.marionette")
 Backbone.$    = Marionette.$ = require("jquery")
 
-buzz = require('buzz')
 
 if env != 'development'
   require('./voice.client.coffee')
-
-###
-mySound = new buzz.sound( "assets/audio/Introduction", {
-    formats: [ "mp3"]
-})
-
-mySound.play()
-    .unloop()
-      
-App.addInitializer (opts) ->
-  # Initialize the main content regions on the page.
-  @addRegions
-   statusRegion: "#status"
-   mainRegion: "#main"
-   sidebarRegion: "#sidebar"
-###
 
 
 # Load up the state instances
@@ -55,8 +37,6 @@ App.addInitializer (opts) ->
   # we don't want it to run just when included
   State.start(opts)
 
-
-
 # Load up the state instances
 Socket = require('./socket.client.coffee')
 
@@ -66,10 +46,7 @@ loader = (opts) ->
 
   @gameView = new Views.Game el: $('#game')
   @gameView.render()
-
-  #@gameLayout.contenders.show @contenders
  
 State.on 'load', loader, App
-
 
 App.start(conf)

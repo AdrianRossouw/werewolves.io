@@ -169,7 +169,7 @@ class Models.Round extends BaseModel
     obj.actions = @actions.toJSON()
     obj
 
-  choose: (me, actionName, target) ->
+  choose: (me, actionName, target, opts = {}) ->
     action = @actions.findWhere
       user:me
       action:actionName
@@ -179,7 +179,9 @@ class Models.Round extends BaseModel
       action:actionName
       target:target
 
-    @actions.add action, merge: true
+    _.extend opts, merge: true
+
+    @actions.add action, opts
     
 
 class Models.Rounds extends Backbone.Collection
