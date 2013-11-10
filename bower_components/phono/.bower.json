@@ -1,0 +1,14 @@
+{
+  "name": "phono",
+  "homepage": "https://github.com/phono/s.phono.com",
+  "_release": "1b54ce999c",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "1b54ce999cca78c3b635aa05e40c7be033e2a2cb"
+  },
+  "_source": "git://github.com/phono/s.phono.com.git",
+  "_target": "*",
+  "_originalSource": "phono",
+  "_direct": true
+}

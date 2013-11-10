@@ -2,6 +2,15 @@
 # This gets processed with browserify to find straggling dependencies.
 App = require('./app.coffee')
 Views = require('./views.coffee')
+_             = require('underscore')
+
+# figure out config for the current environment
+_conf = require('./config.client.coffee')
+conf    = {}
+env     = window.NODE_ENV
+env    ?= 'development'
+
+_.defaults conf, _conf[env], _conf.defaults
 
 window.App = App
 
@@ -10,17 +19,19 @@ window.App = App
 Backbone      = require("backbone")
 Marionette    = require("backbone.marionette")
 Backbone.$    = Marionette.$ = require("jquery")
-_             = require('underscore')
-buzz = require('buzz')
 
-mySound = new buzz.sound( "/howling", {
-    formats: [ "ogg" ]
-})
+if env is not 'development'
+  require('./voice.client.coffee')
+  buzz = require('buzz')
 
-mySound.play()
-    .fadeIn()
-    .unloop()
-    
+  mySound = new buzz.sound( "/howling", {
+      formats: [ "ogg" ]
+  })
+
+  mySound.play()
+      .fadeIn()
+      .unloop()
+      
 ###
 App.addInitializer (opts) ->
   # Initialize the main content regions on the page.
@@ -55,12 +66,5 @@ loader = (opts) ->
  
 State.on 'load', loader, App
 
-# figure out config for the current environment
-_conf = require('./config.client.coffee')
-conf    = {}
-env     = window.NODE_ENV
-env    ?= 'development'
-
-_.defaults conf, _conf[env], _conf.defaults
 
 App.start(conf)
