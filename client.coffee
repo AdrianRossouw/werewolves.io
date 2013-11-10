@@ -25,8 +25,8 @@ Marionette    = require("backbone.marionette")
 Backbone.$    = Marionette.$ = require("jquery")
 
 
-if env != 'development'
-  require('./voice.client.coffee')
+#if env != 'development'
+require('./voice.client.coffee')
 
 
 # Load up the state instances
@@ -51,7 +51,7 @@ loader = (opts) ->
 
   $('.play-now').click playNow
 
-  $body.addClass 'in-lobby'
+  #$body.addClass 'in-lobby'
 
   @gameView = new Views.Game el: $('#game')
   @gameView.render()
