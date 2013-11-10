@@ -93,11 +93,19 @@ h1, h2, h3, h4, h5, h6 {
 
     max-width: 220px;
     width: 100%;
+    &:focus {
+      outline: none;
+    }
   }
   .spectate {
     background-color: transparent;
     color: #fff;
     text-decoration: underline;
+    display: inline-block;
+    line-height: 22px;
+    &:focus {
+      outline: none;
+    }
   }
 
   .nko {
@@ -363,11 +371,13 @@ strong {
     margin: 0;
   }
 }
-.in-lobby .status,
-.in-lobby .game {
-  display: none;
+.in-lobby {
+  .status, .game, .footer {
+    display: none;
+  }
 }
 .in-game .lobby {
+  min-height: 0;
   height: auto;
 }
 .in-game .intro-wrap {
