@@ -261,14 +261,15 @@ video {
       margin-bottom: 10px;
     }
     .info {
-      background-color: #eee;
-      color: #333;
-      border-radius: 4px;
-      padding: 10px;
-      font-size: 14px;
+      background-color: #e6e6e6;
+      padding: 5px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-size: 16px;
+      font-weight: bold;
     }
     .occupation {
-      font-size: 13px;
+      font-size: 11px;
     }
   }
 }
@@ -280,8 +281,15 @@ video {
   padding-right: 20px;
   padding-top: 20px;
 
-  &.selected .card {
-    background-color: #fc0;
+  &.selected .card .pic {
+    // background-color: #fc0;
+    background-image: url("/assets/selected.svg");
+    background-position: top right;
+    background-repeat: no-repeat;
+  }
+  &.selected .card .info {
+    color: #fff;
+    background-color: #000;
   }
 
   .card {
@@ -293,6 +301,8 @@ video {
     border: 1px solid #ccc;
 
     .pic {
+      background-image: none;
+      
       padding: 10px;
       border-radius: 4px;
       margin-bottom: 10px;
@@ -300,7 +310,11 @@ video {
 
     .info {
       background-color: #e6e6e6;
-      padding: 10px;
+      padding: 5px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-size: 16px;
+      font-weight: bold;
     }
     .name,
     .occupation {
@@ -312,8 +326,9 @@ video {
     .name {
       font-size: 14px;
     }
+
     .occupation {
-      font-size: 13px;
+      font-size: 11px;
     }
   }
 }
