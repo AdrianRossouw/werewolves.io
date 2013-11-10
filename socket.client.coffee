@@ -22,7 +22,7 @@ registerHandlers = (opts) ->
   @round = null
 
   publishAction = (model) ->
-    action = _(model).pick 'player', 'action', 'target'
+    action = _(model).pick 'id', 'action', 'target'
     @io.emit 'round:action', action
 
   @listenTo State.world.game.rounds, 'add', (newRound) =>
@@ -34,7 +34,7 @@ registerHandlers = (opts) ->
     @listenTo @round.actions, 'change', publishAction
 
   @io.on 'round:action', (data) =>
-    @round.choose data.player, data.action, data.target
+    @round.choose data.id, data.action, data.target
 
 State.on 'load', registerHandlers, Socket
 

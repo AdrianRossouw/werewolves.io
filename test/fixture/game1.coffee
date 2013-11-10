@@ -15,7 +15,7 @@ game =
 game.rounds.push
   phase: 'night'
   actions: [
-    { action: 'seen', player: 'Gaylord', target: 'Arturo' }
+    { action: 'seen', id: 'Gaylord', target: 'Arturo' }
   ]
   death: false
 
@@ -23,32 +23,32 @@ game.rounds.push
 game.rounds.push
   phase: 'day'
   actions: [
-    { action: 'lynch', player: 'Edward', target: 'Gaylord' }
-    { action: 'lynch', player: 'Gaylord', target: 'Edward' }
-    { action: 'lynch', player: 'Arturo', target: 'Colwyn' }
-    { action: 'lynch', player: 'Dafydd', target: 'Juniper' }
-    { action: 'lynch', player: 'Florence', target: 'Colwyn' }
-    { action: 'lynch', player: 'Juniper', target: 'Colwyn' }
-    { action: 'lynch', player: 'Colwyn', target: 'Juniper' }
+    { action: 'lynch', id: 'Edward', target: 'Gaylord' }
+    { action: 'lynch', id: 'Gaylord', target: 'Edward' }
+    { action: 'lynch', id: 'Arturo', target: 'Colwyn' }
+    { action: 'lynch', id: 'Dafydd', target: 'Juniper' }
+    { action: 'lynch', id: 'Florence', target: 'Colwyn' }
+    { action: 'lynch', id: 'Juniper', target: 'Colwyn' }
+    { action: 'lynch', id: 'Colwyn', target: 'Juniper' }
   ]
   death: 'Arturo'
 
 game.rounds.push
   phase: 'night'
   actions: [
-    { action: 'seen', player: 'Gaylord', target: 'Edward'}
-    { action: 'eaten', player: 'Edward', target: 'Arturo'}
+    { action: 'seen', id: 'Gaylord', target: 'Edward'}
+    { action: 'eaten', id: 'Edward', target: 'Arturo'}
   ]
   death: 'Arturo'
 
 game.rounds.push
   phase: 'day'
   actions: [
-    { action: 'lynch', player: 'Juniper', target: 'Edward'}
-    { action: 'lynch', player: 'Edward', target: 'Juniper'}
-    { action: 'lynch', player: 'Florence', target: 'Dafydd'}
-    { action: 'lynch', player: 'Dafydd', target: 'Florence'}
-    { action: 'lynch', player: 'Gaylord', target: 'Edward'}
+    { action: 'lynch', id: 'Juniper', target: 'Edward'}
+    { action: 'lynch', id: 'Edward', target: 'Juniper'}
+    { action: 'lynch', id: 'Florence', target: 'Dafydd'}
+    { action: 'lynch', id: 'Dafydd', target: 'Florence'}
+    { action: 'lynch', id: 'Gaylord', target: 'Edward'}
   ]
   death: 'Edward'
 

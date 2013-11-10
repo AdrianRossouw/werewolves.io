@@ -175,7 +175,6 @@ class Models.Game extends BaseModel
 
 
 class Models.Action extends BaseModel
-  @attribute 'user'
   @attribute 'action'
   @attribute 'target'
 
@@ -195,11 +194,11 @@ class Models.Round extends BaseModel
 
   choose: (me, actionName, target, opts = {}) ->
     action = @actions.findWhere
-      user:me
+      id:me
       action:actionName
 
     action ?=
-      user:me
+      id:me
       action:actionName
       target:target
 

@@ -44,7 +44,7 @@ roundListener = (socket, session) ->
   @round = null
 
   publishAction = (model) ->
-    action = _(model).pick 'player', 'action', 'target'
+    action = _(model).pick 'id', 'action', 'target'
     socket.broadcast.emit 'round:action', action
 
   @listenTo State.world.game.rounds, 'add', (newRound) =>
@@ -56,7 +56,7 @@ roundListener = (socket, session) ->
     @listenTo @round.actions, 'change', publishAction
 
   socket.on 'round:action', (data) =>
-    @round.choose data.player, data.action, data.target,
+    @round.choose data.id, data.action, data.target,
       silent: true
 
   @on 'disconnect', (socket, session) =>
