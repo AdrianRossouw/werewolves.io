@@ -13,6 +13,14 @@ Backbone.$    = Marionette.$ = require("jquery")
 _             = require('underscore')
 buzz = require('buzz')
 
+mySound = new buzz.sound( "/howling", {
+    formats: [ "ogg" ]
+})
+
+mySound.play()
+    .fadeIn()
+    .unloop()
+    
 ###
 App.addInitializer (opts) ->
   # Initialize the main content regions on the page.

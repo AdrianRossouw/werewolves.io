@@ -2,12 +2,12 @@ _ = require('underscore')
 
 module.exports = (grunt) ->
   vPkg = [
-    "jquery", "underscore", "state",
+    "jquery", "underscore", "state", "buzz"
     "backbone", "backbone.marionette", "url",
     "socket.io-client", "underscore.deferred"
   ]
 
-  shim = ["jquery"]
+  shim = ["jquery", "buzz"]
 
   vAlias = for pkg in _.difference(vPkg, shim)
     "#{pkg}:"
@@ -51,7 +51,11 @@ module.exports = (grunt) ->
             jquery:
               path: "bower_components/jquery/jquery.min.js"
               exports: "$"
-
+            buzz:
+              path: "bower_components/buzz/dist/buzz.min.js"
+              exports: "buzz"
+              depends:
+                jquery: "$"
 
       templates:
         files:

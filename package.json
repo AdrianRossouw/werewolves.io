@@ -77,6 +77,9 @@
     "werewolves",
     "socket.io"
   ],
+  "browser": {
+    "buzz": "./bower_components/buzz/dist/buzz.min.js"
+  },
   "author": "Nodesque",
   "license": "BSD-2-Clause"
 }
