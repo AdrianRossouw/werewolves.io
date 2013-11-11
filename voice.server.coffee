@@ -1,14 +1,16 @@
 App = require('./app.coffee')
 State = require('./state.server.coffee')
 express = require('express')
-request = require('request')
 Voice = App.module "Voice"
 
 tropo  = require('tropo-webapi')
 
 middleware = (opts) ->
+<<<<<<< HEAD
   @use new express.json()
   @use new express.urlencoded()
+=======
+>>>>>>> parent of 3cce697... stuff
   @use new express.static(__dirname + "/bower_components/phono/deps/flensed/1.0")
 
 App.on 'middleware', middleware, App

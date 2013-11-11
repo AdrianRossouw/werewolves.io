@@ -11,6 +11,7 @@ registerHandlers = (opts) ->
 
   publishAction = (model) ->
     action = _(model).pick 'id', 'action', 'target'
+    debugger
     @io.emit 'round:action', action
 
   subscribeActions = (newRound) =>
@@ -41,8 +42,6 @@ registerHandlers = (opts) ->
 
 State.on 'load', registerHandlers, Socket
 
-State.setSipId (playerId, sipId) ->
-  @io.emit('sipId', playerId, sipId)
 
 Socket.addInitializer (opts) ->
   socketio.transports = ["websocket"]
