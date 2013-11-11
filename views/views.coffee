@@ -1,5 +1,5 @@
-App = require('./app.coffee')
-State = require('./state.client.coffee')
+App = require('../app.coffee')
+State = require('../state.client.coffee')
 
 Backbone = require('backbone')
 
@@ -24,7 +24,7 @@ getContestants = (players, round) ->
   contestants
 
 class Views.Game extends Backbone.Marionette.ItemView
-  template: require('./templates/game.jade')
+  template: require('../templates/game.jade')
 
   ui:
     main: "#main"
@@ -86,7 +86,7 @@ class Views.Status extends Backbone.Marionette.ItemView
 class Views.Player extends Backbone.Marionette.ItemView
   className: 'player'
 
-  template: require('./templates/player.jade')
+  template: require('../templates/player.jade')
 
   events:
     click: 'choose'
@@ -129,7 +129,7 @@ class Views.Voter extends Backbone.Marionette.ItemView
 class Views.Contestant extends Backbone.Marionette.CompositeView
   className: 'contestant'
 
-  template: require('./templates/contestant.jade')
+  template: require('../templates/contestant.jade')
 
   itemView: Views.Voter
 
@@ -149,7 +149,7 @@ class Views.Round extends Backbone.Marionette.CollectionView
 class Views.PlayerLog extends Backbone.Marionette.ItemView
   className: 'playerlog'
 
-  template: require('./templates/playerlog.jade')
+  template: require('../templates/playerlog.jade')
 
   serializeData: ->
     json =

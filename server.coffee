@@ -29,7 +29,7 @@ Voice = require('./voice')
 # Set up express with some default things.
 App.addInitializer (opts) ->
   @trigger 'before:settings', opts
-  @set 'views', __dirname + '/views'
+  @set 'views', __dirname + '/templates'
   @set "view engine", "jade"
   @trigger 'settings', opts
 
@@ -51,7 +51,7 @@ App.addInitializer (opts) ->
 
   # Wildcard default route.
   @get "/*", (req, res, next) =>
-    res.render "layout",
+    res.render "layout-server",
       host: opts.host
       env: env
   @trigger 'routes', opts

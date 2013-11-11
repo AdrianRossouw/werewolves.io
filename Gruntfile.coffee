@@ -15,7 +15,7 @@ module.exports = (grunt) ->
   grunt.initConfig
     watch:
       all:
-        files: ["*.coffee", "views/*.jade", "templates/*.jade", "css/*.css", "css/*.less"]
+        files: ["*.coffee", "templates/*.jade", "css/*.css", "css/*.less"]
         tasks: ["browserify:templates", "browserify:client", "less", "concat"]
         options:
           atBegin: ["default"]
@@ -80,11 +80,11 @@ module.exports = (grunt) ->
 
       templates:
         files:
-          "build/js/templates.js": ["templates/*.jade"]
+          "build/js/templates.js": ["templates/*.jade", "!templates/*.server.jade"]
         options:
           transform: ['jadeify2']
           aliasMappings:
-            src: ['templates/*.jade']
+            src: ['templates/*.jade', "!templates/*.server.jade"]
 
       client:
         src: ["client.coffee"],
