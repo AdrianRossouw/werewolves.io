@@ -26,7 +26,15 @@ module.exports = (grunt) ->
         options:
           file: "server.coffee"
           ignoredFiles: ["README.md", "node_modules/**"]
-          watchedFolders: ['build/js', 'views', 'build/css']
+          watchedFolders: [
+            'build/js',
+            'views',
+            'build/css',
+            'voice',
+            'models',
+            'socket',
+            'state'
+          ]
           watchedExtensions: ["coffee", "jade", 'js', 'css']
 
     concurrent:

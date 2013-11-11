@@ -24,7 +24,7 @@ App.addInitializer (opts) ->
 
 # Load up the web sockets
 Socket = require('./socket.server.coffee')
-Voice = require('./voice.server.coffee')
+Voice = require('./voice')
 
 # Set up express with some default things.
 App.addInitializer (opts) ->

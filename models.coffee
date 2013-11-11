@@ -12,7 +12,6 @@ Models = App.module "Models"
 Nonsense     = require('Nonsense')
 ns           = new Nonsense()
 
-
 # Create model attribute getter/setter property.
 # From : http://srackham.wordpress.com/2011/10/16/getters-and-setters-for-backbone-model-attributes/
 class BaseModel extends Backbone.Model
@@ -175,14 +174,11 @@ class Models.Game extends BaseModel
         @rounds.add {}
         @trigger('state', 'round:add')
       startGame: ->
-<<<<<<< HEAD
         if process.env.NODE_ENV != 'production'
           minPlayerLimit = 3
         else
           minPlayerLimit = 7
 
-=======
->>>>>>> parent of 3cce697... stuff
         if App.isServer
           checkStart = ->
             thirtySecondsLast = _(players).max (m) -> (m.timeAdded - 20000)

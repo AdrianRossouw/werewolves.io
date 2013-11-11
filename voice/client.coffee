@@ -1,4 +1,4 @@
-App = require('./app.coffee')
+App = require('../app.coffee')
 Voice = App.module "Voice"
 State = App.module "State"
 

@@ -5,7 +5,7 @@ Models = require('./models.coffee')
 
 
 Views = require('./views.coffee')
-_             = require('underscore')
+_ = require('underscore')
 
 
 # figure out config for the current environment
@@ -26,7 +26,7 @@ Backbone.$    = Marionette.$ = require("jquery")
 
 
 #if env != 'development'
-require('./voice.client.coffee')
+require('./voice')
 
 
 # Load up the state instances
