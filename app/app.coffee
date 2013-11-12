@@ -10,17 +10,21 @@
 # All the dependencies used across the whole system
 Backbone   = require("backbone")
 Marionette = require("backbone.marionette")
-Dfr        = require("underscore.deferred")
+Deferred   = require("underscore.deferred")
+Nonsense   = require('Nonsense')
 _          = require("underscore")
 
 # Marionette needs an implementation of jquery.deferred to run.
 Backbone.$ = Marionette.$ = ->
 
-_.extend Marionette.$, Dfr
-_.extend Backbone.$, Dfr
-_.mixin Dfr
+_.extend Marionette.$, Deferred
+_.extend Backbone.$, Deferred
+_.mixin Deferred
 
 # Start the new marionette application
 App = new Marionette.Application()
+
+# generates useful 'random' values
+App.ns = new Nonsense()
 
 module.exports = App
