@@ -15,7 +15,7 @@ module.exports = (grunt) ->
   grunt.initConfig
     watch:
       all:
-        files: ["*.coffee", "templates/*.jade", "css/*.css", "css/*.less"]
+        files: ["*/*.coffee", "templates/*.jade", "css/*.css", "css/*.less"]
         tasks: ["browserify:templates", "browserify:client", "less", "concat"]
         options:
           atBegin: ["default"]
@@ -24,7 +24,7 @@ module.exports = (grunt) ->
     nodemon:
       dev:
         options:
-          file: "server.coffee"
+          file: "./server.js"
           ignoredFiles: ["README.md", "node_modules/**"]
           watchedFolders: [
             'build/js',
@@ -35,7 +35,7 @@ module.exports = (grunt) ->
             'socket',
             'state'
           ]
-          watchedExtensions: ["coffee", "jade", 'js', 'css']
+          watchedExtensions: ["js", "coffee", "jade", 'css']
 
     concurrent:
       dev:
@@ -87,7 +87,7 @@ module.exports = (grunt) ->
             src: ['templates/*.jade', "!templates/*.server.jade"]
 
       client:
-        src: ["client.coffee"],
+        src: ["app/app.client.coffee"],
         dest: "build/js/client.js"
         options:
           debug: true

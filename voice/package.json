@@ -1,0 +1,6 @@
+{
+  "name": "voice",
+  "description": "voice communication channel",
+  "main": "voice.server.coffee",
+  "browser": "voice.client.coffee"
+}

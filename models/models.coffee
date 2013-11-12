@@ -2,7 +2,7 @@
 #
 # These form the base agreed upon data structures that will be extended
 # by the front-end and/or backend.
-App = require('./app.coffee')
+App = require('../app')
 Backbone = require('backbone')
 _ = require('underscore')
 state = require('state')

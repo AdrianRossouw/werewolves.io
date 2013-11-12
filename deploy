@@ -8,7 +8,7 @@
 #
 
 VERSION="0.6.0"
-CONFIG=./deploy.conf
+CONFIG=./config/deploy.conf
 LOG=/tmp/deploy.log
 TEST=1
 REF=

@@ -1,5 +1,5 @@
-App       = require('./app.coffee')
-State     = require('./state.server.coffee')
+App       = require('../app')
+State     = require('../state')
 express   = require('express')
 socketio  = require("socket.io")
 SessionIo = require("session.socket.io")

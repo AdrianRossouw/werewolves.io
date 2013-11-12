@@ -2,9 +2,9 @@
 #
 # Inherits and decorates the shared application state
 
-App = require('./app.coffee')
+App = require('../app')
 State = require('./state.coffee')
-Models = require('./models.coffee')
+Models = require('../models')
 Backbone = require('backbone')
 
 Picky = require('backbone.picky')

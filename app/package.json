@@ -1,0 +1,5 @@
+{
+  "name": "app",
+  "description": "central application module",
+  "main": "app.coffee"
+}

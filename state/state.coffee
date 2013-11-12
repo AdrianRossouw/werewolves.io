@@ -6,9 +6,9 @@
 # The IO layer will listen for changes from
 # this module, and views will manipulate it
 # from the interface.
-App      = require("./app.coffee")
+App      = require("../app")
 Backbone = require('backbone')
-Models   = require('./models.coffee')
+Models   = require('../models')
 State    = App.module "State",
   startWithParent: false
 

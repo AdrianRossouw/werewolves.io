@@ -1,5 +1,5 @@
-App = require('../app.coffee')
-State = require('../state.server.coffee')
+App = require('../app')
+State = require('../state')
 express = require('express')
 Voice = App.module "Voice"
 
@@ -8,7 +8,7 @@ tropo  = require('tropo-webapi')
 middleware = (opts) ->
   @use new express.json()
   @use new express.urlencoded()
-  @use new express.static(__dirname + "../bower_components/phono/deps/flensed/1.0")
+  @use new express.static(__dirname + "/../bower_components/phono/deps/flensed/1.0")
 
 App.on 'middleware', middleware, App
 

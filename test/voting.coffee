@@ -1,6 +1,8 @@
-App = require('../app.coffee')
-State = require('../state.server.coffee')
+App = require('../app')
+State = require('../state')
 should = require('should')
+
+fixture = require('./fixture/game1.coffee')
 
 it 'should get to this point', ->
   should.ok('reached this point')
@@ -10,6 +12,7 @@ it 'should have returned a module', ->
 
 describe 'init state', ->
   before (done) ->
+    State.load(fixture)
     State.on 'load', (data) ->  done()
 
     State.start()

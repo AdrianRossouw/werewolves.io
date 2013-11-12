@@ -1,15 +1,15 @@
 # Client-side entry point
 # This gets processed with browserify to find straggling dependencies.
 App = require('./app.coffee')
-Models = require('./models.coffee')
+Models = require('../models')
 
 
-Views = require('./views')
+Views = require('../views')
 _ = require('underscore')
 
 
 # figure out config for the current environment
-_conf = require('./config.client.coffee')
+_conf = require('../config')
 conf    = {}
 env     = window.NODE_ENV
 env    ?= 'development'
@@ -26,11 +26,11 @@ Backbone.$    = Marionette.$ = require("jquery")
 
 
 if env != 'development'
-  require('./voice')
+  require('../voice')
 
 
 # Load up the state instances
-State = require('./state.client.coffee')
+State = require('../state')
 App.addInitializer (opts) ->
   @trigger 'before:state', opts
   # We initialize this separately because
@@ -38,7 +38,7 @@ App.addInitializer (opts) ->
   State.start(opts)
 
 # Load up the state instances
-Socket = require('./socket.client.coffee')
+Socket = require('../socket')
 
 loader = (opts) ->
   @addRegions

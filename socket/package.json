@@ -1,0 +1,6 @@
+{
+  "name": "socket",
+  "description": "socket.io communication channel",
+  "main": "socket.server.coffee",
+  "browser": "socket.client.coffee"
+}

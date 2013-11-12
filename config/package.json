@@ -1,0 +1,6 @@
+{
+  "name": "config",
+  "description": "configuration module",
+  "main": "config.server.coffee",
+  "browser": "config.client.coffee"
+}

@@ -1,0 +1,5 @@
+{
+  "name": "models",
+  "description": "backbone models",
+  "main": "models.coffee"
+}

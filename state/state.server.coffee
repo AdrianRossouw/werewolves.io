@@ -1,7 +1,7 @@
 # Server side state
-App    = require('./app.coffee')
+App    = require('../app')
 State  = require('./state.coffee')
-Models = require('./models.coffee')
+Models = require('../models')
 Backbone = require('backbone')
 
 # generates useful 'random' values
@@ -12,7 +12,6 @@ ns           = new Nonsense()
 #todo: load/save to redis.
 #todo: keep track of sessions.
 
-fixture = require('./test/fixture/game1.coffee')
 
 State.addInitializer (opts) ->
     
@@ -23,11 +22,6 @@ State.addInitializer (opts) ->
   @world.game.rounds = new Backbone.Collection [{}],
     model: Models.Round
 
-  @trigger 'load', @world.toJSON()
-
-
-#
-  #State.load(fixture)
   @trigger 'load', opts, @
 
 # Session middleware

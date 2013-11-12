@@ -1,0 +1,6 @@
+{
+  "name": "state",
+  "description": "manages instances of models",
+  "main": "state.server.coffee",
+  "browser": "state.client.coffee"
+}

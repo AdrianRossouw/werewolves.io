@@ -1,0 +1,5 @@
+{
+  "name": "views",
+  "description": "backbone views",
+  "main": "views.coffee"
+}

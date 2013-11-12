@@ -1,5 +1,5 @@
-App = require('../app.coffee')
-State = require('../state.client.coffee')
+App = require('../app')
+State = require('../state')
 
 Backbone = require('backbone')
 

@@ -1,6 +1,6 @@
-App           = require('./app.coffee')
+App           = require('../app')
 Socket        = App.module "Socket"
-State         = require('./state.client.coffee')
+State         = require('../state')
 _             = require('underscore')
 url           = require('url')
 

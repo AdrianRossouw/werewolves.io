@@ -1,4 +1,4 @@
-App      = require('./app.coffee')
+App      = require('../app')
 _        = require('underscore')
 
 # The app object inherits all the methods of the express
@@ -12,7 +12,7 @@ App.server = server
 _.defaults App, _express
 
 # Load up the state instances
-State = require('./state.server.coffee')
+State = require('../state')
 App.addInitializer (opts) ->
   @trigger 'before:state', opts
 
@@ -23,13 +23,13 @@ App.addInitializer (opts) ->
   @trigger 'state', opts
 
 # Load up the web sockets
-Socket = require('./socket.server.coffee')
-Voice = require('./voice')
+Socket = require('../socket')
+Voice = require('../voice')
 
 # Set up express with some default things.
 App.addInitializer (opts) ->
   @trigger 'before:settings', opts
-  @set 'views', __dirname + '/templates'
+  @set 'views', __dirname + '/../templates'
   @set "view engine", "jade"
   @trigger 'settings', opts
 
@@ -40,9 +40,8 @@ App.addInitializer (opts) ->
   @router
   @trigger 'before:middleware', opts
   @use express.compress()
-  @use new express.static(__dirname + "/build")
-  @use new express.static(__dirname + "/bower_components/bootstrap/dist")
-  @use '/assets', new express.static(__dirname + "/assets")
+  @use new express.static(__dirname + "/../build")
+  @use '/assets', new express.static(__dirname + "/../assets")
   @trigger 'middleware', opts
 
 # Set up express routes.
@@ -90,7 +89,7 @@ downgradePerms = ->
 App.on "listen", downgradePerms
 
 # figure out config for the current environment
-sConf   = require('./config.server.coffee')
+sConf   = require('../config')
 conf    = {}
 env     = process.env.NODE_ENV
 env    ?= 'development'
