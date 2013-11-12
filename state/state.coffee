@@ -12,19 +12,18 @@ Models   = require('../models')
 State    = App.module "State",
   startWithParent: false
 
+State.addInitializer (opts) ->
+  @world ?= new Models.World()
+
 # Noop implementations of some methods.
 State.load = (data) ->
-  
-  @world ?= new Models.World()
-  @world.sessions ?= new Models.Sessions()
-  @world.game = new Models.Game data
-  @world.game.players = new Models.Players data.players
-  @world.game.rounds = new Backbone.Collection data.rounds,
-    model: Models.Round
-
+  @world ?= new Models.World(data)
   @trigger 'load', @
 
+State.addFinalizer = ->
 
-State.sync = ->
+  process.exit(1)
+  delete @world
+
 
 module.exports = State

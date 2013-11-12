@@ -7,11 +7,29 @@ Models   = App.module "Models"
 
 # A game that is running or will be starting.
 class Models.Game extends Models.BaseModel
-  @attribute 'players'
+  urlRoot: 'game'
   @attribute 'startTime'
-  @attribute 'rounds'
   @attribute 'phaseTime'
+  initialize: (data={}, opts={}) ->
+    super
+    @id = App.ns.uuid()
+    @players = new Models.Players(data.players or [])
+    @rounds = new Models.Rounds(data.rounds or [])
+    @state('-> recruit')
+
+  toJSON: ->
+    obj = super
+    obj.players = @players.toJSON()
+    obj.rounds = @rounds.toJSON()
+    obj
+
   state s = @::,
+    addPlayer: -> console.log 'hello'
+    recruit:
+
+      addPlayer: (player) ->
+        process.exit(2)
+        @players.add(player)
     phaseAction: -> console.log('phase action')
     wolvesWin: ->
       wolves = @players.where role:'werewolf'

@@ -21,11 +21,7 @@ Models.Players::initialize = (data={}, opts={}) ->
 # TODO: provide mechanisms to apply partial state updates
 
 State.load = (data) ->
-  @world ?= new Models.World()
-  @world.game = new Models.Game data.game
-  @world.game.players = new Models.Players data.game.players
-  @world.game.rounds = new Backbone.Collection data.game.rounds,
-    model: Models.Round
+  @world ?= new Models.World(data)
  
   @world.playerId = data.playerId
 

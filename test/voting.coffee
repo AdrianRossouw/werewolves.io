@@ -58,3 +58,8 @@ describe 'init state', ->
         done()
 
       @currentRound.choose 'Edward', 'lynch', 'Florence'
+
+  after () ->
+    State.on 'all', do console.log
+    State.stop()
+
