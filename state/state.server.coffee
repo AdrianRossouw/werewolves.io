@@ -14,15 +14,18 @@ ns           = new Nonsense()
 
 
 State.addInitializer (opts) ->
-    
   @world ?= new Models.World()
   @world.sessions ?= new Models.Sessions()
+  State.newGame
+
+
+State.newGame = (data) ->
   @world.game = new Models.Game
   @world.game.players = new Models.Players [{id: 'narrator'}]
   @world.game.rounds = new Backbone.Collection [{}],
     model: Models.Round
+  @trigger 'new', opts, @
 
-  @trigger 'load', opts, @
 
 # Session middleware
 express              = require('express')

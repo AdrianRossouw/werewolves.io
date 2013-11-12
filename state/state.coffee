@@ -22,7 +22,7 @@ State.load = (data) ->
   @world.game.rounds = new Backbone.Collection data.rounds,
     model: Models.Round
 
-  @trigger 'load', data
+  @trigger 'load', @
 
 
 State.sync = ->

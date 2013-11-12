@@ -12,9 +12,10 @@ it 'should have returned a module', ->
 
 describe 'init state', ->
   before (done) ->
-    State.load(fixture)
-    State.on 'load', (data) ->  done()
+    State.on 'load', (data) ->
+      done()
 
+    State.load(fixture)
     State.start()
 
   it 'did the loading of records', ->

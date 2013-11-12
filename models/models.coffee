@@ -265,10 +265,11 @@ class Models.Round extends BaseModel
 
       @actions.add action, opts
     else
-      action.target = target
-      action.timeCast= Date.now()
+      action.set
+        target: target
+        timeCast: Date.now()
 
-    _.debounce State.world.game.endRound, 150000
+    #_.debounce State.world.game.endRound, 150000
     
 
 class Models.Rounds extends Backbone.Collection
