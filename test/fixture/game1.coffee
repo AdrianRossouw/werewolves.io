@@ -52,4 +52,5 @@ game.rounds.push
   ]
   death: 'Edward'
 
-module.exports = game
+module.exports =
+  game: game

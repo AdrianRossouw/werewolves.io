@@ -28,7 +28,6 @@ describe 'init state', ->
   describe 'choose method', ->
     before ->
       @currentRound = State.world.game.rounds.last()
-
       @myRecord = @currentRound.actions.findWhere
         id: 'Edward'
         action: 'lynch'
@@ -60,6 +59,5 @@ describe 'init state', ->
       @currentRound.choose 'Edward', 'lynch', 'Florence'
 
   after () ->
-    State.on 'all', do console.log
     State.stop()
 

@@ -16,14 +16,12 @@ State.addInitializer (opts) ->
   @world ?= new Models.World()
 
 # Noop implementations of some methods.
-State.load = (data) ->
+State.load = (data = {}) ->
   @world ?= new Models.World(data)
   @trigger 'load', @
 
-State.addFinalizer = ->
-
-  process.exit(1)
-  delete @world
+State.on 'stop', ->
+  delete State.world
 
 
 module.exports = State

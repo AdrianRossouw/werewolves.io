@@ -17,15 +17,24 @@ class Models.Actions extends Backbone.Collection
 class Models.Round extends Models.BaseModel
   @attribute 'death'
   @attribute 'phase'
+  @attribute 'maxVotes'
+
   initialize: (data = {}, opts = {}) ->
-    @actions ?= new Models.Actions
-    data.actions ?= []
-    @actions.add data.actions
+    super
+    @actions = new Models.Actions data.actions or []
 
   toJSON: ->
     obj = super
     obj.actions = @actions.toJSON()
     obj
+    
+  initState: -> state @,
+    # waiting for the first vote to be cast
+    noVotes: {},
+    # we have enough votes
+    someVotes: {}
+    allVotes: {}
+  
 
   choose: (me, actionName, target, opts = {}) ->
     action = @actions.findWhere
@@ -49,4 +58,4 @@ class Models.Round extends Models.BaseModel
     
 
 class Models.Rounds extends Backbone.Collection
-
+  model: Models.Round

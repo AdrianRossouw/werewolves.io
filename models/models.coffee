@@ -13,15 +13,16 @@ Models   = App.module "Models"
 # From : http://srackham.wordpress.com/2011/10/16/getters-and-setters-for-backbone-model-attributes/
 class Models.BaseModel extends Backbone.Model
   _attributes: []
-  toState: (state) ->
-    @state('-> %{state}')
-    @triggerState state
-
-  triggerState: (state) ->
-    @trigger 'state', state
 
   initialize: (attrs = {}, options = {}) ->
+    @initState()
     @initAttribute attr, val for val, attr in attrs
+
+  initState: ->
+  toJSON: ->
+    obj = super
+    obj._state = @state().path()
+    obj
 
   initAttribute: (attr, value) ->
     @set(attr, value)
@@ -35,7 +36,6 @@ class Models.BaseModel extends Backbone.Model
         attrs = {}
         attrs[attr] = value
         @set attrs
-
 
 require('./session.coffee')
 require('./player.coffee')

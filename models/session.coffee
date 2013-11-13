@@ -15,10 +15,10 @@ Models   = App.module "Models"
 class Models.Session extends Models.BaseModel
   state s = @::,
     offline: state 'initial'
-    online: state
-      socket: state
-      sip: state
-      voice: state
+    online: state 'abstract',
+      socket: {}
+      sip: {}
+      voice: {}
 
 class Models.Sessions extends Backbone.Collection
   model: Models.Session

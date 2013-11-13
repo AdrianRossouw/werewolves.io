@@ -12,29 +12,43 @@ class Models.World extends Models.BaseModel
     super
     @sessions = new Models.Sessions(data.sessions or [])
     @game = new Models.Game(data.game or {})
-    @state('-> attract')
+    @state().change(data._state or 'attract')
+
+    @listenTo @game.state('recruit.ready'), 'arrive', =>
+      _.delay @startGame, 30000
+
 
   toJSON: ->
     obj = super
+    obj._state = @state().path()
     obj.sessions = @sessions.toJSON()
     obj.game = @game.toJSON
     obj
 
-  state s = @::,
+  startGame: =>
+    @state('-> gameplay')
+
+  initState: -> state @,
+
     # we have no registered players or game
     attract:
       arrive: ->
-        @listenTo @game.players, 'add', -> @state('-> startup')
-
-   
+        # on the first user added, go to startup
+        @listenTo @game.players, 'add', ->
+          @state('-> startup')
+  
       exit: ->
-        process.exit(1)
+        @stopListening @game.players, 'add'
 
     # the first player joined
-    startup: state
+    startup: {}
+         
+
 
     # there is an active game running
-    gameplay: state
+    gameplay:
+     enter: ->
+        @game.startGame()
 
     # the last game finished
-    cleanup: state
+    cleanup: {}

@@ -10,12 +10,12 @@ class Models.Game extends Models.BaseModel
   urlRoot: 'game'
   @attribute 'startTime'
   @attribute 'phaseTime'
-  initialize: (data={}, opts={}) ->
+  initialize: (data = {}, opts={}) ->
     super
     @id = App.ns.uuid()
-    @players = new Models.Players(data.players or [])
-    @rounds = new Models.Rounds(data.rounds or [])
-    @state('-> recruit')
+    @players = new Models.Players data.players or []
+    @rounds = new Models.Rounds data.rounds or [{}]
+    @state().change(data._state or 'recruit')
 
   toJSON: ->
     obj = super
@@ -23,78 +23,66 @@ class Models.Game extends Models.BaseModel
     obj.rounds = @rounds.toJSON()
     obj
 
-  state s = @::,
-    addPlayer: -> console.log 'hello'
-    recruit:
+  initState: -> state @,
+    # This game hasn't started yet
+    recruit: state 'abstract',
+      
+      # we are still waiting for enough players to join
+      waiting: {}
+      ready:
+        admit:
+          # only admit state changes from .waiting when ...
+          waiting: ->
+            @owner.players.length >= 7
+
+      # startgame method.
+      startGame: ->
+        @startTime = Date.now()
+        @state('-> night.first')
 
       addPlayer: (player) ->
-        process.exit(2)
         @players.add(player)
-    phaseAction: -> console.log('phase action')
-    wolvesWin: ->
-      wolves = @players.where role:'werewolf'
-      villagers = @players.filter (m) -> m.role is 'villager' or 'seer'
+        @lastPlayerAdded = Date.now()
+        @state('-> ready')
 
-    recruit: state 'initial',
-      nextPhase: ->
-        @trigger('state', 'round.night.first')
-        @state('-> round.night.first')
-      addRound: ->
-        @rounds.add {}
-        @trigger('state', 'round:add')
-      startGame: ->
-        if process.env.NODE_ENV != 'production'
-          minPlayerLimit = 3
-        else
-          minPlayerLimit = 7
+      # assign the roles when we leave the recruit state
+      exit: ->
+        @players.assignRoles()
 
-        if App.isServer
-          checkStart = ->
-            thirtySecondsLast = _(players).max (m) -> (m.timeAdded - 20000)
-            waitMore = (@players.length > 7) and (thirtySecondsLast < Date.now())
-            if (not waitMore) or @players.length = 16
-              @nextPhase()
-
-          
-      joinGame: ->  @trigger 'game:join'
     round: state 'abstract',
-      night: state 'abstract',
-        first: state
-          nextPhase: ->
-            @state('-> round.day.first')
-            @trigger('state', 'round.day.first')
-        next: state
-          nextPhase: ->
-            @state('-> round.day.next')
-            @trigger('state', 'round.day.next')
+      # won't come back here from victory state
+      admit: victory: -> false
 
-      day: state 'abstract',
-        first: state
-          nextPhase: () ->
-            @toState('round.night.next')
-        next: state
-          nextPhase: () ->
-            @state('-> round.night.first')
+      night:
+        admit: 'day': -> true
+        first:
+          admit: 'recruit.ready': -> true
 
+      day:
+        admit: 'night': -> true
+        first:
+          admit: 'night.first': -> true
 
+      next: ->
+        @state('-> victory')
+        @state('-> round')
+
+    # victory conditions
     victory: state 'abstract',
-      wolves: state
-      villagers: state
-    cleanup: state 'final'
-    endRound:  ->
-        if App.isServer
-          checkRound = ->
-            thirtySecondsLast = _(players).max (m) -> m.timeCast
-            waitMore = (thirtySecondsLast < (Date.now() - 150000))
-            if (not waitMore)
-              @phaseAction()
+      wolves:
+        admit:
+          round: ->
+            aliveCount = @owner.players.aliveByRole()
+            aliveCount.werewolf >= aliveCount.villager
+      villagers:
+        admit:
+          round: ->
+            !@owner.players.aliveByRole().werewolf
 
-              if @wolvesWin()
-                @toState('victory.wolves')
-              else if @villagersWin()
-                @toState('victory.villagers')
-              else
-                @nextPhase()
-              
-          _.debounce checkRound, 152000
+    cleanup: state 'final',
+      addRound: ->
+
+    # default addplayer method
+    addPlayer: -> console.log 'can not add player any more'
+    addRound: -> @rounds.add {}
 
