@@ -21,10 +21,13 @@ class Models.Round extends Models.BaseModel
   initialize: (data = {}, opts = {}) ->
     super
     @id = data.id or App.ns.uuid()
-    @actions = new Models.Actions data.actions or []
+    @actions = new Models.Actions []
+    @state().change(data._state or 'startup')
+    @actions.reset data.actions if data.actions
 
   voteState: ->
     @lastChoice = Date.now()
+
     @state('-> votes.none')
     @state('-> votes.some')
     @state('-> votes.all')
@@ -34,7 +37,7 @@ class Models.Round extends Models.BaseModel
     obj.actions = @actions.toJSON()
     obj
   initState: -> state @,
-    startup: state 'initial'
+    startup: {}
 
     votes: state 'abstract',
       # waiting for the first vote to be cast
@@ -46,19 +49,48 @@ class Models.Round extends Models.BaseModel
       some:
         admit:
           '*': -> (1 <= @owner.actions.length <= @owner.activeTotal)
+        arrive: ->
+          @firstVotes = Date.now()
 
       all:
         admit:
           '*': -> @owner.actions.length == @owner.activeTotal
         
-    counted:
-      # only admit full votes
-      admit:
-        'votes.all': true
+    complete: state 'conclusive',
+      # there is a death
+      died: state 'final',
+        arrive: ->
+          @death = @getDeath()
+          @players.kill @death
+        admit:
+          'votes.all': -> @owner.getDeath()
 
+      # there wasn't one
+      survived: state 'final',
+        admit:
+          'votes.all': -> !@owner.getDeath()
+
+  countVotes: ->
+    action = if @phase is 'day' then 'lynch' else 'eat'
+
+    byTarget      = (a)    -> a.target
+    toLengthList  = (l, k) -> { id: k, votes: l.length }
+    sortByLength  = (a)    -> -a.length
+
+    @actions.chain()
+      .where(action: action)
+      .groupBy(byTarget)
+      .map(toLengthList)
+      .sortBy(sortByLength)
+      .value()
+
+  getDeath: ->
+    votes    = @countVotes()
+    victim   =  _(votes).first()
+    top      = _(votes).where votes: victim.votes
+    return if top.length == 1 then victim.id else false
 
   choose: (me, actionName, target, opts = {}) ->
-
     action = @actions.findWhere
       id:me
       action:actionName
@@ -75,7 +107,6 @@ class Models.Round extends Models.BaseModel
         target: target
 
     @voteState()
-    #_.debounce State.world.game.endRound, 150000
     
 
 class Models.Rounds extends Backbone.Collection

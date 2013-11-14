@@ -53,8 +53,8 @@ class Models.Player extends Models.BaseModel
             @state('-> lynching')
           else
             @state('-> seeing')
-            @state('-> eating')
             @state('-> asleep')
+            @state('-> eating')
 
         day: state 'abstract',
           # every living player lynches
@@ -66,7 +66,7 @@ class Models.Player extends Models.BaseModel
           eating:
             admit: '*': -> @owner.role is 'werewolf'
           asleep:
-            admit: true
+            admit: '*': -> @owner.role is 'villager'
 
 class Models.Players extends Backbone.Collection
   model: Models.Player

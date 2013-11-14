@@ -13,9 +13,11 @@ class Models.Game extends Models.BaseModel
   initialize: (data = {}, opts={}) ->
     super
     @id = App.ns.uuid()
-    @players = new Models.Players data.players or []
-    @rounds = new Models.Rounds data.rounds or []
+    @players = new Models.Players []
+    @rounds = new Models.Rounds []
     @state().change(data._state or 'recruit')
+    @players.reset data.players if data.players
+    @rounds.reset data.rounds if data.rounds
 
   toJSON: ->
     obj = super

@@ -36,7 +36,6 @@ describe 'init state', ->
       @world = State.world
       @game = @world.game
       @currentRound = @game.currentRound()
-      console.log @currentRound.actions
       @myRecord = @currentRound.actions.findWhere
         id: 'Edward'
         action: 'lynch'
@@ -61,12 +60,26 @@ describe 'init state', ->
         model.should.have.property 'id'
         model.id.should.equal 'Edward'
         should.exist model.target
-        model.target.should.equal 'Florence'
+        model.target.should.equal 'Juniper'
 
         done()
 
-      @currentRound.choose 'Edward', 'lynch', 'Florence'
+      @currentRound.choose 'Edward', 'lynch', 'Juniper'
+  describe 'game ending', ->
+    before ->
+      @currentRound = State.world.game.currentRound()
 
+    it 'should count the votes correctly', ->
+      votes = @currentRound.countVotes()
+
+      votes[0].should.include { id: 'Edward', votes: 2 }
+      votes[1].should.include { id: 'Juniper', votes: 1 }
+      votes[2].should.include { id: 'Dafydd', votes: 1 }
+      votes[3].should.include { id: 'Florence', votes: 1 }
+
+    it 'should pick the correct victim', ->
+      @currentRound.getDeath().should.equal 'Edward'
+      
   after () ->
     State.stop()
 
