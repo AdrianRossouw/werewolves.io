@@ -69,8 +69,8 @@ describe 'start application', ->
       _(rest).each (p) =>
         @game.addPlayer id: p.id
 
-    it 'should have added 7 players total', ->
-      @game.players.length.should.equal 7
+    it 'should have added 8 players total', ->
+      @game.players.length.should.equal 8
 
     it 'should have state recruit.ready', ->
       @game.state().path().should.equal 'recruit.ready'
@@ -92,7 +92,7 @@ describe 'start application', ->
       counts = @game.players.aliveByRole()
       should.exist(counts)
       counts.werewolf.should.equal 1
-      counts.villager.should.equal 6
+      counts.villager.should.equal 7
 
     it 'should have moved to the night.first round', ->
       @game.state().path().should.equal 'round.night.first'
@@ -133,8 +133,8 @@ describe 'start application', ->
       @game.rounds.length.should.equal 2
       @game.currentRound().phase.should.equal 'day'
 
-    it 'should have 7 active players', ->
-      @game.players.activeTotal().should.equal 7
+    it 'should have 8 active players', ->
+      @game.players.activeTotal().should.equal 8
 
     it 'all should be in lynching state', ->
       @game.players.each (p) ->

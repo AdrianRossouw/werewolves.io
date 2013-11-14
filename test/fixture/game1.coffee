@@ -7,6 +7,7 @@ game =
   rounds: []
 
 game.players.push { id: 'Edward', name: 'Edward', role: 'werewolf' }
+game.players.push { id: 'Narrator', name: 'Narrator', role: 'villager' }
 game.players.push { id: 'Gaylord', name: 'Gaylord', role: 'seer' }
 game.players.push { id: 'Arturo', name: 'Arturo', role: 'villager' }
 game.players.push { id: 'Dafydd', name: 'Dafydd', role: 'villager' }
@@ -16,6 +17,7 @@ game.players.push { id: 'Colwyn', name: 'Colwyn', role: 'villager' }
 
 
 playerStates =
+  Narrator: 'dead'
   Edward: 'alive.lynching'
   Gaylord: 'alive.lynching'
   Arturo: 'dead'
@@ -33,11 +35,12 @@ game.rounds.push
   phase: 'night'
   number: 0
   activeTotal: 1
-  _state: 'complete.survived'
+  _state: 'complete.died'
   actions: [
+    { action: 'eaten', id: 'Edward', target: 'Narrator' }
     { action: 'seen', id: 'Gaylord', target: 'Arturo' }
   ]
-  death: false
+  death: 'Narrator'
 
 
 game.rounds.push

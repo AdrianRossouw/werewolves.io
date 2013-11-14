@@ -12,7 +12,7 @@ getRoles = (numPlayers) ->
   # 18: 4
 
   roles = ['seer', 'werewolf']
-  if numPlayers > 7
+  if numPlayers > 8
     roles.push 'werewolf'
   if numPlayers > 11
     roles.push 'werewolf'
