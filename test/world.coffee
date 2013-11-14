@@ -41,8 +41,8 @@ describe 'start application', ->
     it 'should have an empty players collection', ->
       @game.players.length.should.equal 0
 
-    it 'should only have the first round', ->
-      @game.rounds.length.should.equal 1
+    it 'should have no rounds', ->
+      @game.rounds.length.should.equal 0
 
   describe 'adding first player', ->
     before () ->
@@ -88,6 +88,30 @@ describe 'start application', ->
       should.exist(counts)
       counts.werewolf.should.equal 1
       counts.villager.should.equal 6
+
+    it 'should have moved to the night.first round', ->
+      @game.state().path().should.equal 'round.night.first'
+
+    it 'should have added a night round', ->
+      @game.rounds.length.should.equal 1
+
+
+    it 'should go to the first day round', ->
+      @game.next()
+      @game.state().path().should.equal 'round.day.first'
+      @game.rounds.length.should.equal 2
+
+    it 'should go to the next night round', ->
+      @game.next()
+      @game.state().path().should.equal 'round.night'
+      @game.rounds.length.should.equal 3
+
+    it 'should go to the next day round', ->
+      @game.next()
+      @game.state().path().should.equal 'round.day'
+      @game.rounds.length.should.equal 4
+
+
 
     after ->
       @clock.restore()

@@ -42,8 +42,6 @@ class Models.World extends Models.BaseModel
 
     # the first player joined
     startup: {}
-         
-
 
     # there is an active game running
     gameplay:

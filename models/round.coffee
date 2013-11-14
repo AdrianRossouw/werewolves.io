@@ -22,6 +22,13 @@ class Models.Round extends Models.BaseModel
   initialize: (data = {}, opts = {}) ->
     super
     @actions = new Models.Actions data.actions or []
+    @players = opts.players
+    @listenTo @actions
+
+  tallyVotes: ->
+    @state('-> noVotes')
+    @state('-> someVotes')
+    @state('-> allVotes')
 
   toJSON: ->
     obj = super
@@ -30,11 +37,27 @@ class Models.Round extends Models.BaseModel
     
   initState: -> state @,
     # waiting for the first vote to be cast
-    noVotes: {},
+    noVotes: state 'initial',
+      admit:
+        '*': -> !@owner.actions.length
     # we have enough votes
-    someVotes: {}
-    allVotes: {}
+    someVotes:
+      admit:
+        '*': ->
+          true
+          #1 <= @owner.actions.length <= @owner.players.length
+    allVotes:
+      admit:
+        '*': ->
+          @owner.actions.length == @owner.maxVotes
   
+  startPhase: ->
+    @players.startPhase @phase
+
+
+  killPlayer: (player) ->
+    @players.get(player).kill()
+
 
   choose: (me, actionName, target, opts = {}) ->
     action = @actions.findWhere

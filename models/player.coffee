@@ -43,19 +43,30 @@ class Models.Player extends Models.BaseModel
   initState: ->
     state @,
       # player is dead, they don't get to take part in anything
-      dead: state 'final'
-      alive:
-        daytime: state 'abstract',
+      dead: state 'final',
+        startPhase: ->
+      alive: state 'abstract',
+        kill: -> @state('-> dead')
+
+        startPhase: (phase) ->
+          if phase is 'day'
+            @state('-> lynching')
+          else
+            @state('-> seeing')
+            @state('-> eating')
+            @state('-> sleeping')
+
+        daytime: state 'abstract default',
           # every living player lynches
-          lynching: {}
+          lynching: state 'default'
         nighttime: state 'abstract',
           # guards set on the states based on roles
           seeing:
-            admit: -> @owner.role is 'seer'
+            admit: daytime: -> @owner.role is 'seer'
           eating:
-            admit: -> @owner.role is 'villager'
+            admit: daytime: -> @owner.role is 'villager'
           sleeping:
-            admit: -> @owner.role is 'werewolf'
+            admit: daytime: -> @owner.role is 'werewolf'
 
 class Models.Players extends Backbone.Collection
   model: Models.Player
@@ -64,6 +75,13 @@ class Models.Players extends Backbone.Collection
     roles = getRoles(@length)
     @each (player) ->
       player.set('role', roles.shift())
+
+  aliveTotal: ->
+    isAlive = (p) -> p.state().isIn('alive')
+    @filter(isAlive).length
+
+  startPhase: ->
+    @invoke 'startPhase'
 
   aliveByRole: ->
     isAlive = (p) -> p.state().isIn('alive')

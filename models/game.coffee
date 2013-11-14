@@ -14,7 +14,7 @@ class Models.Game extends Models.BaseModel
     super
     @id = App.ns.uuid()
     @players = new Models.Players data.players or []
-    @rounds = new Models.Rounds data.rounds or [{}]
+    @rounds = new Models.Rounds data.rounds or []
     @state().change(data._state or 'recruit')
 
   toJSON: ->
@@ -50,39 +50,51 @@ class Models.Game extends Models.BaseModel
         @players.assignRoles()
 
     round: state 'abstract',
+
       # won't come back here from victory state
-      admit: victory: -> false
+      admit:
+        'victory.*': -> false
 
       night:
-        admit: 'day': -> true
+        enter: -> @addRound 'night'
+        nextPhase: -> @state('-> day')
         first:
-          admit: 'recruit.ready': -> true
+          nextPhase: -> @state('-> day.first')
 
       day:
-        admit: 'night': -> true
+        enter: -> @addRound 'day'
+        nextPhase: -> @state('-> night')
         first:
-          admit: 'night.first': -> true
+          nextPhase: -> @state('-> night')
+
+      addRound: (phase) ->
+        round =
+          id: App.ns.uuid()
+          phase: phase or 'night'
+
+        @rounds.add round,
+          players: @players
 
       next: ->
-        @state('-> victory')
-        @state('-> round')
+        @state('-> victory.werewolves')
+        @state('-> victory.villagers')
+        @nextPhase()
 
     # victory conditions
     victory: state 'abstract',
-      wolves:
+
+      werewolves:
         admit:
-          round: ->
+          'round.*': ->
             aliveCount = @owner.players.aliveByRole()
             aliveCount.werewolf >= aliveCount.villager
       villagers:
         admit:
-          round: ->
+          'round.*': ->
             !@owner.players.aliveByRole().werewolf
 
-    cleanup: state 'final',
-      addRound: ->
+    cleanup: state 'final'
 
     # default addplayer method
     addPlayer: -> console.log 'can not add player any more'
-    addRound: -> @rounds.add {}
 
