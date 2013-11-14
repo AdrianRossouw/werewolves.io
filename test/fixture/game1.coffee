@@ -1,6 +1,6 @@
 game =
-  phaseTime: 300000
   startTime: 1384027686714
+  _state: 'round.day'
   players: [
     { id: 'Edward', name: 'Edward', role: 'werewolf' }
     { id: 'Gaylord', name: 'Gaylord', role: 'seer' }
@@ -13,7 +13,10 @@ game =
   rounds: []
 
 game.rounds.push
+  id: 'night1'
   phase: 'night'
+  number: 0
+  activeTotal: 1
   actions: [
     { action: 'seen', id: 'Gaylord', target: 'Arturo' }
   ]
@@ -21,7 +24,10 @@ game.rounds.push
 
 
 game.rounds.push
+  id: 'day1'
   phase: 'day'
+  number: 1
+  activeTotal: 7
   actions: [
     { action: 'lynch', id: 'Edward', target: 'Gaylord' }
     { action: 'lynch', id: 'Gaylord', target: 'Edward' }
@@ -34,7 +40,10 @@ game.rounds.push
   death: 'Arturo'
 
 game.rounds.push
+  id: 'night2'
   phase: 'night'
+  number: 1
+  activeTotal: 2
   actions: [
     { action: 'seen', id: 'Gaylord', target: 'Edward'}
     { action: 'eaten', id: 'Edward', target: 'Arturo'}
@@ -42,7 +51,10 @@ game.rounds.push
   death: 'Arturo'
 
 game.rounds.push
+  id: 'day2'
   phase: 'day'
+  number: 3
+  activeTotal: 6
   actions: [
     { action: 'lynch', id: 'Juniper', target: 'Edward'}
     { action: 'lynch', id: 'Edward', target: 'Juniper'}

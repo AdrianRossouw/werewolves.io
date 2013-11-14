@@ -8,58 +8,57 @@ Models   = App.module "Models"
 class Models.Action extends Models.BaseModel
   @attribute 'action'
   @attribute 'target'
-  @attribute 'timeCast'
 
 class Models.Actions extends Backbone.Collection
   model: Models.Action
 
-
 class Models.Round extends Models.BaseModel
   @attribute 'death'
   @attribute 'phase'
-  @attribute 'maxVotes'
+  @attribute 'number'
+  @attribute 'activeTotal'
 
   initialize: (data = {}, opts = {}) ->
     super
+    @id = data.id or App.ns.uuid()
     @actions = new Models.Actions data.actions or []
-    @players = opts.players
-    @listenTo @actions
 
-  tallyVotes: ->
-    @state('-> noVotes')
-    @state('-> someVotes')
-    @state('-> allVotes')
-
+  voteState: ->
+    @lastChoice = Date.now()
+    @state('-> votes.none')
+    @state('-> votes.some')
+    @state('-> votes.all')
+  
   toJSON: ->
     obj = super
     obj.actions = @actions.toJSON()
     obj
-    
   initState: -> state @,
-    # waiting for the first vote to be cast
-    noVotes: state 'initial',
-      admit:
-        '*': -> !@owner.actions.length
-    # we have enough votes
-    someVotes:
-      admit:
-        '*': ->
-          true
-          #1 <= @owner.actions.length <= @owner.players.length
-    allVotes:
-      admit:
-        '*': ->
-          @owner.actions.length == @owner.maxVotes
-  
-  startPhase: ->
-    @players.startPhase @phase
+    startup: state 'initial'
 
+    votes: state 'abstract',
+      # waiting for the first vote to be cast
+      none: state 'default',
+        admit:
+          '*': -> !@owner.actions.length
 
-  killPlayer: (player) ->
-    @players.get(player).kill()
+      # we have  votes
+      some:
+        admit:
+          '*': -> (1 <= @owner.actions.length <= @owner.activeTotal)
+
+      all:
+        admit:
+          '*': -> @owner.actions.length == @owner.activeTotal
+        
+    counted:
+      # only admit full votes
+      admit:
+        'votes.all': true
 
 
   choose: (me, actionName, target, opts = {}) ->
+
     action = @actions.findWhere
       id:me
       action:actionName
@@ -69,14 +68,13 @@ class Models.Round extends Models.BaseModel
         id:me
         action:actionName
         target:target
-        timeCast: Date.now()
 
       @actions.add action, opts
     else
       action.set
         target: target
-        timeCast: Date.now()
 
+    @voteState()
     #_.debounce State.world.game.endRound, 150000
     
 

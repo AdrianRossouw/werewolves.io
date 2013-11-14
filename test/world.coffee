@@ -12,6 +12,7 @@ it 'should have a world model', ->
 
 describe 'start application', ->
   before ->
+    @clock = sinon.useFakeTimers()
     App.start(config.defaults)
     State.start(config.defaults)
 
@@ -59,7 +60,6 @@ describe 'start application', ->
 
   describe 'rest of players', ->
     before () ->
-      @clock = sinon.useFakeTimers()
       @world = State.world
       @game = @world.game
 
@@ -79,6 +79,11 @@ describe 'start application', ->
       @clock.tick(29000)
       @world.state().path().should.equal 'startup'
 
+  describe 'starting game', ->
+    before () ->
+      @world = State.world
+      @game = @world.game
+
     it 'should have started the game another second later', ->
       @clock.tick(2000)
       @world.state().path().should.equal 'gameplay'
@@ -95,28 +100,74 @@ describe 'start application', ->
     it 'should have added a night round', ->
       @game.rounds.length.should.equal 1
 
+  describe 'during the first night', ->
+    before () ->
+      @world = State.world
+      @game = @world.game
+
+
+    it 'should only have 2 active players', ->
+      @game.players.activeTotal().should.equal 2
+
+    it 'should have put the seer in seeing state', ->
+      seer = @game.players.findWhere role: 'seer'
+      seer.state().path().should.equal 'alive.night.seeing'
+
+    it 'should have put the wolf in eating state', ->
+      wolf = @game.players.findWhere role: 'werewolf'
+      wolf.state().path().should.equal 'alive.night.eating'
+
+    it 'should have put the rest in sleep state', ->
+      villagers = @game.players.chain()
+        .where(role: 'villager')
+        .each((v) -> v.state().path().should.equal 'alive.night.asleep')
+
+  describe 'during the first day', ->
+    before () ->
+      @world = State.world
+      @game = @world.game
+      @game.next()
 
     it 'should go to the first day round', ->
-      @game.next()
       @game.state().path().should.equal 'round.day.first'
       @game.rounds.length.should.equal 2
+      @game.currentRound().phase.should.equal 'day'
+
+    it 'should have 7 active players', ->
+      @game.players.activeTotal().should.equal 7
+
+    it 'all should be in lynching state', ->
+      @game.players.each (p) ->
+        p.state().path().should.equal 'alive.day.lynching'
+
+
+  describe 'during the next night', ->
+    before () ->
+      @world = State.world
+      @game = @world.game
+      @game.next()
+
 
     it 'should go to the next night round', ->
-      @game.next()
       @game.state().path().should.equal 'round.night'
       @game.rounds.length.should.equal 3
 
-    it 'should go to the next day round', ->
+  describe 'during the next day', ->
+    before () ->
+      @world = State.world
+      @game = @world.game
       @game.next()
+
+
+    it 'should go to the next day round', ->
       @game.state().path().should.equal 'round.day'
       @game.rounds.length.should.equal 4
 
 
 
-    after ->
-      @clock.restore()
 
   after ->
     State.stop()
+    @clock.restore()
 
 

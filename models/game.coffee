@@ -70,15 +70,22 @@ class Models.Game extends Models.BaseModel
       addRound: (phase) ->
         round =
           id: App.ns.uuid()
+          number: @rounds.length + 1
           phase: phase or 'night'
+          activeTotal: @players.activeTotal()
 
         @rounds.add round,
           players: @players
+
+        @players.startPhase(phase)
 
       next: ->
         @state('-> victory.werewolves')
         @state('-> victory.villagers')
         @nextPhase()
+
+      currentRound: ->
+        @rounds.last()
 
     # victory conditions
     victory: state 'abstract',
@@ -97,4 +104,5 @@ class Models.Game extends Models.BaseModel
 
     # default addplayer method
     addPlayer: -> console.log 'can not add player any more'
+    currentRound: -> console.log 'no rounds yet'
 

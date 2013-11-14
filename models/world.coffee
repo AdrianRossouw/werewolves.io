@@ -14,10 +14,6 @@ class Models.World extends Models.BaseModel
     @game = new Models.Game(data.game or {})
     @state().change(data._state or 'attract')
 
-    @listenTo @game.state('recruit.ready'), 'arrive', =>
-      _.delay @startGame, 30000
-
-
   toJSON: ->
     obj = super
     obj._state = @state().path()
@@ -26,6 +22,7 @@ class Models.World extends Models.BaseModel
     obj
 
   startGame: =>
+
     @state('-> gameplay')
 
   initState: -> state @,
@@ -41,7 +38,13 @@ class Models.World extends Models.BaseModel
         @stopListening @game.players, 'add'
 
     # the first player joined
-    startup: {}
+    startup:
+      arrive: ->
+        @listenTo @game.state('recruit.ready'), 'arrive', =>
+          _.delay @startGame, 30000
+
+      exit: ->
+        @stopListening @game.state('recruit.ready'), 'arrive'
 
     # there is an active game running
     gameplay:

@@ -25,9 +25,18 @@ describe 'init state', ->
     should.exist State.world.game.players
     should.exist State.world.game.rounds
 
+  it 'is in the right state', ->
+    State.world.game.state().path().should.equal 'round.day'
+
+  it 'has 4 rounds', ->
+    State.world.game.rounds.length.should.equal 4
+
   describe 'choose method', ->
     before ->
-      @currentRound = State.world.game.rounds.last()
+      @world = State.world
+      @game = @world.game
+      @currentRound = @game.currentRound()
+      console.log @currentRound.actions
       @myRecord = @currentRound.actions.findWhere
         id: 'Edward'
         action: 'lynch'
