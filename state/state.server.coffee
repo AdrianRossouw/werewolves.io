@@ -36,6 +36,7 @@ State.initMiddleware = (opts) ->
     store: State.sessionStore
     secret: opts.secret
   @use (req, res, next) =>
+    return next() if req.url != '/'
     session = State.world.sessions.findWhere session:req.session.id
     session = State.world.sessions.add {} if not session
    

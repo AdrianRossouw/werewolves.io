@@ -29,8 +29,9 @@ Models.BaseModel::publish = ->
 
   ## the state listeners
   listenState = (state) ->
-    console.log "#{url} changed state to #{state.path()}"
-    State.trigger('state', url, state.path())
+    path = state.path().replace(/\.$/, '')
+    console.log "#{url} changed state to #{path}"
+    State.trigger('state', url, path)
 
   states = @state('**')
   _(states).each (s) -> s.on 'arrive', listenState
@@ -53,6 +54,11 @@ Models.BaseModel::unpublish = ->
 
 State.getPlayer = (player) ->
   @world?.game?.players?.get(player)
+
+
+State.getSession = (session) ->
+  @world?.sessions?.get(session)
+
 
 # Noop implementations of some methods.
 State.load = (data = {}) ->

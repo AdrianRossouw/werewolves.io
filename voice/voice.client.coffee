@@ -1,6 +1,6 @@
 App = require('../app')
-Voice = App.module "Voice"
 State = App.module "State"
+Voice = App.module "Voice"
 
 phono = require('phono')
 PhonoStrophe.LogLevel = {  }
@@ -16,7 +16,7 @@ mySound.play()
     .unloop()
 ###
 
-Voice.addInitializer (opts) ->
+Voice.listenTo App, 'state', (opts) ->
   loader = (world) ->
     @appId = opts.appId
     @apiKey = opts.apiKey

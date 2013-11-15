@@ -36,6 +36,7 @@ App.addInitializer (opts) ->
   # We initialize this separately because
   # we don't want it to run just when included
   State.start(opts)
+  @trigger 'state', opts
 
 # Load up the state instances
 Socket = require('../socket')

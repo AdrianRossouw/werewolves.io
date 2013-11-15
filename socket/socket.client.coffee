@@ -70,6 +70,14 @@ Socket.addInitializer (opts) ->
     console.log 'update session'
     @io.emit 'update', url, model if url is sessionUrl
 
+  @io.on 'data', (url, data) ->
+    model = State.models[url]
+    model.set data if model
+    console.log "received new data for #{url}"
 
+  @io.on 'state', (url, state) ->
+    model = State.models[url]
+    model.state().change(state) if model
+    console.log "received new state #{state} for #{url}"
 
 module.exports = Socket

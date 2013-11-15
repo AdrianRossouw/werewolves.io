@@ -43,17 +43,33 @@ class Models.Session extends Models.BaseModel
 
   setIdentifier: (type, id) ->
     @[type] = id
-    # escalate to a higher level
-    # guards should make it fall
-    # where it can
 
   initState: -> state @,
     offline: state 'initial'
     online: state 'abstract',
-      session: state 'default'
-      socket: {}
-      sip: {}
-      voice: {}
+      session: state 'default',
+        release:
+          socket: -> @owner.session
+          offline: -> !@owner.session
+      socket:
+        admit:
+          session: -> @owner.socket
+          sip: -> @owner.socket
+        release:
+          sip: -> @owner.socket
+          session: -> !@owner.socket
+      sip:
+        admit:
+          socket: -> @owner.sip
+          voice: -> @owner.sip
+        release:
+          voice: -> @owner.sip
+          socket: -> !@owner.sip
+      voice:
+        admit:
+          sip: -> @owner.voice
+        release:
+          sip: -> !@owner.voice
 
 class Models.Sessions extends Backbone.Collection
   model: Models.Session
