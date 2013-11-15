@@ -28,8 +28,6 @@ State.addInitializer (opts) ->
 State.getPlayer = ->
   @world?.game?.players?.get(State.playerId)
 
-# TODO: set the world state based on a dump given to us
-# TODO: provide mechanisms to apply partial state updates
 State.load = (data) ->
   @world = new Models.World(data)
   @trigger 'load', data

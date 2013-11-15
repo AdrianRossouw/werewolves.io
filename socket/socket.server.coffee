@@ -24,17 +24,20 @@ sessionInit = (opts) ->
 App.on "listen", sessionInit, Socket
 
 onConnection = (socket, session) ->
-  session = State.world.sessions.findWhere session:session.id
-  session = State.world.sessions.add {} if not session
+  sModel = State.world.sessions.findWhere session:session.id
+  sModel = State.world.sessions.add {} if not sModel
  
-  session.setIdentifier 'session', session.id
-  session.setIdentifier 'socket', socket.id
+  sModel.setIdentifier 'session', session.id
+  if not sModel.socket
+    sModel.setIdentifier 'socket', socket.id
 
   #Straight forward data query by the client.
   socket.on 'data', (url, cb) ->
     console.log "request #{url}"
     model = State.models[url]
+
     return cb(404, {message: 'not found'}) unless model
+
     cb(null, model.mask())
 
   # a modification of data from the client.
@@ -42,12 +45,22 @@ onConnection = (socket, session) ->
     cb ?= ->
     console.log "update #{url}"
     model = State.models[url]
+
     return cb(404, {message: 'not found'}) unless model
-    # if allowed...
+
     model.set data
     cb(null, data)
 
   socket.on 'disconnect', =>
+    if sModel.socket is socket.id
+      sModel.voice = false
+      sModel.sip = false
+      sModel.socket = false
+
+    socket.removeListener 'data'
+    socket.removeListener 'state'
+    socket.removeListener 'update'
+
     @trigger 'disconnect', socket, session
 
 Socket.on "connection", onConnection, Socket
