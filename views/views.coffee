@@ -32,7 +32,6 @@ class Views.Game extends Backbone.Marionette.ItemView
     sidebar: "#sidebar"
 
   onRender: ->
-    #console.clear()
     @players = State.world.game.players
     @listenTo @players, 'add', @syncPlayersView
     @listenTo @players, 'delete', @syncPlayersView
@@ -40,7 +39,7 @@ class Views.Game extends Backbone.Marionette.ItemView
     @syncPlayersView()
 
     @statusView = new Views.Status el: @ui.status
-    @playerView = new Views.Player model: State.world.game.player, el: @ui.player
+    @playerView = new Views.Player model: State.session.player, el: @ui.player
 
     @playersView.render()
     @playerView.render()
@@ -58,7 +57,7 @@ class Views.Game extends Backbone.Marionette.ItemView
       player.set 'number', i+1
 
     others = @players.filter (p) =>
-      p.id != State.world.game.player.id
+      p.id != State.session.player.id
     otherPlayers = new Backbone.Collection others
 
     @playersView = new Views.Players collection: otherPlayers
@@ -67,7 +66,7 @@ class Views.Game extends Backbone.Marionette.ItemView
   syncRound: ->
     @stopListening @round.actions if @round
 
-    @round = App.State.world.game.rounds.last()
+    @round = State.world.game.rounds.last()
     @listenTo @round.actions, 'add', @syncRoundView
     @listenTo @round.actions, 'delete', @syncRoundView
     @listenTo @round.actions, 'change', @syncRoundView
@@ -102,13 +101,13 @@ class Views.Player extends Backbone.Marionette.ItemView
     @$el.removeClass 'selected'
 
   choose: ->
-    return if @model.id == App.State.world.game.player.id
+    return if @model.id == State.session.player.id
     # TODO: also don't allow choose when you're not allowed to vote
     @model.collection.select @model
 
   serializeData: ->
     json = super
-    json.me = @model.id == App.State.world.game.player.id
+    json.me = @model.id == State.session.player.id
     #json.selected = @model.collection.selected == @model
     json
 

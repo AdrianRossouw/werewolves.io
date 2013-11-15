@@ -53,6 +53,7 @@ App.addInitializer (opts) ->
     res.render "layout-server",
       host: opts.host
       env: env
+      playerId: 'Edward' #req.session.id
   @trigger 'routes', opts
 
   # mount the router middleware in a predicatable place.

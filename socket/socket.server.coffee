@@ -19,7 +19,6 @@ sessionInit = (opts) ->
     if err
       return @trigger 'error', err
 
-    console.log('whores')
     @trigger 'connection', args...
 
 App.on "listen", sessionInit, Socket
@@ -28,9 +27,7 @@ onConnection = (socket, session) ->
   model = State.world.sessions.refreshSocket socket.id
  
   obj = State.world.toJSON()
-  obj.playerId = model.id
-
-  socket.emit('world:state', _(obj).pick 'game', 'playerId')
+  socket.emit('world:state', _(obj).pick 'game', '_state')
 
   socket.on 'disconnect', =>
 
@@ -39,22 +36,21 @@ onConnection = (socket, session) ->
 joinGame = (socket, session) ->
 
   listener = (playerId) ->
-    State.world.game.players.add id: playerId
+    State.world.game.addPlayer id: playerId
     console.log 'added player'
 
   socket.on 'game:join', listener
   socket.on 'disconnect', =>
     socket.removeListener 'game:join', listener
 
-  socket.on 'sipId', (player, sip) =>
-    State.world.sessions.get(player).set('sipId', sip)
-
   addPlayer = (model) ->
     console.log 'emit player added'
     socket.emit 'player:add', model
   State.world.game.players.on 'add', addPlayer
 
+Socket.on "connection", joinGame, Socket
 
+###
 roundListener = (socket, session) ->
   @round = null
 
@@ -79,9 +75,9 @@ roundListener = (socket, session) ->
 
   @on 'disconnect', (socket, session) =>
     socket.removeListener 'round:action', publishAction
+Socket.on "connection", roundListener, Socket
+###
 
 Socket.on "connection", onConnection, Socket
-Socket.on "connection", joinGame, Socket
-Socket.on "connection", roundListener, Socket
 
 module.exports = Socket

@@ -21,7 +21,7 @@ class Models.BaseModel extends Backbone.Model
   initState: ->
   toJSON: ->
     obj = super
-    obj._state = @state().path()
+    obj._state = @state().path() if @state
     obj
 
   initAttribute: (attr, value) ->

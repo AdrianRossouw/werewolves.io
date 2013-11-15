@@ -7,11 +7,11 @@ url           = require('url')
 # SocketIO library (browserified.. yay)
 socketio            = require("socket.io-client")
 registerHandlers = (opts) ->
+  ###
   @round = null
 
   publishAction = (model) ->
     action = _(model).pick 'id', 'action', 'target'
-    debugger
     @io.emit 'round:action', action
 
   subscribeActions = (newRound) =>
@@ -28,18 +28,19 @@ registerHandlers = (opts) ->
   @io.on 'round:action', (data) =>
     @round.choose data.id, data.action, data.target
 
+  ###
   State.world.game.on 'game:join', =>
     @io.emit 'game:join'
 
   @io.on 'player:add', (player) =>
     State.world.game.players.add player
-
   @io.on 'game:state', (state) ->
     State.world.game.toState(state)
 
+  ###
   @io.on 'player:state', (id, state) ->
     State.world.game.players.get(id).toState(state)
-
+  ###
 State.on 'load', registerHandlers, Socket
 
 

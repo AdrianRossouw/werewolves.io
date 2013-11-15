@@ -48,7 +48,7 @@ loader = (opts) ->
 
   playNow = ->
     $body.removeClass('in-lobby').addClass('in-game')
-    App.State.world.game.joinGame(App.State.world.playerId)
+    App.State.world.joinGame(window.PLAYER_ID)
 
   $('.play-now').click playNow
 

@@ -15,6 +15,9 @@ State    = App.module "State",
 State.addInitializer (opts) ->
   @world ?= new Models.World()
 
+State.getPlayer = (player) ->
+  @world?.game?.players?.get(player)
+
 # Noop implementations of some methods.
 State.load = (data = {}) ->
   @world ?= new Models.World(data)

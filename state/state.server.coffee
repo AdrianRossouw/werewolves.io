@@ -12,19 +12,11 @@ ns           = new Nonsense()
 #todo: load/save to redis.
 #todo: keep track of sessions.
 
-
+fixture = require('../test/fixture/game1.coffee')
 State.addInitializer (opts) ->
-  @world ?= new Models.World()
-  @world.sessions ?= new Models.Sessions()
-  State.newGame
-
-
-State.newGame = (data) ->
-  @world.game = new Models.Game
-  @world.game.players = new Models.Players [{id: 'narrator'}]
-  @world.game.rounds = new Backbone.Collection [{}],
-    model: Models.Round
-  @trigger 'new', opts, @
+  # just for now
+  @world = new Models.World(fixture)
+  
 
 
 # Session middleware
@@ -38,13 +30,6 @@ State.initMiddleware = (opts) ->
     store: State.sessionStore
     secret: opts.secret
 
-  # Register with the sessions collection
-  @use (req, res, next) ->
-    State.world.sessions.refreshSession req.session.id if req.session
-    next()
-
-
 App.on 'middleware', State.initMiddleware, App
-
 
 module.exports = State

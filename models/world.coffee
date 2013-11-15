@@ -18,7 +18,7 @@ class Models.World extends Models.BaseModel
     obj = super
     obj._state = @state().path()
     obj.sessions = @sessions.toJSON()
-    obj.game = @game.toJSON
+    obj.game = @game.toJSON()
     obj
 
   startGame: =>
@@ -26,7 +26,9 @@ class Models.World extends Models.BaseModel
     @state('-> gameplay')
 
   initState: -> state @,
-
+    joinGame: (id) ->
+      @game.addPlayer(id: id)
+      @trigger 'game:join'
     # we have no registered players or game
     attract:
       arrive: ->

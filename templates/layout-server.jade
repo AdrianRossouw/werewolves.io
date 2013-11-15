@@ -12,7 +12,8 @@ html
     include intro-server
 
   script.
-    window.NODE_ENV = '#{env}'
+    window.NODE_ENV = '#{env}';
+    window.PLAYER_ID = '#{playerId}';
 
   if env === 'production'
     script(src='/js/app.min.js')
