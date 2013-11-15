@@ -15,7 +15,7 @@ ns           = new Nonsense()
 fixture = require('../test/fixture/game1.coffee')
 State.addInitializer (opts) ->
   # just for now
-  @world = new Models.World(fixture)
+  @world ?= new Models.World()
   
 
 
@@ -29,6 +29,16 @@ State.initMiddleware = (opts) ->
   @use new express.session
     store: State.sessionStore
     secret: opts.secret
+  @use (req, res, next) =>
+    session = State.world.sessions.findWhere session:req.session.id
+    session = State.world.sessions.add {} if not session
+   
+    session.setIdentifier 'session', req.session.id
+    req.state =
+      session: session
+    console.log req.state.session.toJSON()
+    next()
+
 
 App.on 'middleware', State.initMiddleware, App
 

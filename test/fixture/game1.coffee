@@ -26,9 +26,9 @@ playerStates =
   Juniper: 'alive.lynching'
   Colwyn: 'dead'
 
-_(playerStates).each (state, id) ->
-  _(game.players).findWhere(id: id)._state = state
-
+game.players = _(game.players).map (p) ->
+  p._state = playerStates[p.id]
+  p
 
 game.rounds.push
   id: 'night1'

@@ -24,11 +24,21 @@ sessionInit = (opts) ->
 App.on "listen", sessionInit, Socket
 
 onConnection = (socket, session) ->
-  model = State.world.sessions.refreshSocket socket.id
+  session = State.world.sessions.findWhere session:session.id
+  session = State.world.sessions.add {} if not session
  
-  obj = State.world.toJSON()
-  socket.emit('world:state', _(obj).pick 'game', '_state')
+  session.setIdentifier 'session', session.id
+  session.setIdentifier 'socket', socket.id
 
+  obj = State.world.toJSON()
+  #socket.emit('world:state', _(obj).pick 'game', '_state')
+
+  socket.on 'data', (url, cb) ->
+    console.log data
+    return cb(null, obj) if url is 'world'
+    cb(404, {message: notFound})
+
+    
   socket.on 'disconnect', =>
 
     @trigger 'disconnect', socket, session

@@ -29,6 +29,11 @@ registerHandlers = (opts) ->
     @round.choose data.id, data.action, data.target
 
   ###
+
+  @io.emit 'data', 'world', (data) ->
+    console.log data
+    State.load(data)
+
   State.world.game.on 'game:join', =>
     @io.emit 'game:join'
 
@@ -41,6 +46,7 @@ registerHandlers = (opts) ->
   @io.on 'player:state', (id, state) ->
     State.world.game.players.get(id).toState(state)
   ###
+
 State.on 'load', registerHandlers, Socket
 
 

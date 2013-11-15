@@ -19,8 +19,10 @@ class Models.Session extends Models.BaseModel
   @attribute 'socket'
   @attribute 'sip'
   @attribute 'voice'
-  initialize: ->
+  initialize: (data={}, opts={}) ->
     super
+    @id = App.ns.uuid() unless data.id
+
     Object.defineProperty @, 'player',
       get: -> State.getPlayer()
       set: (value) ->
@@ -28,51 +30,33 @@ class Models.Session extends Models.BaseModel
         player = value
         player
 
+  setIdentifier: (type, id) ->
+    @[type] = id
+    # escalate to a higher level
+    # guards should make it fall
+    # where it can
+    @state().change(type)
+
   initState: -> state @,
     offline: state 'initial'
     online: state 'abstract',
-      session: {}
-      socket: {}
-      sip: {}
-      voice: {}
+      session: state 'default',
+        admit:
+          offline: true
+          socket: true
+      socket:
+        admit:
+          session: true
+          sip: true
+      sip:
+        admit:
+          socket: true
+          voice: true
+      voice:
+        admit:
+          sip: true
 
 class Models.Sessions extends Backbone.Collection
   model: Models.Session
   defaultSession: -> id: App.ns.uuid()
 
-  findBySessionId: (sessionId) ->
-    @findWhere session: sessionId
-  findBySocketId: (socketId) ->
-    @findWhere socket: socketId
-  findBySipID: (sipId) ->
-    @findWhere sip: sipId
-
-  refreshSession: (sessionId) ->
-    model = @findBySessionId sessionId
-    if not model
-      model = @defaultSession()
-      model = @add model, merge: true
-
-    model.state('-> online.session')
-    model.session = sessionId
-    return model
-
-  refreshSocket: (socketId) ->
-    model = @findBySocketId socketId
-    if not model
-      model = @defaultSession()
-      model = @add model, merge: true
-
-    model.state('-> online.socket')
-    model.socket = socketId
-    return model
-
-  refreshSip: (sipId) ->
-    model = @findBySipId sipId
-    if not model
-      model = @defaultSession()
-      model = @add model, merge: true
-
-    model.state('-> online.sip')
-    model.sip = sipId
-    return model
