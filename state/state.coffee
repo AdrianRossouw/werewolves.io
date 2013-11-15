@@ -21,20 +21,35 @@ State.models = {}
 Models.BaseModel::publish = ->
   url = _.result @, 'url'
   State.models[url] = @
+  console.log "register #{url}"
   listener = (model) ->
     State.trigger('data', url, model.toJSON())
 
-  State.listenTo @, 'change'
+  State.listenTo @, 'change', listener
+
+  ## the state listeners
+  listenState = (state) ->
+    console.log "#{url} changed state to #{state.path()}"
+    State.trigger('state', url, state.path())
+
+  states = @state('**')
+  _(states).each (s) -> s.on 'arrive', listenState
+
+
+
+
+
 
 Models.BaseModel::unpublish = ->
   State.stopListening @
   url = _.result @, 'url'
+
+  states = @state('**')
+  _(states).each (s) -> s.off 'arrive'
+
   delete State.models[url]
 
 
-
-State.addInitializer (opts) ->
-  @world ?= new Models.World()
 
 State.getPlayer = (player) ->
   @world?.game?.players?.get(player)

@@ -32,14 +32,20 @@ onConnection = (socket, session) ->
 
   #Straight forward data query by the client.
   socket.on 'data', (url, cb) ->
-    return cb(404, {message: notFound}) unless State.models[url]
-    cb(null, State.models[url].mask())
+    console.log "request #{url}"
+    model = State.models[url]
+    return cb(404, {message: 'not found'}) unless model
+    cb(null, model.mask())
 
   # a modification of data from the client.
   socket.on 'update', (url, data, cb) ->
-    return cb(404, {message: notFound}) unless State.models[url]
+    cb ?= ->
+    console.log "update #{url}"
+    model = State.models[url]
+    return cb(404, {message: 'not found'}) unless model
     # if allowed...
-    State.models[url].set(data)
+    model.set data
+    cb(null, data)
 
   socket.on 'disconnect', =>
     @trigger 'disconnect', socket, session

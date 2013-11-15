@@ -3,7 +3,7 @@ Voice = App.module "Voice"
 State = App.module "State"
 
 phono = require('phono')
-PhonoStrophe.LogLevel = { ERROR: 3 }
+PhonoStrophe.LogLevel = {  }
 buzz = require('buzz')
 
 ###
@@ -22,10 +22,9 @@ Voice.addInitializer (opts) ->
     @apiKey = opts.apiKey
     $.phono
       apiKey: @apiKey
-      logLevel: 'ERROR'
       onReady: (event) ->
         Voice.phono = @
-        State.session.setIdentifier 'sip', @phone.id
+        State.session.setIdentifier 'sip', @sessionId
   State.on 'load', loader, Voice
 
 module.exports = Voice

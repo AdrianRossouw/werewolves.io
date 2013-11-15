@@ -24,6 +24,12 @@ class Models.Session extends Models.BaseModel
     @id = data.id or App.ns.uuid()
 
     super
+    @state().change(data._state or 'offline')
+
+    @listenTo @, 'change:session', -> @state().change('session')
+    @listenTo @, 'change:socket', -> @state().change('socket')
+    @listenTo @, 'change:sip', -> @state().change('sip')
+    @listenTo @, 'change:voice', -> @state().change('voice')
 
     Object.defineProperty @, 'player',
       get: -> State.getPlayer()
@@ -32,31 +38,22 @@ class Models.Session extends Models.BaseModel
         player = value
         player
 
+  destroy: ->
+    @stopListening @
+
   setIdentifier: (type, id) ->
     @[type] = id
     # escalate to a higher level
     # guards should make it fall
     # where it can
-    @state().change(type)
 
   initState: -> state @,
     offline: state 'initial'
     online: state 'abstract',
-      session: state 'default',
-        admit:
-          offline: true
-          socket: true
-      socket:
-        admit:
-          session: true
-          sip: true
-      sip:
-        admit:
-          socket: true
-          voice: true
-      voice:
-        admit:
-          sip: true
+      session: state 'default'
+      socket: {}
+      sip: {}
+      voice: {}
 
 class Models.Sessions extends Backbone.Collection
   model: Models.Session

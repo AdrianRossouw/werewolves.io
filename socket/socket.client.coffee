@@ -4,7 +4,6 @@ State         = require('../state')
 _             = require('underscore')
 url           = require('url')
 
-# SocketIO library (browserified.. yay)
 socketio            = require("socket.io-client")
 registerHandlers = (opts) ->
   ###
@@ -57,12 +56,19 @@ Socket.addInitializer (opts) ->
     @io = socketio.connect(socketUrl)
 
 
-  @io.emit 'data', 'world', (err, data) ->
-    State.load(data)
+  sessionUrl = _.result State.session, 'url'
 
-  State.on 'data', (url, model) ->
-    if url is _.result(State.session, 'url')
-      @io.emit 'update', url, model
+  @io.emit 'data', sessionUrl, (err, data) ->
+    console.log 'got session data'
+    State.session.set data, silent: true
+
+  @io.emit 'data', 'world', (err, data) ->
+    console.log 'got world data'
+    State.load(data)
+  
+  State.on 'data', (url, model) =>
+    console.log 'update session'
+    @io.emit 'update', url, model if url is sessionUrl
 
 
 

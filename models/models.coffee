@@ -23,7 +23,7 @@ class Models.BaseModel extends Backbone.Model
     @unpublish()
 
   initState: ->
-  mask: -> @
+  mask: -> @toJSON()
   publish:  -> @
   toJSON: ->
     obj = super
