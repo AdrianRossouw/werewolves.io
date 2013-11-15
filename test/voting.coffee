@@ -43,6 +43,19 @@ describe 'init state', ->
 
       @currentVote = @myRecord.target
 
+    it 'should be in votes.all state', ->
+      @currentRound.state().path().should.equal 'votes.all'
+
+
+    it 'is in the daytime', ->
+      State.world.game.state().path().should.equal 'round.day'
+
+    it 'all living players are awake', ->
+      villagers = @game.players.chain()
+        .where(role: 'villager')
+        .filter((v) -> v.state().path() != 'dead')
+        .each((v) -> v.state().path().should.equal 'alive.day.lynching')
+
     it 'should have a current vote', ->
       should.exist @myRecord
       should.exist @currentVote

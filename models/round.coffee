@@ -99,10 +99,23 @@ class Models.Round extends Models.BaseModel
     return if top.length == 1 then victim.id else false
 
   choose: (me, actionName, target, opts = {}) ->
+    player = State.getPlayer me
+   
+    debug 'choose', me, target, player.voteAction(), actionName
+    # you cant vote while asleep
+    if player.state().isIn('asleep')
+      debug 'player is asleep'
+      return false
+
+    # can't do anything that the voteAction doesnt let you
+    if player.voteAction() is not actionName
+      debug 'player cant do this'
+      return false
+
     action = @actions.findWhere
       id:me
       action:actionName
-
+    
     if not action
       action ?=
         id:me
@@ -114,8 +127,8 @@ class Models.Round extends Models.BaseModel
       action.set
         target: target
 
+    debug "change vote state", action
     @voteState()
-    
 
 class Models.Rounds extends Backbone.Collection
   model: Models.Round

@@ -100,69 +100,119 @@ describe 'start application', ->
     it 'should have added a night round', ->
       @game.rounds.length.should.equal 1
 
-  describe 'during the first night', ->
-    before () ->
-      @world = State.world
-      @game = @world.game
-      @round = @game.currentRound()
+  describe 'playing the game', ->
+    before ->
+      # we are assigning roles randomly
+      # so we need to use the assigned roles
+
+      @wolves = @game.players.where
+        role:'werewolf'
+      @seer = @game.players.findWhere
+        role:'seer'
+      @villagers = @game.players.where
+        role:'villager'
+
+    describe 'during the first night', ->
+      before () ->
+        @clock.tick(100)
+        @world = State.world
+        @game = @world.game
+        @round = @game.currentRound()
 
 
-    it 'should only have 2 active players', ->
-      @game.players.activeTotal().should.equal 2
+      it 'should only have 2 active players', ->
+        @game.players.activeTotal().should.equal 2
 
-    it 'should have put the seer in seeing state', ->
-      seer = @game.players.findWhere role: 'seer'
-      seer.state().path().should.equal 'alive.night.seeing'
+      it 'should have put the seer in seeing state', ->
+        @seer.state().path().should.equal 'alive.night.seeing'
 
-    it 'should have put the wolf in eating state', ->
-      wolf = @game.players.findWhere role: 'werewolf'
-      wolf.state().path().should.equal 'alive.night.eating'
+      it 'should have put the wolf in eating state', ->
+        _(@wolves).each((v) -> v.state().path().should.equal 'alive.night.eating')
 
-    it 'should have put the rest in sleep state', ->
-      villagers = @game.players.chain()
-        .where(role: 'villager')
-        .each((v) -> v.state().path().should.equal 'alive.night.asleep')
+      it 'should have put the rest in sleep state', ->
+        _(@villagers).each((v) -> v.state().path().should.equal 'alive.night.asleep')
 
-  describe 'during the first day', ->
-    before () ->
-      @world = State.world
-      @game = @world.game
-      @game.next()
+      it 'should have the round in votes.none state', ->
+        @game.currentRound().state().path().should.equal 'votes.none'
 
-    it 'should go to the first day round', ->
-      @game.state().path().should.equal 'round.day.first'
-      @game.rounds.length.should.equal 2
-      @game.currentRound().phase.should.equal 'day'
+    describe 'night voting', ->
+      before ->
+        @clock.tick(100)
+        @world = State.world
+        @game = @world.game
+        @round = @game.currentRound()
 
-    it 'should have 8 active players', ->
-      @game.players.activeTotal().should.equal 8
+        @round.choose _(@wolves).first().id, 'eat', _(@villagers).first().id
 
-    it 'all should be in lynching state', ->
-      @game.players.each (p) ->
-        p.state().path().should.equal 'alive.day.lynching'
+      it 'should allow the wolf to vote', ->
+        @round.actions.at(0).should.include
+          id: _(@wolves).first().id
+          action: 'eat'
+          target: _(@villagers).first().id
+
+      it 'should have set the state to votes.some', ->
+        @round.state().path().should.equal 'votes.some'
+
+      it 'should correctly identify who would die next', ->
+        @round.getDeath().should.equal(_(@villagers).first().id)
+
+    describe 'villagers are really asleep', ->
+      before ->
+        @clock.tick(100)
+        @world = State.world
+        @game = @world.game
+        @round = @game.currentRound()
+
+        @round.choose _(@villagers).last().id, 'eat', _(@wolves).last().id
+        @round.choose _(@villagers).last().id, 'eat', _(@villagers).first().id
+        @round.choose @villagers[2].id, 'lynch', @seer.id
+
+      it 'should not allow villagers to vote now', ->
+        @round.actions.length.should.equal 1
+
+    describe 'during the first day', ->
+      before () ->
+        @clock.tick(100)
+        @world = State.world
+        @game = @world.game
+        @game.next()
+
+      it 'should go to the first day round', ->
+        @game.state().path().should.equal 'round.day.first'
+        @game.rounds.length.should.equal 2
+        @game.currentRound().phase.should.equal 'day'
+
+      it 'should have 8 active players', ->
+        @game.players.activeTotal().should.equal 8
+
+      it 'all should be in lynching state', ->
+        @game.players.each (p) ->
+          p.state().path().should.equal 'alive.day.lynching'
 
 
-  describe 'during the next night', ->
-    before () ->
-      @world = State.world
-      @game = @world.game
-      @game.next()
+    describe 'during the next night', ->
+      before () ->
+        @clock.tick(100)
+        @world = State.world
+        @game = @world.game
+        @game.next()
 
 
-    it 'should go to the next night round', ->
-      @game.state().path().should.equal 'round.night'
-      @game.rounds.length.should.equal 3
+      it 'should go to the next night round', ->
+        @game.state().path().should.equal 'round.night'
+        @game.rounds.length.should.equal 3
 
-  describe 'during the next day', ->
-    before () ->
-      @world = State.world
-      @game = @world.game
-      @game.next()
+    describe 'during the next day', ->
+      before () ->
+        @clock.tick(100)
+        @world = State.world
+        @game = @world.game
+        @game.next()
 
 
-    it 'should go to the next day round', ->
-      @game.state().path().should.equal 'round.day'
-      @game.rounds.length.should.equal 4
+      it 'should go to the next day round', ->
+        @game.state().path().should.equal 'round.day'
+        @game.rounds.length.should.equal 4
 
 
 

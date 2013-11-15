@@ -3,6 +3,7 @@ State     = require('../state')
 express   = require('express')
 socketio  = require("socket.io")
 SessionIo = require("session.socket.io")
+debug     = require('debug')('werewolves:state:server')
 _         = require('underscore')
 Socket    = App.module "Socket"
 
@@ -33,7 +34,7 @@ onConnection = (socket, session) ->
 
   #Straight forward data query by the client.
   socket.on 'data', (url, cb) ->
-    console.log "request #{url}"
+    debug "request #{url}"
     model = State.models[url]
 
     return cb(404, {message: 'not found'}) unless model
@@ -43,7 +44,7 @@ onConnection = (socket, session) ->
   # a modification of data from the client.
   socket.on 'update', (url, data, cb) ->
     cb ?= ->
-    console.log "update #{url}"
+    debug "update #{url}"
     model = State.models[url]
 
     return cb(404, {message: 'not found'}) unless model
@@ -72,14 +73,14 @@ joinGame = (socket, session) ->
 
   listener = (playerId) ->
     State.world.game.addPlayer id: playerId
-    console.log 'added player'
+    debug 'added player'
 
   socket.on 'game:join', listener
   socket.on 'disconnect', =>
     socket.removeListener 'game:join', listener
 
   addPlayer = (model) ->
-    console.log 'emit player added'
+    debug 'emit player added'
     socket.emit 'player:add', model
   State.world.game.players.on 'add', addPlayer
 

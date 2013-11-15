@@ -1,6 +1,7 @@
 App           = require('../app')
 Socket        = App.module "Socket"
 State         = require('../state')
+debug         = require('debug')('werewolves:state:client')
 _             = require('underscore')
 url           = require('url')
 
@@ -59,25 +60,25 @@ Socket.addInitializer (opts) ->
   sessionUrl = _.result State.session, 'url'
 
   @io.emit 'data', sessionUrl, (err, data) ->
-    console.log 'got session data'
+    debug 'got session data'
     State.session.set data, silent: true
 
   @io.emit 'data', 'world', (err, data) ->
-    console.log 'got world data'
+    debug 'got world data'
     State.load(data)
   
   State.on 'data', (url, model) =>
-    console.log 'update session'
+    debug 'update session'
     @io.emit 'update', url, model if url is sessionUrl
 
   @io.on 'data', (url, data) ->
     model = State.models[url]
     model.set data if model
-    console.log "received new data for #{url}"
+    debug "received new data for #{url}"
 
   @io.on 'state', (url, state) ->
     model = State.models[url]
     model.state().change(state) if model
-    console.log "received new state #{state} for #{url}"
+    debug "received new state #{state} for #{url}"
 
 module.exports = Socket

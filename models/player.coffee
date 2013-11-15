@@ -34,22 +34,24 @@ class Models.Player extends Models.BaseModel
   @attribute 'role'
   @attribute 'occupation'
 
-  initialize: ->
+  initialize: (data={}, opts={}) ->
+    @id = @id or App.ns.uuid()
     super
     @set('name', App.ns.name()) unless @name
     @set('occupation', App.ns.jobTitle()) unless @occupation
     @set('role', 'villager') unless @villager
-    @state('-> alive')
+    @state().change(data._state or 'alive')
 
   initState: ->
     state @,
+      voteAction: -> false
       # player is dead, they don't get to take part in anything
       dead: state 'final',
         startPhase: ->
       alive:
         kill: -> @state('-> dead')
-
         startPhase: (phase) ->
+          debug('phase', @state().path(), phase)
           if phase is 'day'
             @state('-> lynching')
           else
@@ -57,22 +59,25 @@ class Models.Player extends Models.BaseModel
             @state('-> asleep')
             @state('-> eating')
 
-        day: state 'abstract',
-          # every living player lynches
-          lynching: {}
+
         night: state 'abstract',
           # guards set on the states based on roles
-          seeing:
-            admit: '*': -> @owner.role is 'seer'
-          eating:
-            admit: '*': -> @owner.role is 'werewolf'
           asleep:
-            admit: '*': -> @owner.role is 'villager'
-
+            admit: 'alive': -> @owner.role is 'villager'
+          seeing:
+            admit: 'alive': -> @owner.role is 'seer'
+            voteAction: -> 'see'
+          eating:
+            admit: 'alive': -> @owner.role is 'werewolf'
+            voteAction: -> 'eat'
+        day: state 'abstract',
+          # every living player lynches
+          lynching:
+            voteAction: -> 'lynch'
 class Models.Players extends Backbone.Collection
   model: Models.Player
 
-  assignRoles: ->
+  assignRoles: (roles) ->
     roles = getRoles(@length)
     @each (player) ->
       player.set('role', roles.shift())
@@ -84,6 +89,7 @@ class Models.Players extends Backbone.Collection
   activeTotal: ->
     isActive = (p) ->
       state = p.state()
+      debug 'active state', p.id, state.isIn('alive'), state.isIn('asleep'), state.path()
       state.isIn('alive') and not state.isIn('asleep')
     @filter(isActive).length
 
