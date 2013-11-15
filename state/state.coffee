@@ -9,8 +9,29 @@
 App      = require("../app")
 Backbone = require('backbone')
 Models   = require('../models')
+_ = require('underscore')
+
 State    = App.module "State",
   startWithParent: false
+
+# singleton map of models to url()
+# used for syncing to clients.
+State.models = {}
+
+Models.BaseModel::publish = ->
+  url = _.result @, 'url'
+  State.models[url] = @
+  listener = (model) ->
+    State.trigger('data', url, model.toJSON())
+
+  State.listenTo @, 'change'
+
+Models.BaseModel::unpublish = ->
+  State.stopListening @
+  url = _.result @, 'url'
+  delete State.models[url]
+
+
 
 State.addInitializer (opts) ->
   @world ?= new Models.World()
@@ -24,6 +45,8 @@ State.load = (data = {}) ->
   @trigger 'load', @
 
 State.on 'stop', ->
+  # TODO: destroy, not delete
+  State.world.destroy()
   delete State.world
 
 

@@ -30,18 +30,24 @@ onConnection = (socket, session) ->
   session.setIdentifier 'session', session.id
   session.setIdentifier 'socket', socket.id
 
-  obj = State.world.toJSON()
-  #socket.emit('world:state', _(obj).pick 'game', '_state')
-
+  #Straight forward data query by the client.
   socket.on 'data', (url, cb) ->
-    console.log data
-    return cb(null, obj) if url is 'world'
-    cb(404, {message: notFound})
+    return cb(404, {message: notFound}) unless State.models[url]
+    cb(null, State.models[url].mask())
 
-    
+  # a modification of data from the client.
+  socket.on 'update', (url, data, cb) ->
+    return cb(404, {message: notFound}) unless State.models[url]
+    # if allowed...
+    State.models[url].set(data)
+
   socket.on 'disconnect', =>
-
     @trigger 'disconnect', socket, session
+
+Socket.on "connection", onConnection, Socket
+
+###
+clientDataStream = (socket, session) ->
 
 joinGame = (socket, session) ->
 
@@ -60,7 +66,6 @@ joinGame = (socket, session) ->
 
 Socket.on "connection", joinGame, Socket
 
-###
 roundListener = (socket, session) ->
   @round = null
 
@@ -86,8 +91,7 @@ roundListener = (socket, session) ->
   @on 'disconnect', (socket, session) =>
     socket.removeListener 'round:action', publishAction
 Socket.on "connection", roundListener, Socket
-###
 
-Socket.on "connection", onConnection, Socket
+###
 
 module.exports = Socket

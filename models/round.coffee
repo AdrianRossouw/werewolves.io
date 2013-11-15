@@ -6,6 +6,7 @@ Models   = App.module "Models"
 
 
 class Models.Action extends Models.BaseModel
+  urlRoot: 'action'
   @attribute 'action'
   @attribute 'target'
 
@@ -13,14 +14,15 @@ class Models.Actions extends Backbone.Collection
   model: Models.Action
 
 class Models.Round extends Models.BaseModel
+  urlRoot: 'round'
   @attribute 'death'
   @attribute 'phase'
   @attribute 'number'
   @attribute 'activeTotal'
 
   initialize: (data = {}, opts = {}) ->
-    super
     @id = data.id or App.ns.uuid()
+    super
     @actions = new Models.Actions []
     @state().change(data._state or 'startup')
     @actions.reset data.actions if data.actions

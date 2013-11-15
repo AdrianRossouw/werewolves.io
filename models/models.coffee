@@ -17,8 +17,14 @@ class Models.BaseModel extends Backbone.Model
   initialize: (attrs = {}, options = {}) ->
     @initState()
     @initAttribute attr, val for val, attr in attrs
+    @publish()
+
+  destroy: ->
+    @unpublish()
 
   initState: ->
+  mask: -> @
+  publish:  -> @
   toJSON: ->
     obj = super
     obj._state = @state().path() if @state

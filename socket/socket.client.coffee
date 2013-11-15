@@ -30,10 +30,6 @@ registerHandlers = (opts) ->
 
   ###
 
-  @io.emit 'data', 'world', (data) ->
-    console.log data
-    State.load(data)
-
   State.world.game.on 'game:join', =>
     @io.emit 'game:join'
 
@@ -41,6 +37,7 @@ registerHandlers = (opts) ->
     State.world.game.players.add player
   @io.on 'game:state', (state) ->
     State.world.game.toState(state)
+
 
   ###
   @io.on 'player:state', (id, state) ->
@@ -58,8 +55,15 @@ Socket.addInitializer (opts) ->
     @io = socketio.connect(socketUrl, { secure: true })
   else
     @io = socketio.connect(socketUrl)
-  @io.on 'world:state', (data) =>
-    State.load data
+
+
+  @io.emit 'data', 'world', (err, data) ->
+    State.load(data)
+
+  State.on 'data', (url, model) ->
+    if url is _.result(State.session, 'url')
+      @io.emit 'update', url, model
+
 
 
 module.exports = Socket

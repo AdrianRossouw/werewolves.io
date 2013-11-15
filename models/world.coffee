@@ -7,12 +7,17 @@ Models   = App.module "Models"
 # The world acts as the container for the other
 # pieces of state.
 class Models.World extends Models.BaseModel
-  url: 'world',
+  url: 'world'
   initialize: (data = {}, opts = {}) ->
     super
     @sessions = new Models.Sessions(data.sessions or [])
     @game = new Models.Game(data.game or {})
     @state().change(data._state or 'attract')
+
+  destroy: ->
+    @sessions.invoke 'destroy'
+    @game.destroy()
+    super
 
   toJSON: ->
     obj = super

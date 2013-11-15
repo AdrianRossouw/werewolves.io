@@ -18,6 +18,8 @@ Models.Players::initialize = (data={}, opts={}) ->
   _.extend @, selectOne
 
 
+
+
 State.playerId = window.PLAYER_ID
 
 State.addInitializer (opts) ->
@@ -32,6 +34,7 @@ State.load = (data) ->
   @world = new Models.World(data)
   @trigger 'load', data
 
+ 
 ###
   @listenTo @world.game.players, 'select:one', (model) =>
     id = @world.game.player.id

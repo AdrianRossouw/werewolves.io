@@ -3,6 +3,7 @@ App    = require('../app')
 State  = require('./state.coffee')
 Models = require('../models')
 Backbone = require('backbone')
+_ = require('underscore')
 
 # generates useful 'random' values
 Nonsense     = require('Nonsense')
@@ -17,6 +18,11 @@ State.addInitializer (opts) ->
   # just for now
   @world ?= new Models.World()
   
+
+# hide sensitive information from client
+Models.World::mask = ->
+  _.pick(@toJSON(), 'game', '_state')
+
 
 
 # Session middleware
@@ -36,7 +42,6 @@ State.initMiddleware = (opts) ->
     session.setIdentifier 'session', req.session.id
     req.state =
       session: session
-    console.log req.state.session.toJSON()
     next()
 
 

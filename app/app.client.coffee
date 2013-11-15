@@ -25,8 +25,9 @@ Marionette    = require("backbone.marionette")
 Backbone.$    = Marionette.$ = require("jquery")
 
 
-if env != 'development'
-  require('../voice')
+#if env != 'development'
+
+require('../voice')
 
 
 # Load up the state instances

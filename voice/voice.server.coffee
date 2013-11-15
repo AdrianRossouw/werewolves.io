@@ -14,12 +14,12 @@ App.on 'middleware', middleware, App
 
 mountRoutes = (opts) ->
   @post '/voice', (req, res, next) ->
+        
     tropo = new TropoWebAPI()
     tropo.say "http://hosting.tropo.com/5010929/www/audio/Introduction.mp3"
-
+    tropo.say 'what the fuck'
 
     tropo.conference("game", null, "conference", null, null, null)
-    
     res.send TropoJSON(tropo)
 
 App.on 'before:routes', mountRoutes, App

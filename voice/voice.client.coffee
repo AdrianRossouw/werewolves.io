@@ -3,6 +3,7 @@ Voice = App.module "Voice"
 State = App.module "State"
 
 phono = require('phono')
+PhonoStrophe.LogLevel = { ERROR: 3 }
 buzz = require('buzz')
 
 ###
@@ -24,14 +25,7 @@ Voice.addInitializer (opts) ->
       logLevel: 'ERROR'
       onReady: (event) ->
         Voice.phono = @
-        Socket.setSipId world.playerId, @phone.id
-        @phone.wideband true
-        @phone.ringbackTone false
-        @phone.dial Voice.appId,
-          volume: 100
-          headers: [
-            { name: "x-player-id", value: ''+world.playerId }
-          ]
+        State.session.setIdentifier 'sip', @phone.id
   State.on 'load', loader, Voice
 
 module.exports = Voice

@@ -11,13 +11,18 @@ class Models.Game extends Models.BaseModel
   @attribute 'startTime'
   @attribute 'phaseTime'
   initialize: (data = {}, opts={}) ->
-    super
     @id = App.ns.uuid()
+    super
     @players = new Models.Players []
     @rounds = new Models.Rounds []
     @state().change(data._state or 'recruit')
     @players.reset data.players if data.players
     @rounds.reset data.rounds if data.rounds
+
+  destroy: ->
+    @players.invoke('destroy')
+    @rounds.invoke('destroy')
+    super
 
   toJSON: ->
     obj = super

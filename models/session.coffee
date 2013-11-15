@@ -15,13 +15,15 @@ State    = App.module "State"
 
 class Models.Session extends Models.BaseModel
   # session identifiers
+  urlRoot: 'session'
   @attribute 'session'
   @attribute 'socket'
   @attribute 'sip'
   @attribute 'voice'
   initialize: (data={}, opts={}) ->
+    @id = data.id or App.ns.uuid()
+
     super
-    @id = App.ns.uuid() unless data.id
 
     Object.defineProperty @, 'player',
       get: -> State.getPlayer()
