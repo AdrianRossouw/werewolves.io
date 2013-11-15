@@ -104,6 +104,7 @@ describe 'start application', ->
     before () ->
       @world = State.world
       @game = @world.game
+      @round = @game.currentRound()
 
 
     it 'should only have 2 active players', ->

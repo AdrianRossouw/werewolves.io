@@ -1,8 +1,10 @@
 App      = require('../app')
 state    = require('state')
+debug    = require('debug')('werewolves:model:round')
 _        = require('underscore')
 Backbone = require('backbone')
 Models   = App.module "Models"
+State    = App.module "State"
 
 
 class Models.Action extends Models.BaseModel
@@ -18,14 +20,14 @@ class Models.Round extends Models.BaseModel
   @attribute 'death'
   @attribute 'phase'
   @attribute 'number'
-  @attribute 'activeTotal'
 
   initialize: (data = {}, opts = {}) ->
     @id = data.id or App.ns.uuid()
     super
     @actions = new Models.Actions []
-    @state().change(data._state or 'startup')
+    @players = opts.players
     @actions.reset data.actions if data.actions
+    @state().change(data._state or 'votes.none')
 
   voteState: ->
     @lastChoice = Date.now()
@@ -39,8 +41,6 @@ class Models.Round extends Models.BaseModel
     obj.actions = @actions.toJSON()
     obj
   initState: -> state @,
-    startup: {}
-
     votes: state 'abstract',
       # waiting for the first vote to be cast
       none: state 'default',
@@ -50,14 +50,20 @@ class Models.Round extends Models.BaseModel
       # we have  votes
       some:
         admit:
-          '*': -> (1 <= @owner.actions.length <= @owner.activeTotal)
+          'none': ->
+            activeTotal = @owner.players.activeTotal()
+            (1 <= @owner.actions.length <= activeTotal)
+
         arrive: ->
           @firstVotes = Date.now()
 
       all:
         admit:
-          '*': -> @owner.actions.length == @owner.activeTotal
-        
+          '': -> true
+          'some': ->
+            activeTotal = @owner.players.activeTotal()
+            @owner.actions.length == activeTotal
+
     complete: state 'conclusive',
       # there is a death
       died: state 'final',

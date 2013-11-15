@@ -18,12 +18,12 @@ game.players.push { id: 'Colwyn', name: 'Colwyn', role: 'villager' }
 
 playerStates =
   Narrator: 'dead'
-  Edward: 'alive.lynching'
-  Gaylord: 'alive.lynching'
+  Edward: 'alive.day.lynching'
+  Gaylord: 'alive.day.lynching'
   Arturo: 'dead'
-  Dafydd: 'alive.lynching'
-  Florence: 'alive.lynching'
-  Juniper: 'alive.lynching'
+  Dafydd: 'alive.day.lynching'
+  Florence: 'alive.day.lynching'
+  Juniper: 'alive.day.lynching'
   Colwyn: 'dead'
 
 game.players = _(game.players).map (p) ->

@@ -25,6 +25,12 @@ Voice.listenTo App, 'state', (opts) ->
       onReady: (event) ->
         Voice.phono = @
         State.session.setIdentifier 'sip', @sessionId
+      phone:
+        onIncomingCall: (event) ->
+          call = event.call
+          console.log("Auto-answering call with ID " + call.id)
+          call.answer()
+
   State.on 'load', loader, Voice
 
 module.exports = Voice

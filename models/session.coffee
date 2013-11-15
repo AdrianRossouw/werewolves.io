@@ -34,7 +34,7 @@ class Models.Session extends Models.BaseModel
     Object.defineProperty @, 'player',
       get: -> State.getPlayer()
       set: (value) ->
-        player = State.getPlayer()
+        player = State.getPlayer(@id)
         player = value
         player
 

@@ -32,7 +32,6 @@ mountRoutes = (opts) ->
       round = game.currentRound()
       player = State.getPlayer(playerId)
 
-
       if callState is 'init'
         tropo.call session.sip
 

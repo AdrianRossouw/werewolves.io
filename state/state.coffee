@@ -9,6 +9,7 @@
 App      = require("../app")
 Backbone = require('backbone')
 Models   = require('../models')
+debug    = require('debug')('werewolves:state')
 _ = require('underscore')
 
 State    = App.module "State",
@@ -21,7 +22,7 @@ State.models = {}
 Models.BaseModel::publish = ->
   url = _.result @, 'url'
   State.models[url] = @
-  console.log "register #{url}"
+  debug "register #{url}"
   listener = (model) ->
     State.trigger('data', url, model.toJSON())
 
@@ -30,11 +31,12 @@ Models.BaseModel::publish = ->
   ## the state listeners
   listenState = (state) ->
     path = state.path().replace(/\.$/, '')
-    console.log "#{url} changed state to #{path}"
+    debug "#{url} changed state to #{path}"
     State.trigger('state', url, path)
 
-  states = @state('**')
-  _(states).each (s) -> s.on 'arrive', listenState
+  if @state
+    states = @state('**')
+    _(states).each (s) -> s.on 'arrive', listenState
 
 
 
@@ -51,10 +53,8 @@ Models.BaseModel::unpublish = ->
   delete State.models[url]
 
 
-
 State.getPlayer = (player) ->
   @world?.game?.players?.get(player)
-
 
 State.getSession = (session) ->
   @world?.sessions?.get(session)

@@ -32,7 +32,8 @@ class Views.Player extends Backbone.Marionette.ItemView
 
   serializeData: ->
     json = super
-    json.me = @model.id == State.session.player.id
+    if State.session.player
+      json.me = @model.id == State.session.player.id
     #json.selected = @model.collection.selected == @model
     json
 

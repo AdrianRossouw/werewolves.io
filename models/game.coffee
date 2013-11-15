@@ -2,6 +2,7 @@ App      = require('../app')
 state    = require('state')
 _        = require('underscore')
 Backbone = require('backbone')
+debug    = require('debug')('werewolves:model:game')
 Models   = App.module "Models"
 
 
@@ -79,7 +80,6 @@ class Models.Game extends Models.BaseModel
           id: App.ns.uuid()
           number: @rounds.length + 1
           phase: phase or 'night'
-          activeTotal: @players.activeTotal()
 
         @rounds.add round,
           players: @players

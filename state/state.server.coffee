@@ -24,7 +24,6 @@ Models.World::mask = ->
   _.pick(@toJSON(), 'game', '_state')
 
 
-
 # Session middleware
 express              = require('express')
 RedisStore           = require('connect-redis')(express)

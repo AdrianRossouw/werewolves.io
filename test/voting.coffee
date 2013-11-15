@@ -65,6 +65,7 @@ describe 'init state', ->
 
         done()
 
+
       @currentRound.choose 'Edward', 'lynch', 'Juniper'
   describe 'game ending', ->
     before ->

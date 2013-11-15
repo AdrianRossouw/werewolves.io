@@ -57,9 +57,9 @@ onConnection = (socket, session) ->
       sModel.sip = false
       sModel.socket = false
 
-    socket.removeListener 'data'
-    socket.removeListener 'state'
-    socket.removeListener 'update'
+    #socket.removeListener 'data'
+    #socket.removeListener 'state'
+    #socket.removeListener 'update'
 
     @trigger 'disconnect', socket, session
 

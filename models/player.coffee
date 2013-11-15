@@ -1,6 +1,7 @@
 App      = require('../app')
 state    = require('state')
 _        = require('underscore')
+debug    = require('debug')('werewolves:model:player')
 Backbone = require('backbone')
 Models   = App.module "Models"
 

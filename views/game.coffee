@@ -64,11 +64,17 @@ class Views.Game extends Backbone.Marionette.ItemView
     for player, i in @players.models
       player.set 'number', i+1
 
-    others = @players.filter (p) =>
-      p.id != State.session.player.id
-    otherPlayers = new Backbone.Collection others
+    players = @players
 
-    @playersView = new Views.Players collection: otherPlayers
+
+    # is the currently active session even playing along?
+    sesPlayer = State.session.player
+    if sesPlayer
+      others = @players.filter (p) =>
+        p.id != State.session.player.id
+      players = new Backbone.Collection others
+
+    @playersView = new Views.Players collection: players
     @ui.main.append @playersView.render().el
 
   syncRound: ->
