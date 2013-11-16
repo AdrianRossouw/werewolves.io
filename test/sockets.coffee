@@ -3,18 +3,17 @@ State = require('../state')
 Socket = require('../socket')
 config = require('../config')
 should = require('should')
+express     = require('express')
 sinon = require('sinon')
 _ = require('underscore')
 socketio = require("socket.io-client")
+socketio.transports = ["websocket"]
 
 App.config = ->
-  conf = {}
-  _.defaults conf, config.defaults
+  _.extend {}, config.defaults,
+    port: 8001
+    socket: log: false
 
-  conf.port =  8001
-  conf.socket =
-      log: false
-  conf
 
 before (done) ->
   App.on 'listen', -> done()
@@ -25,14 +24,20 @@ it 'should have started the state module', ->
   State.should.have.property '_isInitialized', true
 
 describe 'socket can connect', ->
+
   before (done) ->
-    socketio.transports = ["websocket"]
+    @stateSpy = sinon.spy State, 'trigger'
+    @socketSpy = sinon.spy Socket, 'trigger'
     @io = socketio.connect('http://localhost:8001')
-    @io.on 'connect', ->
+    @io.on 'connect', =>
       done()
 
   it 'should have set up the environment', ->
     should.exist @io
+
+  after ->
+    @stateSpy.restore()
+    @socketSpy.restore()
 
 describe 'cleanup', ->
   before ->
