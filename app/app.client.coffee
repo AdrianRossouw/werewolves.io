@@ -41,15 +41,28 @@ App.addInitializer (opts) ->
 # Load up the state instances
 Socket = require('../socket')
 
+$body = $('body')
+
+App.showGame = ->
+  $body.removeClass('in-lobby').addClass('in-game')
+
+App.hideGame = ->
+  $body.addClass('in-lobby').removeClass('in-game')
+
+App.listenTo State, "state", (url, state) ->
+  if url is world
+    if (state is 'gameplay') or State.session.player
+      @showGame()
+    else
+      @hideGame()
+
 loader = (opts) ->
   @addRegions
     game: '#game'
 
-  $body = $('body')
-
   playNow = ->
-    $body.removeClass('in-lobby').addClass('in-game')
-    App.State.world.joinGame(window.PLAYER_ID)
+    App.showGame()
+    App.State.joinGame()
 
   $('.play-now').click playNow
 

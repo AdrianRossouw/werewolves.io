@@ -5,6 +5,42 @@ express = require('express')
 request = require('request')
 Voice = App.module "Voice"
 
+Models.Session::signal = (signal) ->
+  return false if not @voice
+
+  body = JSON.stringify(signal: signal)
+
+  reqOpts =
+    url: "https://api.tropo.com/1.0/sessions/#{@voice}/signals"
+    body: body
+    json: true
+
+  request.post reqOpts, ->
+
+Models.Session::initVoice = ->
+
+  body = JSON.stringify
+    token: Voice.token,
+    playerId: @id
+    callState: 'init'
+
+  reqOpts =
+    url: 'https://api.tropo.com/1.0/sessions'
+    body: body
+    json: true
+
+  request.post reqOpts, (err, resp) =>
+    @voice = resp.body.id.replace('\r\n', '')
+
+
+Models.Sessions::findVoice = (voice) ->
+  return false if not voice
+  @findWhere voice: voice
+
+
+Models.Sessions::findSip = (sip) ->
+  return false if not sip
+  @findWhere sip: sip
 
 tropo  = require('tropo-webapi')
 
@@ -16,7 +52,7 @@ middleware = (opts) ->
 
 App.on 'middleware', middleware, App
 
-Voice.debug = (tropo) ->
+Voice.debug = (tropo, env) ->
   tropo.say "session is #{env.session.state().name}" if env.session
   tropo.say "world is #{env.world.state().name}" if env.world
   tropo.say "game is #{env.game.state().name}" if env.game
@@ -42,30 +78,14 @@ Voice.intro = (tropo, env) ->
   @awake tropo
 
 
-
-
 Voice.listenTo App, 'before:state', (opts) ->
   @token = opts.token
 
 Voice.listenTo State, 'state', (url, state) ->
   if state is 'online.sip'
     session = State.models[url]
-    @initSession session.id, (err, resp) =>
-      session.voice = resp.body.id.replace(/\/r\/n/, '')
-      console.log session.voice
-
-Voice.initSession = (playerId, cb) ->
-  body = JSON.stringify
-    token: @token,
-    playerId: playerId
-    callState: 'init'
-
-  reqOpts =
-    url: 'https://api.tropo.com/1.0/sessions'
-    body: body
-    json: true
-
-  request.post reqOpts, cb
+    console.log session
+    session.initVoice()
 
 Voice.listenTo App, 'before:routes', (opts) ->
   App.post '/voice', (req, res, next) =>
@@ -75,10 +95,13 @@ Voice.listenTo App, 'before:routes', (opts) ->
     if req.body?.session?.parameters
       callState = req.body.session.parameters.callState
 
-      playerId = req.body.session.parameters.playerId
+      session = State.world.sessions.findVoice(req.body?.session?.id)
+      console.log State.world.sessions.pluck('voice')
+
+      playerId = session.id
 
       env =
-        session: State.getSession(playerId)
+        session: session
         world: State.world
         game: State.world.game
         round: State.world.game.currentRound()
@@ -88,8 +111,8 @@ Voice.listenTo App, 'before:routes', (opts) ->
         tropo.call env.session.sip
 
       if not env.world.state().isIn('gameplay')
-        @intro tropo
-
+        #@intro tropo
+        @debug tropo, env
       else
         @debug tropo, env
     else

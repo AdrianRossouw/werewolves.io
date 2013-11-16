@@ -32,7 +32,9 @@ State.load = (data) ->
   @world = new Models.World(data)
   @trigger 'load', data
 
- 
+State.joinGame = ->
+  @trigger 'game:join'
+
 ###
   @listenTo @world.game.players, 'select:one', (model) =>
     id = @world.game.player.id

@@ -30,7 +30,7 @@ registerHandlers = (opts) ->
 
   ###
 
-  State.world.game.on 'game:join', =>
+  State.on 'game:join', =>
     @io.emit 'game:join'
 
 # on the client side we only care about our session
