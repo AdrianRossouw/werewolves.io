@@ -41,6 +41,7 @@ class Models.Player extends Models.BaseModel
     @set('occupation', App.ns.jobTitle()) unless @occupation
     @set('role', 'villager') unless @villager
     @state().change(data._state or 'alive')
+    @publish()
 
   initState: ->
     state @,
@@ -74,7 +75,10 @@ class Models.Player extends Models.BaseModel
           # every living player lynches
           lynching:
             voteAction: -> 'lynch'
-class Models.Players extends Backbone.Collection
+
+
+class Models.Players extends Models.BaseCollection
+  url: 'player'
   model: Models.Player
 
   assignRoles: (roles) ->

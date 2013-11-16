@@ -11,8 +11,12 @@ class Models.Action extends Models.BaseModel
   urlRoot: 'action'
   @attribute 'action'
   @attribute 'target'
+  initialize: ->
+    super
+    @publish()
 
-class Models.Actions extends Backbone.Collection
+class Models.Actions extends Models.BaseCollection
+  url: 'action'
   model: Models.Action
 
 class Models.Round extends Models.BaseModel
@@ -28,6 +32,7 @@ class Models.Round extends Models.BaseModel
     @players = opts.players
     @actions.reset data.actions if data.actions
     @state().change(data._state or 'votes.none')
+    @publish()
 
   voteState: ->
     @lastChoice = Date.now()
@@ -130,5 +135,6 @@ class Models.Round extends Models.BaseModel
     debug "change vote state", action
     @voteState()
 
-class Models.Rounds extends Backbone.Collection
+class Models.Rounds extends Models.BaseCollection
+  url: 'round'
   model: Models.Round

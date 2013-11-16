@@ -26,6 +26,7 @@ class Models.Session extends Models.BaseModel
     super
     @state().change(data._state or 'offline')
 
+    @publish()
     @listenTo @, 'change:session', -> @state().change('session')
     @listenTo @, 'change:socket', -> @state().change('socket')
     @listenTo @, 'change:sip', -> @state().change('sip')
@@ -71,7 +72,7 @@ class Models.Session extends Models.BaseModel
         release:
           sip: -> !@owner.voice
 
-class Models.Sessions extends Backbone.Collection
+class Models.Sessions extends Models.BaseCollection
+  url: 'session'
   model: Models.Session
-  defaultSession: -> id: App.ns.uuid()
 

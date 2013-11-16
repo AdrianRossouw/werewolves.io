@@ -32,6 +32,7 @@ onConnection = (socket, session) ->
   if not sModel.socket
     sModel.setIdentifier 'socket', socket.id
 
+
   #Straight forward data query by the client.
   dataHandler = (url, cb = ->) ->
     debug "request #{url}"
@@ -46,6 +47,7 @@ onConnection = (socket, session) ->
   # a modification of data from the client.
   updateHandler = (url, data, cb = ->) ->
     debug "update #{url}"
+    console.log arguments
     model = State.models[url]
 
     return cb(404, {message: 'not found'}) unless model
@@ -54,8 +56,6 @@ onConnection = (socket, session) ->
     cb(null, data)
 
   socket.on 'update', updateHandler
-
-
 
   socket.on 'disconnect', =>
     if sModel.socket is socket.id
@@ -70,26 +70,22 @@ onConnection = (socket, session) ->
 
 Socket.on "connection", onConnection, Socket
 
-###
-clientDataStream = (socket, session) ->
-
 joinGame = (socket, session) ->
+  sModel = State.world.sessions.findWhere session:session.id
+  sModel = State.world.sessions.add {} if not sModel
 
-  listener = (playerId) ->
-    State.world.game.addPlayer id: playerId
+  listener = (cb=->) ->
     debug 'added player'
+    State.world.game.addPlayer(id: sModel.id)
+    cb(null, sModel)
 
   socket.on 'game:join', listener
   socket.on 'disconnect', =>
     socket.removeListener 'game:join', listener
 
-  addPlayer = (model) ->
-    debug 'emit player added'
-    socket.emit 'player:add', model
-  State.world.game.players.on 'add', addPlayer
-
 Socket.on "connection", joinGame, Socket
 
+###
 roundListener = (socket, session) ->
   @round = null
 

@@ -15,7 +15,6 @@ class Models.BaseModel extends Backbone.Model
 
   initialize: (attrs = {}, options = {}) ->
     @initState()
-    @publish()
 
   destroy: ->
     @unpublish()
@@ -36,6 +35,21 @@ class Models.BaseModel extends Backbone.Model
         attrs = {}
         attrs[attr] = value
         @set attrs
+
+# Create model attribute getter/setter property.
+# From : http://srackham.wordpress.com/2011/10/16/getters-and-setters-for-backbone-model-attributes/
+class Models.BaseCollection extends Backbone.Collection
+
+  initialize: (records = {}, options = {}) ->
+    super
+    @publish()
+
+  destroy: ->
+    @unpublish()
+
+  initState: ->
+  mask: -> @toJSON()
+  publish:  -> @
 
 require('./session.coffee')
 require('./player.coffee')

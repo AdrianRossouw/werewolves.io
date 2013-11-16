@@ -35,7 +35,7 @@ module.exports = (grunt) ->
             'socket',
             'state'
           ]
-          watchedExtensions: ["js", "coffee", "jade", 'css']
+          watchedExtensions: ["coffee", "jade", 'css']
 
     concurrent:
       dev:

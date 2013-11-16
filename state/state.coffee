@@ -15,6 +15,13 @@ _ = require('underscore')
 State    = App.module "State",
   startWithParent: false
 
+# Test functions to determine what to sync
+State.isPlayer = (url) -> /player\/.*$/.test(url)
+State.isSession = (url) -> /session\/.*$/.test(url)
+State.isAction = (url) -> /action\/.*$/.test(url)
+State.isGame = (url) -> /game\/.*$/.test(url)
+State.isRound = (url) -> /round\/.*$/.test(url)
+
 # singleton map of models to url()
 # used for syncing to clients.
 State.models = {}
@@ -22,24 +29,51 @@ State.models = {}
 Models.BaseModel::publish = ->
   url = _.result @, 'url'
   State.models[url] = @
-  debug "register #{url}"
+  debug "model",  url
+  #State.trigger('data', 'model', url, @toJSON())
+
   listener = (model) ->
-    State.trigger('data', url, model.toJSON())
+    debug "change", url
+    State.trigger('data', 'change', url, model.toJSON())
 
   State.listenTo @, 'change', listener
 
   ## the state listeners
   listenState = (state) ->
     path = state.path().replace(/\.$/, '')
-    debug "#{url} changed state to #{path}"
+    debug path, url
     State.trigger('state', url, path)
 
   if @state
     states = @state('**')
     _(states).each (s) -> s.on 'arrive', listenState
 
+Models.BaseCollection::publish = ->
+  url = _.result @, 'url'
+
+  State.models[url] = @
+
+  debug "collection",  url
+  State.trigger('data', 'collection', url, @toJSON())
+
+  addListener = (model) ->
+    mUrl = _.result model, 'url'
+    debug "add", url, mUrl
+    State.trigger('data', 'add', url, mUrl, model.toJSON())
+
+  removeListener = (model) ->
+    mUrl = _.result model, 'url'
+    debug "remove", url, mUrl
+    State.trigger('data', 'remove', url, mUrl, model.toJSON())
+
+  resetListener = (collection) ->
+    debug "reset", url
+    State.trigger('data', 'reset', url, collection.toJSON())
 
 
+  State.listenTo @, 'add', addListener
+  State.listenTo @, 'remove', removeListener
+  State.listenTo @, 'reset', resetListener
 
 
 
@@ -48,7 +82,7 @@ Models.BaseModel::unpublish = ->
   url = _.result @, 'url'
 
   states = @state('**')
-  _(states).each (s) -> s.off 'arrive'
+  #_(states).each (s) -> s.off 'arrive'
 
   delete State.models[url]
 

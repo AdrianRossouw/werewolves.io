@@ -11,7 +11,6 @@ tropo  = require('tropo-webapi')
 middleware = (opts) ->
   @use new express.json()
   @use new express.urlencoded()
-  @use new express.logger()
   @use new express.static(__dirname + "/../bower_components/phono/deps/flensed/1.0")
 
 App.on 'middleware', middleware, App

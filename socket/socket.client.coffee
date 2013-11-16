@@ -33,20 +33,11 @@ registerHandlers = (opts) ->
   State.world.game.on 'game:join', =>
     @io.emit 'game:join'
 
-  @io.on 'player:add', (player) =>
-    State.world.game.players.add player
-  @io.on 'game:state', (state) ->
-    State.world.game.toState(state)
-
-
-  ###
-  @io.on 'player:state', (id, state) ->
-    State.world.game.players.get(id).toState(state)
-  ###
+# on the client side we only care about our session
+State.isSession = (url) ->
+  url is _.result State.session, 'url'
 
 State.on 'load', registerHandlers, Socket
-
-
 Socket.addInitializer (opts) ->
   socketio.transports = ["websocket"]
   socketUrl = url.format _.pick(opts, 'hostname', 'protocol', 'port')
@@ -55,7 +46,6 @@ Socket.addInitializer (opts) ->
     @io = socketio.connect(socketUrl, { secure: true })
   else
     @io = socketio.connect(socketUrl)
-
 
   sessionUrl = _.result State.session, 'url'
 
@@ -67,14 +57,29 @@ Socket.addInitializer (opts) ->
     debug 'got world data'
     State.load(data)
   
-  State.on 'data', (url, model) =>
+  State.on 'data', (event, url, model) =>
     debug 'update session'
-    @io.emit 'update', url, model if url is sessionUrl
 
-  @io.on 'data', (url, data) ->
-    model = State.models[url]
-    model.set data if model
-    debug "received new data for #{url}"
+    @io.emit 'update', url, model if State.isSession(url)
+
+  @io.on 'data', (event, url, args...) ->
+    if event is 'add'
+      [mUrl, data] = args
+      coll = State.model[url]
+      coll.add data
+      debug "added #{mUrl} to #{url}"
+
+    if event is 'remove'
+      [mUrl, data] = args
+      coll = State.model[url]
+      coll.remove coll.get url
+      debug "removes #{mUrl} from #{url}"
+
+    if event is 'change'
+      [data] = args
+      model = State.models[url]
+      model.set data if model
+      debug "received new data for #{url}"
 
   @io.on 'state', (url, state) ->
     model = State.models[url]

@@ -13,6 +13,7 @@ class Models.World extends Models.BaseModel
     @sessions = new Models.Sessions(data.sessions or [])
     @game = new Models.Game(data.game or {})
     @state().change(data._state or 'attract')
+    @publish()
 
   destroy: ->
     @sessions.invoke 'destroy'
