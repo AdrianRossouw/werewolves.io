@@ -67,6 +67,7 @@ App.addInitializer (opts) ->
       console.error err
       process.exit -1
 
+    @_running = true
     console.log "Server running at http://#{opts.host}:#{opts.port}/"
     @trigger "listen", opts
 
@@ -89,17 +90,22 @@ downgradePerms = ->
 
 App.on "listen", downgradePerms
 
+App.on "stop", ->
+  if @_running
+    @trigger 'before:close'
+    @_running = false
+    server.close()
+    @trigger 'close'
+
+
 # figure out config for the current environment
-sConf   = require('../config')
-conf    = {}
-env     = process.env.NODE_ENV
-env    ?= 'development'
+App.config = ->
+  sConf   = require('../config')
+  conf    = {}
+  env     = process.env.NODE_ENV
+  env    ?= 'development'
 
-_.defaults conf, sConf[env], sConf.defaults
+  _.defaults conf, sConf[env], sConf.defaults
+  conf
 
-# Ping home to show we have been deployed
-nko = require('nko')
-nko conf.nkoKey
-
-# Start the app.
-App.start(conf)
+module.exports = App

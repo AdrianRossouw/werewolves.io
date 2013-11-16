@@ -4,7 +4,6 @@ should = require('should')
 
 fixture = require('./fixture/game1.coffee')
 
-
 it 'should get to this point', ->
   should.ok('reached this point')
 

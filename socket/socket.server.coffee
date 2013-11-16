@@ -9,10 +9,12 @@ Socket    = App.module "Socket"
 
 # Initialize the socket.io library, with the
 # session handler wrapper.
-sessionInit = (opts) ->
+sessionInit = (opts = {}) ->
   cookieParser = new express.cookieParser(opts.secret)
 
-  @io = socketio.listen(App.server)
+  opts.socket ?= {}
+
+  @io = socketio.listen(App.server, opts.socket)
   @io.set("destroy upgrade",false)
 
   @sio = new SessionIo @io, State.sessionStore, cookieParser
@@ -23,6 +25,7 @@ sessionInit = (opts) ->
     @trigger 'connection', args...
 
 App.on "listen", sessionInit, Socket
+
 
 onConnection = (socket, session) ->
   sModel = State.world.sessions.findWhere session:session.id
@@ -90,34 +93,5 @@ joinGame = (socket, session) ->
     socket.removeListener 'game:join', listener
 
 Socket.on "connection", joinGame, Socket
-
-###
-roundListener = (socket, session) ->
-  @round = null
-
-  publishAction = (model) ->
-    action = _(model).pick 'id', 'action', 'target'
-    socket.broadcast.emit 'round:action', action
-
-  subscribeActions = (newRound) =>
-    @stopListening @round.actions if @round
-
-    @round = newRound
-
-    @listenTo @round.actions, 'add', publishAction
-    @listenTo @round.actions, 'change', publishAction
-
-  @listenTo State.world.game.rounds, 'add', subscribeActions
-  subscribeActions State.world.game.rounds.last()
-
-  socket.on 'round:action', (data) =>
-    @round.choose data.id, data.action, data.target,
-      silent: true
-
-  @on 'disconnect', (socket, session) =>
-    socket.removeListener 'round:action', publishAction
-Socket.on "connection", roundListener, Socket
-
-###
 
 module.exports = Socket

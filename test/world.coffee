@@ -217,8 +217,13 @@ describe 'start application', ->
 
 
 
-  after ->
-    State.stop()
+describe 'cleanup', ->
+  before ->
+    App.stop()
     @clock.restore()
+
+  it 'should have stopped the modules', ->
+    State.should.have.property '_isInitialized', false
+    App.Models.should.have.property '_isInitialized', false
 
 

@@ -1,2 +1,6 @@
 require('coffee-script');
-require('./app/app.server.coffee');
+App = require('./app/app.server.coffee');
+
+App.start(App.config());
+
+module.exports = App;

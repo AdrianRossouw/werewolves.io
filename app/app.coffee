@@ -27,4 +27,10 @@ App = new Marionette.Application()
 # generates useful 'random' values
 App.ns = new Nonsense()
 
+App.stop = ->
+  _(@submodules).invoke 'stop'
+  @trigger 'before:stop'
+  @_initCallbacks.reset()
+  @trigger 'stop'
+
 module.exports = App
