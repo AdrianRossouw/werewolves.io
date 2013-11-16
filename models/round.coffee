@@ -32,6 +32,8 @@ class Models.Round extends Models.BaseModel
     @players = opts.players
     @actions.reset data.actions if data.actions
     @state().change(data._state or 'votes.none')
+    @listenTo @state('votes.all'), 'arrive', @endPhase
+
     @publish()
 
   voteState: ->
@@ -82,6 +84,10 @@ class Models.Round extends Models.BaseModel
       survived: state 'final',
         admit:
           'votes.all': -> !@owner.getDeath()
+
+  endPhase: ->
+    @state().change('complete.died')
+    @state().change('complete.survived')
 
   countVotes: ->
     action = if @phase is 'day' then 'lynch' else 'eat'
