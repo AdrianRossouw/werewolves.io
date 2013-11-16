@@ -20,10 +20,14 @@ Voice.listenTo App, 'state', (opts) ->
   loader = (world) ->
     @appId = opts.appId
     @apiKey = opts.apiKey
+
     $.phono
       apiKey: @apiKey
       onReady: (event) ->
         Voice.phono = @
+        @phone.ringTone false
+        @phone.wideband true
+
         State.session.setIdentifier 'sip', @sessionId
       phone:
         onIncomingCall: (event) ->

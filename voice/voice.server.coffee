@@ -72,55 +72,129 @@ Voice.awake = (tropo) ->
 Voice.spectate = (tropo) ->
   tropo.conference("awake", true, "awake", false, null, '#', 'exit')
 
-  
+
+# introductory, to be played in attract mode
 Voice.intro = (tropo, env) ->
   @audio tropo, "Introduction"
   @awake tropo
 
+# To be played on the first night
+Voice.firstNight = (tropo, env) ->
+  # per role
+  if (env.player.role is 'villager')
+    @audio tropo 'VillagerTutorial'
+  else if (env.player.role is 'werewolf')
+    @audio tropo 'VillagerTutorial'
+  else if (env.player.role is 'seer')
+    @audio tropo 'SeerTutorial'
+
+  # for everyone
+  @audio tropo 'FirstNight'
+
+  # for specific roles again
+  if env.player.role is 'werewolf'
+    @audio tropo 'FirstNightWerewolves'
+  else if env.player.role is 'seer'
+    @audio tropo 'FirstNightSeer'
+  @awakeByRole tropo, env.player
+
+# first day
+Voice.firstDay = (tropo, env) ->
+  @audio tropo 'FirstDay'
+  @awake(tropo)
+
+# each subsequent night
+
+Voice.night = (tropo, env) ->
+  @audio tropo 'NextNight1'
+  @awakeByRole(tropo, env.player)
+
+# each subsequent day
+# TODO: add files for who died.
+Voice.day = (tropo, env) ->
+  @audio tropo 'NextDay1'
+  @awake tropo
+
+# for specific roles
+# leave them muted/unmuted in the 
+# right conference rooms.
+Voice.awakeByRole = (tropo, player) ->
+  if player?.state()?.is('dead')
+    @spectate(tropo)
+  if player?.role is 'werewolf'
+    @awake(tropo)
+  else
+    @asleep(tropo)
 
 Voice.listenTo App, 'before:state', (opts) ->
   @token = opts.token
 
+# Listen to the various states of the game flipping over
 Voice.listenTo State, 'state', (url, state) ->
+
+  # if a user gets up to the sip state, call them
   if state is 'online.sip'
     session = State.models[url]
-    console.log session
     session.initVoice()
 
+
+  # end of a round, interrupt everyone.
+  # tropo will call back to get the script
+  if state in ['completed.survived', 'completed.died']
+    State.sessions.invoke 'signal', 'exit'
+
+
+# this is the url that tropo will hit when it calls
+# us.
+#
+# TODO: handle hangups, so we can remove inactive sessions
 Voice.listenTo App, 'before:routes', (opts) ->
   App.post '/voice', (req, res, next) =>
     tropo = new TropoWebAPI()
 
+    # when the session get the exit signal, it will call back
     tropo.on 'exit', null, 'voice'
+
+    # session.voice maps to this body property from tropo's backend
+    session = State.world.sessions.findVoice(req.body?.session?.id)
+
+    # if we just got your sip number, call your browser
     if req.body?.session?.parameters
       callState = req.body.session.parameters.callState
 
-      session = State.world.sessions.findVoice(req.body?.session?.id)
-      console.log State.world.sessions.pluck('voice')
-
-      playerId = session.id
-
-      env =
-        session: session
-        world: State.world
-        game: State.world.game
-        round: State.world.game.currentRound()
-        player: State.getPlayer(playerId)
-
       if callState is 'init'
-        tropo.call env.session.sip
+        tropo.call session.sip
 
-      if not env.world.state().isIn('gameplay')
-        #@intro tropo
-        @debug tropo, env
-      else
-        @debug tropo, env
+    # gather env variables to handle the call correctly
+    playerId = session.id
+    env =
+      session: session
+      world: State.world
+      game: State.world.game
+      round: State.world.game.currentRound()
+      player: State.getPlayer(playerId)
+
+
+    # play the right files for each phase
+    if not env.world.state().isIn('gameplay')
+      @intro tropo, env
+    else if env.game.state().isIn('night.first')
+      @firstNight tropo, env
+    else if env.game.state().isIn('day.first')
+      @firstDay tropo, env
+    else if env.game.state().isIn('night')
+      @night tropo, env
+    else if env.game.state().isIn('day')
+      @day tropo, env
+    else if env.game.state().isIn('victory.werewolves')
+      @debug tropo, env
+    else if env.game.state().isIn('victory.villagers')
+      @debug tropo, env
     else
-      @intro tropo
-    
+      @debug tropo, env
+
 
     res.send TropoJSON(tropo)
-
 
 
 module.exports = Voice

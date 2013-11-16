@@ -57,6 +57,12 @@ onConnection = (socket, session) ->
 
   socket.on 'update', updateHandler
 
+  Socket.listenTo State, 'data', (args...) =>
+    socket.emit 'data', args...
+
+  Socket.listenTo State, 'state', (args...) =>
+    socket.emit 'state', args...
+
   socket.on 'disconnect', =>
     if sModel.socket is socket.id
       sModel.voice = false

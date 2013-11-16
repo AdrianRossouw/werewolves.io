@@ -50,7 +50,7 @@ App.hideGame = ->
   $body.addClass('in-lobby').removeClass('in-game')
 
 App.listenTo State, "state", (url, state) ->
-  if url is world
+  if url is 'world'
     if (state is 'gameplay') or State.session.player
       @showGame()
     else
