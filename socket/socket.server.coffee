@@ -33,17 +33,18 @@ onConnection = (socket, session) ->
     sModel.setIdentifier 'socket', socket.id
 
   #Straight forward data query by the client.
-  socket.on 'data', (url, cb) ->
+  dataHandler = (url, cb = ->) ->
     debug "request #{url}"
     model = State.models[url]
 
     return cb(404, {message: 'not found'}) unless model
 
     cb(null, model.mask())
+ 
+  socket.on 'data', dataHandler
 
   # a modification of data from the client.
-  socket.on 'update', (url, data, cb) ->
-    cb ?= ->
+  updateHandler = (url, data, cb = ->) ->
     debug "update #{url}"
     model = State.models[url]
 
@@ -52,15 +53,18 @@ onConnection = (socket, session) ->
     model.set data
     cb(null, data)
 
+  socket.on 'update', updateHandler
+
+
+
   socket.on 'disconnect', =>
     if sModel.socket is socket.id
       sModel.voice = false
       sModel.sip = false
       sModel.socket = false
 
-    #socket.removeListener 'data'
-    #socket.removeListener 'state'
-    #socket.removeListener 'update'
+    socket.removeListener 'data', dataHandler
+    socket.removeListener 'update', updateHandler
 
     @trigger 'disconnect', socket, session
 

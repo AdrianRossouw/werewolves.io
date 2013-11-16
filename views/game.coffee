@@ -44,14 +44,14 @@ class Views.Game extends Backbone.Marionette.ItemView
     @statusView = new Views.Status el: @ui.status
     @playersView.render()
 
-    player = State.session.player
-    
+    player = State.session.player or @players.first()
+   
     if player
-        @playerView = new Views.Player
-            model: State.session.player
-            el: @ui.player
+      @playerView = new Views.Player
+          model: player
+          el: @ui.player
 
-        @playerView.render()
+      @playerView.render()
 
     if State.world.state().isIn('gameplay')
         @syncRound()
@@ -64,15 +64,14 @@ class Views.Game extends Backbone.Marionette.ItemView
     for player, i in @players.models
       player.set 'number', i+1
 
-    players = @players
 
 
     # is the currently active session even playing along?
-    sesPlayer = State.session.player
-    if sesPlayer
-      others = @players.filter (p) =>
-        p.id != State.session.player.id
-      players = new Backbone.Collection others
+    sesPlayer = State.session.player or @players.first()
+    others = @players.filter (p) =>
+      p.id != sesPlayer.id
+
+    players = new Backbone.Collection others
 
     @playersView = new Views.Players collection: players
     @ui.main.append @playersView.render().el
