@@ -10,48 +10,38 @@ tropo  = require('tropo-webapi')
 
 middleware = (opts) ->
   @use new express.json()
+  @use new express.logger()
   @use new express.urlencoded()
   @use new express.static(__dirname + "/../bower_components/phono/deps/flensed/1.0")
 
 App.on 'middleware', middleware, App
 
-mountRoutes = (opts) ->
-  @post '/voice', (req, res, next) ->
-    tropo = new TropoWebAPI()
-
-    if req.body?.session?.parameters
-      callState = req.body.session.parameters.callState
-
-      playerId = req.body.session.parameters.playerId
+Voice.debug = (tropo) ->
+  tropo.say "session is #{env.session.state().name}" if env.session
+  tropo.say "world is #{env.world.state().name}" if env.world
+  tropo.say "game is #{env.game.state().name}" if env.game
+  tropo.say "round is #{env.round.state().name}" if env.round
+  tropo.say "player is #{env.player.state().name}" if env.player
 
 
-      session = State.getSession(playerId)
-      world = State.world
-      game  = world.game
-      round = game.currentRound()
-      player = State.getPlayer(playerId)
+Voice.audio = (tropo, name) ->
+  tropo.say "http://hosting.tropo.com/5010929/www/audio/#{name}.mp3"
 
-      if callState is 'init'
-        tropo.call session.sip
+Voice.asleep = (tropo) ->
+  tropo.conference("asleep", true, "asleep", false, null, '#', 'exit')
 
-      tropo.say "session is #{session.state().name}" if session
-      tropo.say "world is #{world.state().name}" if world
-      tropo.say "game is #{game.state().name}" if game
-      tropo.say "round is #{round.state().name}" if round
-      tropo.say "player is #{player.state().name}" if player
+Voice.awake = (tropo) ->
+  tropo.conference("awake", null, "awake", false, null, '#', 'exit')
 
-      #tropo.say "http://hosting.tropo.com/5010929/www/audio/Introduction.mp3"
-      #tropo.say 'what the fuck'
-      #tropo.conference("game", null, "conference", null, null, null)
+Voice.spectate = (tropo) ->
+  tropo.conference("awake", true, "awake", false, null, '#', 'exit')
 
-    else
-      console.log "not a session"
-      tropo.say "not a session"
-      tropo.conference("game", null, "conference", null, null, null)
+  
+Voice.intro = (tropo, env) ->
+  @audio tropo, "Introduction"
+  @awake tropo
 
-    res.send TropoJSON(tropo)
 
-App.on 'before:routes', mountRoutes, App
 
 
 Voice.listenTo App, 'before:state', (opts) ->
@@ -62,6 +52,7 @@ Voice.listenTo State, 'state', (url, state) ->
     session = State.models[url]
     @initSession session.id, (err, resp) =>
       session.voice = resp.body.id.replace(/\/r\/n/, '')
+      console.log session.voice
 
 Voice.initSession = (playerId, cb) ->
   body = JSON.stringify
@@ -75,6 +66,38 @@ Voice.initSession = (playerId, cb) ->
     json: true
 
   request.post reqOpts, cb
+
+Voice.listenTo App, 'before:routes', (opts) ->
+  App.post '/voice', (req, res, next) =>
+    tropo = new TropoWebAPI()
+
+    tropo.on 'exit', null, 'voice'
+    if req.body?.session?.parameters
+      callState = req.body.session.parameters.callState
+
+      playerId = req.body.session.parameters.playerId
+
+      env =
+        session: State.getSession(playerId)
+        world: State.world
+        game: State.world.game
+        round: State.world.game.currentRound()
+        player: State.getPlayer(playerId)
+
+      if callState is 'init'
+        tropo.call env.session.sip
+
+      if not env.world.state().isIn('gameplay')
+        @intro tropo
+
+      else
+        @debug tropo, env
+    else
+      @intro tropo
+    
+
+    res.send TropoJSON(tropo)
+
 
 
 module.exports = Voice
