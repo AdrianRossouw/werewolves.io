@@ -7,29 +7,6 @@ url           = require('url')
 
 socketio            = require("socket.io-client")
 registerHandlers = (opts) ->
-  ###
-  @round = null
-
-  publishAction = (model) ->
-    action = _(model).pick 'id', 'action', 'target'
-    @io.emit 'round:action', action
-
-  subscribeActions = (newRound) =>
-    @stopListening @round.actions if @round
-
-    @round = newRound
-
-    @listenTo @round.actions, 'add', publishAction
-    @listenTo @round.actions, 'change', publishAction
-
-  @listenTo State.world.game.rounds, 'add', subscribeActions
-  subscribeActions State.world.game.rounds.last()
-
-  @io.on 'round:action', (data) =>
-    @round.choose data.id, data.action, data.target
-
-  ###
-
   State.on 'game:join', =>
     @io.emit 'game:join'
 
@@ -63,6 +40,7 @@ Socket.addInitializer (opts) ->
     @io.emit 'update', url, model if State.isSession(url)
 
   @io.on 'data', (event, url, args...) ->
+    debug 'data', arguments
     if event is 'add'
       [mUrl, data] = args
       coll = State.model[url]
