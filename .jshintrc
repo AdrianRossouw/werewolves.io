@@ -1,0 +1,10 @@
+{
+    "globals" : { 
+        "phantom" : true
+    },
+    "expr"    : true,
+    "unused"  : false,
+    "node"    : true,
+    "shadow"  : true,
+    "trailing": true
+}
