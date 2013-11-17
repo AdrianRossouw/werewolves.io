@@ -62,6 +62,7 @@ class Models.Session extends Models.BaseModel
           session: -> !@owner.socket
       sip:
         admit:
+          offline: -> @owner.sip
           socket: -> @owner.sip
           voice: -> @owner.sip
         release:
@@ -69,6 +70,7 @@ class Models.Session extends Models.BaseModel
           socket: -> !@owner.sip
       voice:
         admit:
+          offline: -> @owner.voice
           sip: -> @owner.voice
         release:
           sip: -> !@owner.voice

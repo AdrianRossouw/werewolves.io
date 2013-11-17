@@ -1,0 +1,91 @@
+# This test is built to confirm that the session
+# state machine behaves as expected.
+
+Models   = require('../models')
+should   = require('should')
+sinon    = require('sinon')
+_ = require('underscore')
+
+# some initial states for the session object to play with
+$data =
+  offline:
+    id: 'offline'
+    _state: 'offline'
+
+  session:
+    id: 'session'
+    session: 'session.id'
+    _state: 'online.session'
+
+  socket:
+    id: 'socket'
+    session: 'session.id'
+    socket: 'socket.id'
+    _state: 'online.socket'
+
+  sip:
+    id: 'sip'
+    session: 'session.id'
+    socket: 'socket.id'
+    sip: 'sip.id'
+    _state: 'online.sip'
+
+  voice:
+    id: 'voice'
+    session: 'session.id'
+    socket: 'socket.id'
+    sip: 'sip.id'
+    voice: 'voice.id'
+    _state: 'online.voice'
+
+  # edge case: used during testing a lot
+  socketOnly:
+    id: 'socket-only'
+    socket: 'socket.id'
+    _state: 'online.socket'
+
+# get a clean instance
+cleanInstances = ->
+  result = {}
+  for type, data of $data
+    result[type] = new Models.Session data
+  result
+
+describe 'initializing sessions', ->
+  before ->
+    @m = cleanInstances()
+
+  testInitialized = (instances, key) ->
+    data = $data[key]
+    inst = instances[key]
+
+    should.exist inst
+
+    for key, value of data
+      if key is not '_state'
+        should.exist inst[key]
+        inst[key].should.equal value
+
+    should.exist inst.state
+    inst.state().path().should.equal data._state
+
+
+  it 'should have initialized an offline session', ->
+    testInitialized @m, 'offline'
+
+  it 'should have initialized an session session', ->
+    testInitialized @m, 'session'
+
+  it 'should have initialized an socket session', ->
+    testInitialized @m, 'socket'
+
+  it 'should have initialized an sip session', ->
+    testInitialized @m, 'sip'
+
+  it 'should have initialized an voice session', ->
+    testInitialized @m, 'voice'
+
+  it 'should have initialized an socketOnly session', ->
+    testInitialized @m, 'socketOnly'
+
+
