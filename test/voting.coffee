@@ -11,10 +11,7 @@ it 'should have returned a module', ->
   should.exist(State)
 
 describe 'init state', ->
-  before (done) ->
-    State.on 'load', (data) ->
-      done()
-
+  before ->
     State.load(fixture)
     State.start()
 

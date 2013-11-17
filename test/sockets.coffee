@@ -47,11 +47,10 @@ socketio.transports = ["websocket"]
 App.config = ->
   _.extend {}, config.defaults,
     port: 8001
-    socket: log: false
+    socket:
+      log: false
 
-before (done) ->
-  App.on 'listen', -> done()
-
+before ->
   App.module "Voice",
     startsWithParent: false
 
