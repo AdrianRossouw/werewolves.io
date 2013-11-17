@@ -47,7 +47,7 @@ onConnection = (socket, state) ->
 
     return cb(404, {message: 'not found'}) unless model
 
-    cb(null, model.mask())
+    cb(null, model.mask(state))
  
   socket.on 'data', dataHandler
 
@@ -63,8 +63,16 @@ onConnection = (socket, state) ->
 
   socket.on 'update', updateHandler
 
-  Socket.listenTo State, 'data', (args...) =>
-    socket.emit 'data', args...
+  Socket.listenTo State, 'data', (event, args...) =>
+    if event is 'change'
+      [url, model] = args
+
+      socket.emit 'data', 'change', url, model.mask(state)
+    else if event is 'add'
+      [cUrl, url, model] = args
+      socket.emit 'data', 'add', cUrl, url, model.mask(state)
+    else
+      socket.emit 'data', args...
 
   Socket.listenTo State, 'state', (args...) =>
     socket.emit 'state', args...

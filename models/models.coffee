@@ -20,8 +20,9 @@ class Models.BaseModel extends Backbone.Model
     @unpublish()
 
   initState: ->
-  mask: -> @toJSON()
+  mask: (session) -> @toJSON()
   publish:  -> @
+  getUrl: -> _.result @, 'url'
   toJSON: ->
     obj = super
     obj.id = @id if @id
@@ -49,7 +50,7 @@ class Models.BaseCollection extends Backbone.Collection
     @unpublish()
 
   initState: ->
-  mask: -> @toJSON()
+  mask: (session) -> @toJSON()
   publish:  -> @
 
 require('./session.coffee')

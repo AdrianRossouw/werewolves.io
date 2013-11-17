@@ -17,13 +17,29 @@ $io     = {}
 $socket = {}
 $state  = {}
 $server = {}
+$clock  = false
 
 $round  = _(fixture.rounds).pluck 'actions'
 $player = _(fixture.players).map (p) ->
-  _(p).pick 'id', 'name'
+  _(p).pick('id', 'name')
 
 
 
+setupSpies = ->
+  $spy.state = sinon.spy State, 'trigger'
+  $spy.socket = sinon.spy Socket, 'trigger'
+  $spy.ioData = sinon.spy()
+  $spy.ioState = sinon.spy()
+
+  $spy.socket.withArgs('connection')
+  $spy.state.withArgs('data', 'add', 'session')
+  $spy.state.withArgs('data', 'change')
+  $spy.state.withArgs('state')
+
+resetSpies = -> _($spy).invoke 'reset'
+restoreSpies = ->
+  $spy.state.restore()
+  $spy.socket.restore()
 
 # Configuration things we need to do
 socketio.transports = ["websocket"]
@@ -47,17 +63,7 @@ it 'should have started the state module', ->
 describe 'socket can connect', ->
 
   before (done) ->
-
-    $spy.state = sinon.spy State, 'trigger'
-    $spy.socket = sinon.spy Socket, 'trigger'
-    $spy.ioData = sinon.spy()
-    $spy.ioState = sinon.spy()
-
-    $spy.socket.withArgs('connection')
-    $spy.state.withArgs('data', 'add', 'session')
-    $spy.state.withArgs('data', 'change')
-    $spy.state.withArgs('state')
-
+    setupSpies()
     $io.socket = socketio.connect('http://localhost:8001')
     $io.socket.on 'connect', -> done()
     $io.socket.on 'data', $spy.ioData
@@ -83,7 +89,7 @@ describe 'socket can connect', ->
       $state.id = $state.session.id
       $state.world = State.world
       $state.game = State.world.game
-      $state.players = State.world.players
+      $state.players = State.world.game.players
 
     it 'should have fired a data add state event', ->
       $spy.state.calledWith('data', 'add', 'session', $state.url).should.be.ok
@@ -200,6 +206,11 @@ describe 'socket can connect', ->
       should.exist $io.player
       should.exist $state.player
 
+    it 'should have right defaults', ->
+      $io.player.role.should.equal 'villager'
+      $io.player.name.should.be.ok
+      $io.player.occupation.should.be.ok
+
     it 'should have the same id as session', ->
       $io.player.id.should.equal $state.session.id
       $io.player.id.should.equal $io.session.id
@@ -209,10 +220,8 @@ describe 'socket can connect', ->
       $io.player._state.should.equal 'alive'
       $state.player.state().path().should.equal 'alive'
 
-    it 'should match the state on the server', ->
-        
     it 'should have added us to the players list', ->
-      $state.game.players.length.should.equal 1
+      $state.players.length.should.equal 1
 
     it 'should have changed the world state', ->
       $state.world.state().path().should.equal 'startup'
@@ -226,21 +235,123 @@ describe 'socket can connect', ->
 
   describe 'can only join once', ->
     before (done) ->
+      resetSpies()
       $io.socket.emit 'game:join', (err, player) ->
         return done(err) if err
         done()
 
     it 'shouldnt have added us again', ->
-      $state.game.players.length.should.equal 1
+      $state.players.length.should.equal 1
 
   describe 'adding another player to the game', ->
     before ->
-      $state.game.addPlayer _($player).first()
+      $state.player2 = $state.game.addPlayer _($player).first()
+
+    it 'should have added them to the players list', ->
+      $state.players.length.should.equal 2
+
+    it 'should have fired the data add player event', ->
+      $spy.state.calledWith('data', 'add', 'player', $state.player2.getUrl()).should.be.ok
+
+    it 'should have passed the data add to the socket', ->
+      $spy.ioData.calledWith('add', 'player', $state.player2.getUrl()).should.be.ok
+      withArgs = $spy.ioData.withArgs('add', 'player', $state.player2.getUrl())
+      $io.player2 = withArgs.firstCall.args[3]
+
+    it 'should have given the new player the right state', ->
+      $io.player2._state.should.equal 'alive'
+
+    it 'should have right defaults', ->
+      $io.player2.role.should.equal 'villager'
+      $io.player2.name.should.be.ok
+      $io.player2.occupation.should.be.ok
+
+  # only this part uses fake timers
+  describe 'starting the game', ->
+
+    before ->
+      resetSpies()
+      $clock = sinon.useFakeTimers()
+   
+    describe 'adding more players, 10 seconds apart', ->
+      before ->
+        resetSpies()
+        rest = _($player).rest()
+        _(rest).each (p) ->
+          $clock.tick 10000
+          $state.game.addPlayer p
+   
+      it 'should have fired 7 player add data events', ->
+        $spy.state.withArgs('data', 'add', 'player').callCount.should.equal 7
+
+      it 'should have changed the game state', ->
+        $state.game.state().path().should.equal('recruit.ready')
+
+      it 'socket should have picked up 7 player add events', ->
+        $spy.ioData.withArgs('add', 'player').callCount.should.equal 7
+
+      it 'socket should have gotten the game state change', ->
+        $spy.ioState.withArgs($state.game.getUrl(), 'recruit.ready').called.should.be.ok
+
+    describe 'game starts in another 30 seconds', ->
+      before ->
+        resetSpies()
+        $clock.tick 30100
+
+      it 'changed the world state to gameplay', ->
+        $state.world.state().is('gameplay').should.be.ok
+
+      it 'changed the world state to the first night', ->
+        $state.game.state().is('round.night.first').should.be.ok
+
+      it 'set all the players to one of the night states', ->
+        $state.players.each (p) ->
+          p.state().isIn('alive').should.be.ok
+          p.state().isIn('night').should.be.ok
+
+      it 'triggered all state changes over the state module', ->
+        $spy.state.calledWith('state', 'world', 'gameplay').should.be.ok
+        $spy.state.calledWith('state', $state.game.getUrl(), 'round.night.first').should.be.ok
+        $state.players.each (p) ->
+          $spy.state.calledWith('state', p.getUrl(), p.state().path()).should.be.ok
+
+    describe 'all players got roles', ->
+      before ->
+        $state.roles = $state.players.groupBy((p) -> p.role)
 
 
-  after ->
-    $spy.state.restore()
-    $spy.socket.restore()
+      it 'handed out the right roles', ->
+
+        $state.roles.werewolf.length.should.equal 2
+        $state.roles.seer.length.should.equal 1
+        $state.roles.villager.length.should.equal 6
+
+      it 'triggered all the data events for role changes', ->
+        resetSpies()
+        $state.players.each (p) ->
+          if p.role is not 'villager'
+            $spy.state.calledWith('data', 'change', p.getUrl()).should.be.ok
+          else
+            $spy.state.calledWith('data', 'change', p.getUrl()).should.not.be.ok
+
+        $clock.tick(10000)
+
+      it 'only sent us our role. not everybodys', ->
+        $state.players.each (p) ->
+          isMe = p.id is $state.id
+          isNotVillager = p.role is not 'villager'
+
+          if isMe and isNotVillager
+            $spy.ioData.calledWith('change', p.getUrl()).should.be.ok
+          else
+            withArgs = $spy.ioData.withArgs('change', p.getUrl())
+            withArgs.callCount.should.equal 0
+
+
+    after -> $clock.restore()
+
+  after restoreSpies
+
 
 describe 'cleanup', ->
   before ->

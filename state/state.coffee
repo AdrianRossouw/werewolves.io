@@ -34,7 +34,7 @@ Models.BaseModel::publish = ->
 
   listener = (model) ->
     debug "change", url
-    State.trigger('data', 'change', url, model.toJSON())
+    State.trigger('data', 'change', url, model)
 
   State.listenTo @, 'change', listener
 
@@ -58,16 +58,16 @@ Models.BaseCollection::publish = ->
   addListener = (model) ->
     mUrl = _.result model, 'url'
     debug "add", url, mUrl
-    State.trigger('data', 'add', url, mUrl, model.toJSON())
+    State.trigger('data', 'add', url, mUrl, model)
 
   removeListener = (model) ->
     mUrl = _.result model, 'url'
     debug "remove", url, mUrl
-    State.trigger('data', 'remove', url, mUrl, model.toJSON())
+    State.trigger('data', 'remove', url, mUrl, model)
 
   resetListener = (collection) ->
     debug "reset", url
-    State.trigger('data', 'reset', url, collection.toJSON())
+    State.trigger('data', 'reset', url, collection)
 
 
   State.listenTo @, 'add', addListener
@@ -102,6 +102,8 @@ State.on 'stop', ->
   # TODO: destroy, not delete
   State.world.destroy()
   delete State.world
+  State.models = {}
+
 
 
 module.exports = State
