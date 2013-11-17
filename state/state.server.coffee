@@ -19,10 +19,28 @@ Models.Sessions::touchSession = (sess) ->
   session
 
 fixture = require('../test/fixture/game1.coffee')
-State.addInitializer (opts) ->  @world ?= new Models.World()
+
+State.addInitializer (opts) ->
+  @world ?= new Models.World()
 
 # hide sensitive information from client
 Models.World::mask = (session) -> _.pick(@toJSON(), 'id', 'game', '_state')
+
+# hide roles from players, unless they were seen
+Models.Player::mask = (session) ->
+  result = @toJSON()
+  
+  # dead roles are known
+  return result if @state().is('dead')
+
+  # your own role is known
+  player = session.player
+  return result if session.id is player?.id
+
+  # otherwise villager is what you get
+  result.role = 'villager'
+
+  result
 
 
 # Session middleware
