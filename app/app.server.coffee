@@ -97,15 +97,12 @@ App.on "stop", ->
     server.close()
     @trigger 'close'
 
+env  = process.env.NODE_ENV or 'development'
 
 # figure out config for the current environment
 App.config = ->
-  sConf   = require('../config')
-  conf    = {}
-  env     = process.env.NODE_ENV
-  env    ?= 'development'
+  conf   = require('../config')
 
-  _.defaults conf, sConf[env], sConf.defaults
-  conf
+  _.extend {}, conf[env], conf.defaults
 
 module.exports = App

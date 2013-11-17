@@ -9,20 +9,20 @@ _ = require('underscore')
 Nonsense     = require('Nonsense')
 ns           = new Nonsense()
 
+Models.Sessions::findSession = (id) ->
+  State.world.sessions.findWhere session:id
 
-#todo: load/save to redis.
-#todo: keep track of sessions.
+Models.Sessions::touchSession = (sess) ->
+  session = @findSession(sess.id)
+  session ?= @add {}
+  session.session = sess.id
+  session
 
 fixture = require('../test/fixture/game1.coffee')
-State.addInitializer (opts) ->
-  # just for now
-  @world ?= new Models.World()
-  
+State.addInitializer (opts) ->  @world ?= new Models.World()
 
 # hide sensitive information from client
-Models.World::mask = ->
-  _.pick(@toJSON(), 'game', '_state')
-
+Models.World::mask = -> _.pick(@toJSON(), 'game', '_state')
 
 # Session middleware
 express              = require('express')
@@ -34,14 +34,16 @@ State.initMiddleware = (opts) ->
   @use new express.session
     store: State.sessionStore
     secret: opts.secret
+
+  # finds the state instance for this sentence
+  # and attaches it to the middleware so we can
+  # print it in the layout.
   @use (req, res, next) =>
     return next() if req.url != '/'
-    session = State.world.sessions.findWhere session:req.session.id
-    session = State.world.sessions.add {} if not session
-   
-    session.setIdentifier 'session', req.session.id
-    req.state =
-      session: session
+
+    _sessions = State.world.sessions
+    session = _sessions.touchSession(req.session)
+    req.state = session: session
     next()
 
 

@@ -6,6 +6,18 @@ SessionIo = require("session.socket.io")
 debug     = require('debug')('werewolves:state:server')
 _         = require('underscore')
 Socket    = App.module "Socket"
+Models    = App.module "Models"
+
+Models.Sessions::findSocket = (id) ->
+  State.world.sessions.findWhere socket:id
+
+Models.Sessions::touchSocket = (socket, sess) ->
+  session = @touchSession(sess) if sess
+  session ?= @findSocket(socket.id)
+  session ?= @add {}
+  session.socket ?= socket.id
+  session
+
 
 # Initialize the socket.io library, with the
 # session handler wrapper.
@@ -18,23 +30,15 @@ sessionInit = (opts = {}) ->
   @io.set("destroy upgrade",false)
 
   @sio = new SessionIo @io, State.sessionStore, cookieParser
-  @sio.on 'connection', (err, args...) =>
-    if err
-      return @trigger 'error', err
+  @sio.on 'connection', (err, socket, sess) =>
+    state = State.world.sessions.touchSocket socket, sess
 
-    @trigger 'connection', args...
+    @trigger 'connection', socket, state
 
 App.on "listen", sessionInit, Socket
 
 
-onConnection = (socket, session) ->
-  sModel = State.world.sessions.findWhere session:session.id
-  sModel = State.world.sessions.add {} if not sModel
- 
-  sModel.setIdentifier 'session', session.id
-  if not sModel.socket
-    sModel.setIdentifier 'socket', socket.id
-
+onConnection = (socket, state) ->
 
   #Straight forward data query by the client.
   dataHandler = (url, cb = ->) ->

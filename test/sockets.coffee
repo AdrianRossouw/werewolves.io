@@ -34,6 +34,7 @@ describe 'socket can connect', ->
 
   it 'should have set up the environment', ->
     should.exist @io
+    console.log @socketSpy.args
 
   after ->
     @stateSpy.restore()
