@@ -33,7 +33,7 @@ class Models.Session extends Models.BaseModel
     @listenTo @, 'change:voice', -> @state().change('voice')
 
     Object.defineProperty @, 'player',
-      get: -> State.getPlayer()
+      get: -> State.getPlayer(@id)
       set: (value) ->
         player = State.getPlayer(@id)
         player = value
@@ -50,10 +50,11 @@ class Models.Session extends Models.BaseModel
     online: state 'abstract',
       session: state 'default',
         release:
-          socket: -> @owner.session
           offline: -> !@owner.session
+          socket: -> @owner.session
       socket:
         admit:
+          offline: -> @owner.socket
           session: -> @owner.socket
           sip: -> @owner.socket
         release:

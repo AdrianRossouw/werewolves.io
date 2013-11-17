@@ -52,7 +52,6 @@ Models.BaseCollection::publish = ->
   url = _.result @, 'url'
 
   State.models[url] = @
-
   debug "collection",  url
   State.trigger('data', 'collection', url, @toJSON())
 

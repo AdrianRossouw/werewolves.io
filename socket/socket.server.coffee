@@ -54,7 +54,6 @@ onConnection = (socket, state) ->
   # a modification of data from the client.
   updateHandler = (url, data, cb = ->) ->
     debug "update #{url}"
-    console.log arguments
     model = State.models[url]
 
     return cb(404, {message: 'not found'}) unless model
@@ -84,13 +83,14 @@ onConnection = (socket, state) ->
 Socket.on "connection", onConnection, Socket
 
 joinGame = (socket, session) ->
-  sModel = State.world.sessions.findWhere session:session.id
-  sModel = State.world.sessions.add {} if not sModel
 
   listener = (cb=->) ->
-    debug 'added player'
-    State.world.game.addPlayer(id: sModel.id)
-    cb(null, sModel)
+    player = State.world.game.addPlayer(id: session.id)
+
+    return cb(500, {message: 'unknown error'}) if not player
+
+    cb(null, player)
+
 
   socket.on 'game:join', listener
   socket.on 'disconnect', =>

@@ -24,6 +24,7 @@ class Models.BaseModel extends Backbone.Model
   publish:  -> @
   toJSON: ->
     obj = super
+    obj.id = @id if @id
     obj._state = @state().path() if @state
     obj
 

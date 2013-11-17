@@ -22,7 +22,7 @@ fixture = require('../test/fixture/game1.coffee')
 State.addInitializer (opts) ->  @world ?= new Models.World()
 
 # hide sensitive information from client
-Models.World::mask = -> _.pick(@toJSON(), 'game', '_state')
+Models.World::mask = -> _.pick(@toJSON(), 'id', 'game', '_state')
 
 # Session middleware
 express              = require('express')

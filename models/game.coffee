@@ -16,6 +16,7 @@ class Models.Game extends Models.BaseModel
     super
     @players = new Models.Players []
     @rounds = new Models.Rounds []
+    @publish()
     @state().change(data._state or 'recruit')
     @players.reset data.players if data.players
     @rounds.reset data.rounds if data.rounds
@@ -49,9 +50,10 @@ class Models.Game extends Models.BaseModel
         @state('-> night.first')
 
       addPlayer: (player) ->
-        @players.add(player)
+        result = @players.add(player)
         @lastPlayerAdded = Date.now()
         @state('-> ready')
+        result
 
       # assign the roles when we leave the recruit state
       exit: ->
