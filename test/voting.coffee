@@ -42,7 +42,7 @@ describe 'init state', ->
 
       @currentVote = @myRecord.target
 
-    it.skip 'should be in votes.all state', ->
+    it 'should be in votes.all state', ->
       @currentRound.state().path().should.equal 'votes.all'
 
 

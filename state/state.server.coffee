@@ -21,7 +21,7 @@ Models.Sessions::touchSession = (sess) ->
 fixture = require('../test/fixture/game1.coffee')
 
 State.addInitializer (opts) ->
-  @world ?= new Models.World()
+  State.load()
 
 # hide sensitive information from client
 Models.World::mask = (session) -> _.pick(@toJSON(), 'id', 'game', '_state')

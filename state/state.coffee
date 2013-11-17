@@ -74,8 +74,6 @@ Models.BaseCollection::publish = ->
   State.listenTo @, 'remove', removeListener
   State.listenTo @, 'reset', resetListener
 
-
-
 Models.BaseModel::unpublish = ->
   State.stopListening @
   url = _.result @, 'url'
@@ -85,13 +83,11 @@ Models.BaseModel::unpublish = ->
 
   delete State.models[url]
 
-
 State.getPlayer = (player) ->
   @world?.game?.players?.get(player)
 
 State.getSession = (session) ->
   @world?.sessions?.get(session)
-
 
 # Noop implementations of some methods.
 State.load = (data = {}) ->
