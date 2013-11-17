@@ -1,24 +1,25 @@
-App      = require('../app')
-_        = require('underscore')
-
-# The app object inherits all the methods of the express
-# server, allowing us to register middleware more
-# easily.
+App        = require('../app')
+conf       = require('../config')
+debug      = require('debug')('werewolves:server')
 http       = require("http")
+_          = require('underscore')
 express    = require("express")
 _express   = express()
 server     = http.createServer(_express)
 App.server = server
+
+# The app object inherits all the methods of the express
+# server, allowing us to register middleware more
+# easily.
 _.defaults App, _express
 
 # Load up the state instances
+#
+# We initialize this separately because
+# we don't want it to run just when included
 State = require('../state')
 App.addInitializer (opts) ->
   @trigger 'before:state', opts
-
-  # We initialize this separately because
-  # we don't want it to run just when included
-
   State.start(opts)
   @trigger 'state', opts
 
@@ -34,9 +35,11 @@ App.addInitializer (opts) ->
   @trigger 'settings', opts
 
 # Setup express middleware.
+#
+# We call just @router first as a
+# no-op, to get around express auto-mounting the
+# router when the first verb is called.
 App.addInitializer (opts) ->
-  # no-op, to get around express auto-mounting the
-  # router when the first verb is called.
   @router
   @trigger 'before:middleware', opts
   @use express.compress()
@@ -45,18 +48,20 @@ App.addInitializer (opts) ->
   @trigger 'middleware', opts
 
 # Set up express routes.
+# Mostly the wildcard default route.
+#
+# Also mounts the router middleware in a predicatable place.
 App.addInitializer (opts) ->
-  @trigger 'before:routes', opts
 
-  # Wildcard default route.
-  @get "/*", (req, res, next) =>
+  defaultRoute = (req, res, next) =>
     res.render "layout-server",
       host: opts.host
       env: env
       playerId: req.state.session.id
-  @trigger 'routes', opts
 
-  # mount the router middleware in a predicatable place.
+  @trigger 'before:routes', opts
+  @get "/*", defaultRoute
+  @trigger 'routes', opts
   @use @router
 
 # Start listening to the ports.
@@ -64,45 +69,28 @@ App.addInitializer (opts) ->
   @trigger 'before:listen', opts
   server.listen opts.port, (err) =>
     if err
-      console.error err
+      debug 'listen error', err
       process.exit -1
 
     @_running = true
-    console.log "Server running at http://#{opts.host}:#{opts.port}/"
+    debug 'started', "http://#{opts.host}:#{opts.port}/"
     @trigger "listen", opts
 
-# set back to non-root permissions
+# Stop the application and server
 #
-# if run as root, downgrade to the owner of this file.
-#
-# we run nginx in our environment since we need
-# https, and it complicates the app too much
-# to implement it directly.
-fs = require('fs')
-
-downgradePerms = ->
-  if process.getuid() is 0
-    fs.stat __filename, (err, stats) ->
-      return console.error(err)  if err
-      process.setuid stats.uid
-      #process.setgid stats.gid
-      #process.initgroups(stats.uid, stats.gid)
-
-App.on "listen", downgradePerms
-
+# mostly needed for multiple tests that start the
+# server on different ports.
 App.on "stop", ->
-  if @_running
-    @trigger 'before:close'
-    @_running = false
-    server.close()
-    @trigger 'close'
+  @trigger 'before:close'
+  server.close() if @_running
+  @_running = false
+  @trigger 'close'
+
 
 env  = process.env.NODE_ENV or 'development'
 
 # figure out config for the current environment
 App.config = ->
-  conf   = require('../config')
-
-  _.extend {}, conf[env], conf.defaults
+  _.extend({}, conf[env], conf.defaults)
 
 module.exports = App
