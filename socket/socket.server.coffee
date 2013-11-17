@@ -90,20 +90,27 @@ onConnection = (socket, state) ->
 
 Socket.on "connection", onConnection, Socket
 
-joinGame = (socket, session) ->
+actions = (socket, session) ->
 
   listener = (cb=->) ->
     player = State.world.game.addPlayer(id: session.id)
-
     return cb(500, {message: 'unknown error'}) if not player
-
     cb(null, player)
 
-
   socket.on 'game:join', listener
+
+  choose = (verb, target, cb=->) ->
+    round = State.world.game.currentRound()
+    result = round.choose(session.id, verb, target)
+    return cb(403, {message: 'denied'}) if not result
+    return cb(null, 'ok')
+
+  socket.on 'round:action', choose
+
   socket.on 'disconnect', =>
     socket.removeListener 'game:join', listener
+    socket.removeListener 'round:action', choose
 
-Socket.on "connection", joinGame, Socket
+Socket.on "connection", actions, Socket
 
 module.exports = Socket
