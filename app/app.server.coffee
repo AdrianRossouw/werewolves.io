@@ -80,12 +80,12 @@ App.addInitializer (opts) ->
 #
 # mostly needed for multiple tests that start the
 # server on different ports.
-App.on "stop", ->
-  @trigger 'before:close'
-  server.close() if @_running
-  @_running = false
-  @trigger 'close'
-
+App.addInitializer (opts) ->
+  @listenTo @, "stop", ->
+    @trigger 'before:close'
+    server.close() if @_running
+    @_running = false
+    @trigger 'close'
 
 env  = process.env.NODE_ENV or 'development'
 

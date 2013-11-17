@@ -36,6 +36,14 @@ class Models.Round extends Models.BaseModel
 
     @publish()
 
+  destroy: ->
+    super
+
+    delete @players
+
+    @actions.destroy()
+    delete @actions
+
   voteState: ->
     @lastChoice = Date.now()
 

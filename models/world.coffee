@@ -19,6 +19,7 @@ class Models.World extends Models.BaseModel
     @sessions.invoke 'destroy'
     @game.destroy()
     super
+    @stopListening()
 
   toJSON: ->
     obj = super
@@ -28,7 +29,6 @@ class Models.World extends Models.BaseModel
     obj
 
   startGame: =>
-
     @state('-> gameplay')
 
   initState: -> state @,

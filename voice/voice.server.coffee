@@ -196,5 +196,8 @@ Voice.listenTo App, 'before:routes', (opts) ->
 
     res.send TropoJSON(tropo)
 
+Voice.addFinalizer (opts) ->
+  @stopListening()
+
 
 module.exports = Voice

@@ -28,9 +28,11 @@ App = new Marionette.Application()
 App.ns = new Nonsense()
 
 App.stop = ->
-  _(@submodules).invoke 'stop'
+  _(@submodules).chain().where(_isInitialized:true).invoke('stop')
   @trigger 'before:stop'
   @_initCallbacks.reset()
   @trigger 'stop'
+
+  @off()
 
 module.exports = App

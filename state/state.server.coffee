@@ -18,8 +18,6 @@ Models.Sessions::touchSession = (sess) ->
   session.session = sess.id
   session
 
-fixture = require('../test/fixture/game1.coffee')
-State.addInitializer (opts) ->  @world ?= new Models.World()
 
 # hide sensitive information from client
 Models.World::mask = (session) -> _.pick(@toJSON(), 'id', 'game', '_state')
@@ -48,24 +46,26 @@ express              = require('express')
 RedisStore           = require('connect-redis')(express)
 State.sessionStore   = new RedisStore
 
-State.initMiddleware = (opts) ->
-  @use new express.cookieParser(opts.secret)
-  @use new express.session
-    store: State.sessionStore
-    secret: opts.secret
+State.addInitializer (opts) ->
 
-  # finds the state instance for this sentence
-  # and attaches it to the middleware so we can
-  # print it in the layout.
-  @use (req, res, next) =>
-    return next() if req.url != '/'
+  @world ?= new Models.World()
 
-    _sessions = State.world.sessions
-    session = _sessions.touchSession(req.session)
-    req.state = session: session
-    next()
+  App.listenTo App, 'middleware', (opts) ->
+    @use new express.cookieParser(opts.secret)
+    @use new express.session
+      store: State.sessionStore
+      secret: opts.secret
 
+    # finds the state instance for this sentence
+    # and attaches it to the middleware so we can
+    # print it in the layout.
+    @use (req, res, next) =>
+      return next() if req.url != '/'
 
-App.on 'middleware', State.initMiddleware, App
+      _sessions = State.world.sessions
+      session = _sessions.touchSession(req.session)
+      req.state = session: session
+      next()
+
 
 module.exports = State

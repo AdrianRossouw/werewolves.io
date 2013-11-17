@@ -5,8 +5,10 @@ socketio  = require("socket.io")
 SessionIo = require("session.socket.io")
 debug     = require('debug')('werewolves:state:server')
 _         = require('underscore')
-Socket    = App.module "Socket"
 Models    = App.module "Models"
+
+Socket    = App.module "Socket",
+  startWithParent: false
 
 Models.Sessions::findSocket = (id) ->
   State.world.sessions.findWhere socket:id
@@ -21,96 +23,96 @@ Models.Sessions::touchSocket = (socket, sess) ->
 
 # Initialize the socket.io library, with the
 # session handler wrapper.
-sessionInit = (opts = {}) ->
-  cookieParser = new express.cookieParser(opts.secret)
+Socket.addInitializer (opts) ->
+  @listenTo App, 'listen', (opts = {}) ->
+    cookieParser = new express.cookieParser(opts.secret)
+    opts.socket ?= {}
 
-  opts.socket ?= {}
+    @io = socketio.listen(App.server, opts.socket)
+    @io.set("destroy upgrade",false)
 
-  @io = socketio.listen(App.server, opts.socket)
-  @io.set("destroy upgrade",false)
+    @sio = new SessionIo @io, State.sessionStore, cookieParser
+    @sio.on 'connection', (err, socket, sess) =>
+      state = State.world.sessions.touchSocket socket, sess
+      @trigger 'connection', socket, state
 
-  @sio = new SessionIo @io, State.sessionStore, cookieParser
-  @sio.on 'connection', (err, socket, sess) =>
-    state = State.world.sessions.touchSocket socket, sess
-
-    @trigger 'connection', socket, state
-
-App.on "listen", sessionInit, Socket
+      socket.on 'disconnect', =>
+        if state.socket is socket.id
+          state.voice = false
+          state.sip = false
+          state.socket = false
 
 
-onConnection = (socket, state) ->
 
-  #Straight forward data query by the client.
-  dataHandler = (url, cb = ->) ->
-    debug "request #{url}"
-    model = State.models[url]
 
-    return cb(404, {message: 'not found'}) unless model
+# Incoming requests from the client
+Socket.addInitializer (opts) ->
 
-    cb(null, model.mask(state))
- 
-  socket.on 'data', dataHandler
+  # when a new socket connection is made
+  @listenTo @, 'connection', (socket, state) ->
 
-  # a modification of data from the client.
-  updateHandler = (url, data, cb = ->) ->
-    debug "update #{url}"
-    model = State.models[url]
+    #Straight forward data query by the client.
+    socket.on 'data', (url, cb = ->) ->
+      debug "request #{url}"
+      model = State.models[url]
+      return cb(404, {message: 'not found'}) unless model
+      cb(null, model.mask(state))
+   
 
-    return cb(404, {message: 'not found'}) unless model
+    # a modification of data from the client.
+    socket.on 'update', (url, data, cb = ->) ->
+      debug "update #{url}"
+      model = State.models[url]
+      return cb(404, {message: 'not found'}) unless model
+      model.set data
+      cb(null, data)
 
-    model.set data
-    cb(null, data)
 
-  socket.on 'update', updateHandler
+    # allow players to join
+    socket.on 'game:join', (cb=->) ->
+      player = State.world.game.addPlayer(id: state.id)
+      return cb(500, {message: 'unknown error'}) if not player
+      cb(null, player)
 
-  Socket.listenTo State, 'data', (event, args...) =>
-    if event is 'change'
-      [url, model] = args
+    # allow players to pick one of the currently active players.
+    socket.on 'round:action', (verb, target, cb=->) ->
+      round = State.world.game.currentRound()
+      result = round.choose(state.id, verb, target)
+      return cb(403, {message: 'denied'}) if not result
+      return cb(null, 'ok')
 
-      socket.emit 'data', 'change', url, model.mask(state)
-    else if event is 'add'
-      [cUrl, url, model] = args
-      socket.emit 'data', 'add', cUrl, url, model.mask(state)
-    else
-      socket.emit 'data', args...
+    # remove all the listeners on this socket
+    socket.on 'disconnect', =>
+      socket.removeAllListeners 'data'
+      socket.removeAllListeners 'update'
+      socket.removeAllListeners 'game:join'
+      socket.removeAllListeners 'round:action'
 
-  Socket.listenTo State, 'state', (args...) =>
-    socket.emit 'state', args...
 
-  socket.on 'disconnect', =>
-    if sModel.socket is socket.id
-      sModel.voice = false
-      sModel.sip = false
-      sModel.socket = false
 
-    socket.removeListener 'data', dataHandler
-    socket.removeListener 'update', updateHandler
+# outgoing broadcasts from the server to the client
+Socket.addInitializer (opts) ->
+  
+  # when a new socket connection is made
+  @listenTo @, 'connection', (socket, state) ->
 
-    @trigger 'disconnect', socket, session
+    @listenTo State, 'data', (event, args...) =>
+      if event is 'change'
+        [url, model] = args
+        socket.emit 'data', 'change', url, model.mask(state)
 
-Socket.on "connection", onConnection, Socket
+      else if event is 'add'
+        [cUrl, url, model] = args
+        socket.emit 'data', 'add', cUrl, url, model.mask(state)
 
-actions = (socket, session) ->
+      else
+        socket.emit 'data', args...
 
-  listener = (cb=->) ->
-    player = State.world.game.addPlayer(id: session.id)
-    return cb(500, {message: 'unknown error'}) if not player
-    cb(null, player)
+    @listenTo State, 'state', (args...) =>
+      socket.emit 'state', args...
 
-  socket.on 'game:join', listener
 
-  choose = (verb, target, cb=->) ->
-    round = State.world.game.currentRound()
-    result = round.choose(session.id, verb, target)
-    return cb(403, {message: 'denied'}) if not result
-    return cb(null, 'ok')
-
-  socket.on 'round:action', choose
-
-  socket.on 'disconnect', =>
-    socket.removeListener 'game:join', listener
-    socket.removeListener 'round:action', choose
-
-Socket.on "connection", actions, Socket
+Socket.addFinalizer (opts) ->
+  @off()
 
 module.exports = Socket

@@ -95,11 +95,11 @@ State.getSession = (session) ->
 
 # Noop implementations of some methods.
 State.load = (data = {}) ->
-  @world ?= new Models.World(data)
+  @world = new Models.World(data)
   @trigger 'load', @
 
-State.on 'stop', ->
-  # TODO: destroy, not delete
+State.addFinalizer ->
+  @off()
   State.world.destroy()
   delete State.world
   State.models = {}

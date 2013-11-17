@@ -55,6 +55,7 @@ before ->
     startsWithParent: false
 
   App.start App.config()
+  Socket.start App.config()
 
 it 'should have started the state module', ->
   State.should.have.property '_isInitialized', true
