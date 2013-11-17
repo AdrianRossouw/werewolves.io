@@ -41,7 +41,7 @@ Models.BaseModel::publish = ->
   ## the state listeners
   listenState = (state) ->
     path = state.path().replace(/\.$/, '')
-    debug path, url
+    debug 'state', path, url
     State.trigger('state', url, path)
 
   if @state

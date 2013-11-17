@@ -60,8 +60,8 @@ Socket.addInitializer (opts) ->
       debug "received new data for #{url}"
 
   @io.on 'state', (url, state) ->
+    debug "received new state #{state} for #{url}"
     model = State.models[url]
     model.state().change(state) if model
-    debug "received new state #{state} for #{url}"
 
 module.exports = Socket

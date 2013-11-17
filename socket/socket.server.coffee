@@ -17,7 +17,7 @@ Models.Sessions::touchSocket = (socket, sess) ->
   session = @touchSession(sess) if sess
   session ?= @findSocket(socket.id)
   session ?= @add {}
-  session.socket ?= socket.id
+  session.socket = socket.id
   session
 
 
@@ -61,7 +61,7 @@ Socket.addInitializer (opts) ->
 
     # a modification of data from the client.
     socket.on 'update', (url, data, cb = ->) ->
-      debug "update #{url}"
+      debug "update", url, data
       model = State.models[url]
       return cb(404, {message: 'not found'}) unless model
       model.set data
