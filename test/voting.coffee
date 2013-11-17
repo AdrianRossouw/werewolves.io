@@ -15,8 +15,8 @@ describe 'init state', ->
     State.on 'load', (data) ->
       done()
 
-    State.load(fixture)
     State.start()
+    State.load(fixture)
 
   it 'did the loading of records', ->
     should.exist State.world
@@ -42,7 +42,7 @@ describe 'init state', ->
 
       @currentVote = @myRecord.target
 
-    it 'should be in votes.all state', ->
+    it.skip 'should be in votes.all state', ->
       @currentRound.state().path().should.equal 'votes.all'
 
 

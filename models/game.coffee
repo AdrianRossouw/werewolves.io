@@ -16,14 +16,41 @@ class Models.Game extends Models.BaseModel
     super
     @players = new Models.Players []
     @rounds = new Models.Rounds []
-    @publish()
-    @state().change(data._state or 'recruit')
     @players.reset data.players if data.players
     @rounds.reset data.rounds if data.rounds
+    @state().change(data._state or 'recruit')
+    @publish()
+
+  mask: (session) ->
+    result = @toJSON()
+
+    # dead roles are known
+    return result if @state().is('dead')
+
+    player = session?.player
+
+    if player
+      # your own role is known
+      return result if session.id is player?.id
+
+      realRole = result.role
+      result.role = 'villager'
+
+      isSeer = player?.role is 'seer'
+      seen = @id in (player?.seen or [])
+      
+      return result if isSeer and seen
+
+    #otherwise hide it
+    result.role = 'villager'
+
+    result
 
   destroy: ->
     @players.invoke('destroy')
+    delete @players
     @rounds.invoke('destroy')
+    delete @rounds
     super
 
   toJSON: ->

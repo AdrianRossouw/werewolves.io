@@ -100,8 +100,8 @@ State.load = (data = {}) ->
 
 State.on 'stop', ->
   # TODO: destroy, not delete
-  State.world.destroy()
-  delete State.world
+  @world.destroy()
+  delete @world
   State.models = {}
 
 

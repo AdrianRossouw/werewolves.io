@@ -50,7 +50,7 @@ class Models.BaseCollection extends Backbone.Collection
     @unpublish()
 
   initState: ->
-  mask: (session) -> @toJSON()
+  mask: (session) -> @invoke('mask', session)
   publish:  -> @
 
 require('./session.coffee')

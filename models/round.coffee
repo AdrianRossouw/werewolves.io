@@ -31,10 +31,10 @@ class Models.Round extends Models.BaseModel
     @actions = new Models.Actions []
     @players = opts.players
     @actions.reset data.actions if data.actions
-    @state().change(data._state or 'votes.none')
     @listenTo @state('votes.all'), 'arrive', @endPhase
-
+    @state().change(data._state or 'votes.none')
     @publish()
+
 
   voteState: ->
     @lastChoice = Date.now()
@@ -59,17 +59,17 @@ class Models.Round extends Models.BaseModel
         admit:
           'none': ->
             activeTotal = @owner.players.activeTotal()
-            (1 <= @owner.actions.length <= activeTotal)
+            1 <= @owner.actions.length < activeTotal
 
         arrive: ->
           @firstVotes = Date.now()
 
       all:
         admit:
-          '': -> true
           'some': ->
             activeTotal = @owner.players.activeTotal()
             @owner.actions.length == activeTotal
+          '*': -> true
 
     complete: state 'conclusive',
       # there is a death

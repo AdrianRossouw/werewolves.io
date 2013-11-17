@@ -24,24 +24,6 @@ State.addInitializer (opts) ->  @world ?= new Models.World()
 # hide sensitive information from client
 Models.World::mask = (session) -> _.pick(@toJSON(), 'id', 'game', '_state')
 
-# hide roles from players, unless they were seen
-Models.Player::mask = (session) ->
-  result = @toJSON()
-  
-  # dead roles are known
-  return result if @state().is('dead')
-
-  player = session.player
-  # your own role is known
-  return result if session.id is player?.id
-
-  seen = player?.seen or []
-
-  # seer could have seen you
-  if (player?.role != 'seer') and (@id not in seen)
-    result.role = 'villager'
-
-  result
 
 # Session middleware
 express              = require('express')
