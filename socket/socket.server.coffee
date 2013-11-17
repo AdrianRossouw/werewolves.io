@@ -66,11 +66,10 @@ onConnection = (socket, state) ->
   Socket.listenTo State, 'data', (event, args...) =>
     if event is 'change'
       [url, model] = args
+
       socket.emit 'data', 'change', url, model.mask(state)
     else if event is 'add'
       [cUrl, url, model] = args
-
-      debug 'stuff', model, JSON.stringify(model.mask(state), null, 2)
       socket.emit 'data', 'add', cUrl, url, model.mask(state)
     else
       socket.emit 'data', args...

@@ -18,11 +18,12 @@ $socket = {}
 $state  = {}
 $server = {}
 $clock  = false
-$_round = false
 
 $round  = _(fixture.rounds).pluck 'actions'
 $player = _(fixture.players).map (p) ->
   _(p).pick('id', 'name')
+
+
 
 setupSpies = ->
   $spy.state = sinon.spy State, 'trigger'
@@ -267,6 +268,7 @@ describe 'socket can connect', ->
 
   # only this part uses fake timers
   describe 'starting the game', ->
+
     before ->
       resetSpies()
       $clock = sinon.useFakeTimers()
@@ -313,20 +315,10 @@ describe 'socket can connect', ->
         $state.players.each (p) ->
           $spy.state.calledWith('state', p.getUrl(), p.state().path()).should.be.ok
 
-    describe 'should have populated the first round', ->
-      before ->
-        $state.round = $state.game.currentRound()
-
-      it 'should have fired data add events', ->
-        $spy.state.calledWith('data', 'add', 'round', $state.round.getUrl()).should.be.ok
-
-      it 'should have passed the new round add event to the socket', ->
-        $spy.ioData.calledWith('add', 'round', $state.round.getUrl()).should.be.ok
-
-
     describe 'all players got roles', ->
       before ->
         $state.roles = $state.players.groupBy((p) -> p.role)
+
 
       it 'handed out the right roles', ->
 
@@ -335,43 +327,31 @@ describe 'socket can connect', ->
         $state.roles.villager.length.should.equal 6
 
       it 'triggered all the data events for role changes', ->
+        resetSpies()
         $state.players.each (p) ->
           if p.role is not 'villager'
             $spy.state.calledWith('data', 'change', p.getUrl()).should.be.ok
-        
-      it 'triggered all data io events for only me', ->
-        me = $state.player
-        if me.role is not 'villager'
-          $spy.ioData.calledWith('data', 'change', me.getUrl()).should.be.ok
+          else
+            $spy.state.calledWith('data', 'change', p.getUrl()).should.not.be.ok
 
-      describe 'first night round', ->
-        before ->
-          $_round = $state.game.currentRound()
-          villagers = $state.roles.villager
+        $clock.tick(10000)
 
-          $target = _(villagers).find (v) -> v.id != $state.id
+      it 'only sent us our role. not everybodys', ->
+        $state.players.each (p) ->
+          isMe = p.id is $state.id
+          isNotVillager = p.role is not 'villager'
 
-          $wolves = $state.roles.werewolf
-          _($wolves).each (w) ->
-            $_round.choose(w.id, 'eat', $target.id)
-            $clock.tick 1000
+          if isMe and isNotVillager
+            $spy.ioData.calledWith('change', p.getUrl()).should.be.ok
+          else
+            withArgs = $spy.ioData.withArgs('change', p.getUrl())
+            withArgs.callCount.should.equal 0
 
-          $seer = $state.roles.seer[0]
-          $_round.choose($seer.id, 'see', $wolves[0].id)
-
-
-        it 'currently active players', ->
-          $state.players.activeTotal().should.equal 3
-
-        it 'current round actions', ->
-          $state.game.currentRound().actions.length.should.equal 3
-
-
-        it 'should be in the votes.all state', ->
-          $state.game.currentRound().state().path().should.equal 'votes.all'
 
     after -> $clock.restore()
-  after -> restoreSpies()
+
+  after restoreSpies
+
 
 describe 'cleanup', ->
   before ->

@@ -15,8 +15,8 @@ describe 'init state', ->
     State.on 'load', (data) ->
       done()
 
-    State.start()
     State.load(fixture)
+    State.start()
 
   it 'did the loading of records', ->
     should.exist State.world

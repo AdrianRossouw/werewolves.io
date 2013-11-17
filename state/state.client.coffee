@@ -18,6 +18,8 @@ Models.Players::initialize = (data={}, opts={}) ->
   _.extend @, selectOne
 
 
+
+
 State.playerId = window.PLAYER_ID
 
 State.addInitializer (opts) ->
