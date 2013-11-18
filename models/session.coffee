@@ -12,6 +12,7 @@ state    = require('state')
 Backbone = require('backbone')
 Models   = App.module "Models"
 State    = App.module "State"
+_ = require('underscore')
 
 class Models.Session extends Models.BaseModel
   # session identifiers
@@ -27,8 +28,7 @@ class Models.Session extends Models.BaseModel
 
     @state().change(data._state or 'offline')
 
-    @listenTo @, 'change', @findState
-
+    @listenTo @, 'change', @upgrade
 
     Object.defineProperty @, 'player',
       get: -> State.getPlayer(@id)
@@ -36,56 +36,49 @@ class Models.Session extends Models.BaseModel
         player = State.getPlayer(@id)
         player = value
         player
-
-  # attempt all the possible states in order
-  findState: ->
-    @state().change('offline')
-    @state().change('session')
-    @state().change('socket')
-    @state().change('sip')
-    @state().change('voice')
-
   destroy: ->
     @stopListening @
+
 
   setIdentifier: (type, id) ->
     @[type] = id
 
+  toState: (nextState) ->
+    state.bind ->
+      next = @query(nextState)
+      # check if we meet the requirements
+      if next.call 'allow'
+        @go nextState
+        next.call 'upgrade'
+      else if not @owner.allow()
+        console.log 'hello?'
+        next.call 'downgrade'
+
   initState: ->
     state @,
-      offline: state 'initial'
+      upgrade: ->
+      downgrade: ->
+      offline: state 'initial',
+        allow: -> true
+        upgrade: @toState 'session'
       online: state 'abstract',
         session: state 'default',
-          admit: (from) ->
-            console.log from
-            true if @owner.session
-          release: true
+          downgrade: @toState 'offline'
+          upgrade: @toState 'socket'
+          allow: -> true
         socket:
-          deps: -> true if @socket
-
-          admit:
-            offline: state.bind @deps
-            session: state.bind @deps
-            sip: state.bind @deps
-          release:
-            sip:  state.bind @deps
-            session: state.bind -> !@owner.deps()
+          upgrade: @toState 'sip'
+          downgrade: @toState 'session'
+          allow: -> true if @socket
         sip:
-          deps: -> true if @socket and @sip
-          admit:
-            offline:  state.bind @deps
-            socket:  state.bind @deps
-            voice:  state.bind @deps
-          release:
-            voice:  state.bind @deps
-            socket: state.bind -> !@owner.deps()
+          upgrade: @toState 'voice'
+          downgrade: @toState 'socket'
+          allow: -> true if @socket and @sip
         voice:
-          deps: -> true if @socket and @sip and @voice
-          admit:
-            offline:  state.bind @deps
-            sip:  state.bind @deps
-          release:
-            sip: state.bind -> !@owner.deps()
+          allow: -> true if @socket and @voice and @sip
+          downgrade: @toState 'sip'
+
+
 
 class Models.Sessions extends Models.BaseCollection
   url: 'session'
