@@ -24,13 +24,11 @@ class Models.Session extends Models.BaseModel
     @id = data.id or App.ns.uuid()
 
     super
+
     @state().change(data._state or 'offline')
 
-    @publish()
-    @listenTo @, 'change:session', -> @state().change('session')
-    @listenTo @, 'change:socket', -> @state().change('socket')
-    @listenTo @, 'change:sip', -> @state().change('sip')
-    @listenTo @, 'change:voice', -> @state().change('voice')
+    @listenTo @, 'change', @findState
+
 
     Object.defineProperty @, 'player',
       get: -> State.getPlayer(@id)
@@ -39,41 +37,55 @@ class Models.Session extends Models.BaseModel
         player = value
         player
 
+  # attempt all the possible states in order
+  findState: ->
+    @state().change('offline')
+    @state().change('session')
+    @state().change('socket')
+    @state().change('sip')
+    @state().change('voice')
+
   destroy: ->
     @stopListening @
 
   setIdentifier: (type, id) ->
     @[type] = id
 
-  initState: -> state @,
-    offline: state 'initial'
-    online: state 'abstract',
-      session: state 'default',
-        release:
-          offline: -> !@owner.session
-          socket: -> @owner.session
-      socket:
-        admit:
-          offline: -> @owner.socket
-          session: -> @owner.socket
-          sip: -> @owner.socket
-        release:
-          sip: -> @owner.socket
-          session: -> !@owner.socket
-      sip:
-        admit:
-          offline: -> @owner.sip
-          socket: -> @owner.sip
-          voice: -> @owner.sip
-        release:
-          voice: -> @owner.sip
-          socket: -> !@owner.sip
-      voice:
-        admit:
-          offline: -> @owner.voice
-          sip: -> @owner.voice
-        release:
-          sip: -> !@owner.voice
+  initState: ->
+    state @,
+      offline: state 'initial'
+      online: state 'abstract',
+        session: state 'default',
+          admit: (from) ->
+            console.log from
+            true if @owner.session
+          release: true
+        socket:
+          deps: -> true if @socket
+
+          admit:
+            offline: state.bind @deps
+            session: state.bind @deps
+            sip: state.bind @deps
+          release:
+            sip:  state.bind @deps
+            session: state.bind -> !@owner.deps()
+        sip:
+          deps: -> true if @socket and @sip
+          admit:
+            offline:  state.bind @deps
+            socket:  state.bind @deps
+            voice:  state.bind @deps
+          release:
+            voice:  state.bind @deps
+            socket: state.bind -> !@owner.deps()
+        voice:
+          deps: -> true if @socket and @sip and @voice
+          admit:
+            offline:  state.bind @deps
+            sip:  state.bind @deps
+          release:
+            sip: state.bind -> !@owner.deps()
 
 class Models.Sessions extends Models.BaseCollection
   url: 'session'

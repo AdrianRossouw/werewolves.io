@@ -88,4 +88,85 @@ describe 'initializing sessions', ->
   it 'should have initialized an socketOnly session', ->
     testInitialized @m, 'socketOnly'
 
+describe 'upgrading connections', ->
+  
+  describe 'from offline state', ->
+    before -> @m = cleanInstances().offline
 
+    it 'should upgrade to session', ->
+      @m.session = 'session.id'
+      @m.session.should.equal 'session.id'
+      @m.state().path().should.equal 'online.session'
+
+    it 'should upgrade to socket', ->
+      @m.socket = 'socket.id'
+      @m.socket.should.equal 'socket.id'
+      @m.state().path().should.equal 'online.socket'
+
+    it 'should upgrade to sip', ->
+      @m.sip = 'sip.id'
+      @m.sip.should.equal 'sip.id'
+      @m.state().path().should.equal 'online.sip'
+
+    it 'should upgrade to voice', ->
+      @m.voice = 'voice.id'
+      @m.voice.should.equal 'voice.id'
+      @m.state().path().should.equal 'online.voice'
+
+  
+  describe 'from session state', ->
+    beforeEach -> @m = cleanInstances().session
+
+    it 'should upgrade to socket', ->
+      @m.socket = 'socket.id'
+      @m.socket.should.equal 'socket.id'
+      @m.state().path().should.equal 'online.socket'
+
+    it 'should upgrade to sip', ->
+      @m.sip = 'sip.id'
+      @m.sip.should.equal 'sip.id'
+      @m.state().path().should.equal 'online.sip'
+
+    it 'should upgrade to voice', ->
+      @m.voice = 'voice.id'
+      @m.voice.should.equal 'voice.id'
+      @m.state().path().should.equal 'online.voice'
+ 
+  describe 'from socket state', ->
+    beforeEach -> @m = cleanInstances().socket
+
+    it 'should upgrade to sip', ->
+      @m.sip = 'sip.id'
+      @m.sip.should.equal 'sip.id'
+      @m.state().path().should.equal 'online.sip'
+
+    it 'should upgrade to voice', ->
+      @m.voice = 'voice.id'
+      @m.voice.should.equal 'voice.id'
+      @m.state().path().should.equal 'online.voice'
+
+  describe 'from sip state', ->
+    beforeEach -> @m = cleanInstances().socket
+
+    it 'should upgrade to voice', ->
+      @m.voice = 'voice.id'
+      @m.voice.should.equal 'voice.id'
+      @m.state().path().should.equal 'online.voice'
+
+  describe 'from socketOnly state', ->
+    beforeEach -> @m = cleanInstances().socketOnly
+    
+    it 'should not downgrade to session', ->
+      @m.session = 'session.id'
+      @m.session.should.equal 'session.id'
+      @m.state().path().should.equal 'online.session'
+
+    it 'should upgrade to sip', ->
+      @m.sip = 'sip.id'
+      @m.sip.should.equal 'sip.id'
+      @m.state().path().should.equal 'online.sip'
+
+    it 'should upgrade to voice', ->
+      @m.voice = 'voice.id'
+      @m.voice.should.equal 'voice.id'
+      @m.state().path().should.equal 'online.voice'
