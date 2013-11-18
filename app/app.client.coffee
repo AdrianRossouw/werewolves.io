@@ -59,7 +59,8 @@ App.worldHandler =  ->
     @hideGame()
 
 App.listenTo State, "state", (url, state) ->
-  @worldHandler() if url is 'world'
+  @worldHandler() if State.isWorld(url)
+
 
 App.listenTo State, 'load', ->
   @addRegions

@@ -20,6 +20,7 @@ State.isPlayer = (url) -> /player\/.*$/.test(url)
 State.isSession = (url) -> /session\/.*$/.test(url)
 State.isAction = (url) -> /action\/.*$/.test(url)
 State.isGame = (url) -> /game\/.*$/.test(url)
+State.isWorld = (url) -> true if url is 'world'
 State.isRound = (url) -> /round\/.*$/.test(url)
 
 # singleton map of models to url()
