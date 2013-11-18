@@ -16,6 +16,9 @@ class Views.Player extends Backbone.Marionette.ItemView
   events:
     click: 'choose'
 
+  modelEvents:
+    'change': 'render'
+
   initialize: ->
     @listenTo @model, 'selected', @selected
     @listenTo @model, 'deselected', @deselected

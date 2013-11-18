@@ -25,8 +25,8 @@ Marionette    = require("backbone.marionette")
 Backbone.$    = Marionette.$ = require("jquery")
 
 
-#if env != 'development'
-require('../voice')
+if env != 'development'
+  require('../voice')
 
 
 # Load up the state instances
@@ -44,19 +44,24 @@ Socket = require('../socket')
 $body = $('body')
 
 App.showGame = ->
+  # we must have a good reason to show it, right?
+  @gameView.render()
   $body.removeClass('in-lobby').addClass('in-game')
 
 App.hideGame = ->
   $body.addClass('in-lobby').removeClass('in-game')
 
-App.listenTo State, "state", (url, state) ->
-  if url is 'world'
-    if (state is 'gameplay') or State.session.player
-      @showGame()
-    else
-      @hideGame()
+App.worldHandler =  ->
+  state = State.world.state().path()
+  if (state is 'gameplay') or State.session.player
+    @showGame()
+  else
+    @hideGame()
 
-loader = (opts) ->
+App.listenTo State, "state", (url, state) ->
+  @worldHandler() if url is 'world'
+
+App.listenTo State, 'load', ->
   @addRegions
     game: '#game'
 
@@ -66,11 +71,8 @@ loader = (opts) ->
 
   $('.play-now').click playNow
 
-  #$body.addClass 'in-lobby'
-
   @gameView = new Views.Game el: $('#game')
-  @gameView.render()
- 
-State.on 'load', loader, App
+
+  @worldHandler()
 
 App.start(conf)
