@@ -1,0 +1,6 @@
+{
+  "name": "wolfbots",
+  "description": "automated players to test the game on your own",
+  "main": "wolfbots.server.coffee",
+  "browser": "wolfbots.client.coffee"
+}

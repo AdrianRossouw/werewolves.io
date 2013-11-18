@@ -7,6 +7,7 @@ express    = require("express")
 _express   = express()
 server     = http.createServer(_express)
 App.server = server
+env        = process.env.NODE_ENV or 'development'
 
 # The app object inherits all the methods of the express
 # server, allowing us to register middleware more
@@ -26,6 +27,14 @@ App.addInitializer (opts) ->
 # Load up the web sockets
 Socket = require('../socket')
 Voice = require('../voice')
+
+if env is 'development'
+  Wolfbots = require('../wolfbots')
+  Wolfbots.start()
+
+
+
+
 
 # Set up express with some default things.
 App.addInitializer (opts) ->
@@ -88,7 +97,6 @@ App.addInitializer (opts) ->
     @_running = false
     @trigger 'close'
 
-env  = process.env.NODE_ENV or 'development'
 
 # figure out config for the current environment
 App.config = ->
