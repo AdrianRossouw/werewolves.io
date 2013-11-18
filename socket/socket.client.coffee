@@ -43,13 +43,13 @@ Socket.addInitializer (opts) ->
     debug 'data', arguments
     if event is 'add'
       [mUrl, data] = args
-      coll = State.model[url]
+      coll = State.models[url]
       coll.add data
       debug "added #{mUrl} to #{url}"
 
     if event is 'remove'
       [mUrl, data] = args
-      coll = State.model[url]
+      coll = State.models[url]
       coll.remove coll.get url
       debug "removes #{mUrl} from #{url}"
 
