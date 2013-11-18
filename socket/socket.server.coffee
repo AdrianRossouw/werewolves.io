@@ -43,8 +43,6 @@ Socket.addInitializer (opts) ->
           state.socket = false
 
 
-
-
 # Incoming requests from the client
 Socket.addInitializer (opts) ->
 
