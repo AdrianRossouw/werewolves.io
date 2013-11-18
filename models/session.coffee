@@ -27,6 +27,7 @@ class Models.Session extends Models.BaseModel
     super
 
     @state().change(data._state or 'offline')
+    @publish()
 
     @listenTo @, 'change', @upgrade
 
