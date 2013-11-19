@@ -94,24 +94,31 @@ Socket.addInitializer (opts) ->
 
 # outgoing broadcasts from the server to the client
 Socket.addInitializer (opts) ->
-  
+  @stateMask = (url, state, session) ->
+    true unless State.isSession(url) and (session.getUrl() != url)
+
   # when a new socket connection is made
   @listenTo @, 'connection', (socket, state) ->
 
     @listenTo State, 'data', (event, args...) =>
       if event is 'change'
         [url, model] = args
-        socket.emit 'data', 'change', url, model.mask(state)
+        mask = model.mask(state)
+        socket.emit 'data', 'change', url, mask if mask
 
       else if event is 'add'
         [cUrl, url, model] = args
-        socket.emit 'data', 'add', cUrl, url, model.mask(state)
+        mask = model.mask(state)
+        socket.emit 'data', 'add', cUrl, url, mask if mask
 
       else
-        socket.emit 'data', args...
+        socket.broadcast.emit 'data', args...
 
-    @listenTo State, 'state', (args...) =>
-      socket.emit 'state', args...
+
+    @listenTo State, 'state', (url, newState) ->
+      allow = @stateMask url, newState, state
+
+      socket.emit 'state', url, newState if allow
 
 
 Socket.addFinalizer (opts) ->
