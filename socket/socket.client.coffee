@@ -1,5 +1,6 @@
 App           = require('../app')
-Socket        = App.module "Socket"
+Socket        = App.module "Socket",
+  startWithParent: false
 State         = require('../state')
 debug         = require('debug')('werewolves:state:client')
 _             = require('underscore')
@@ -10,11 +11,11 @@ registerHandlers = (opts) ->
   State.on 'game:join', =>
     @io.emit 'game:join'
 
-# on the client side we only care about our session
-State.isSession = (url) -> url is State.session.getUrl()
 
 State.on 'load', registerHandlers, Socket
 Socket.addInitializer (opts) ->
+  @isSession = (url) -> url is State.world.session.getUrl()
+
   socketio.transports = ["websocket"]
   socketUrl = url.format _.pick(opts, 'hostname', 'protocol', 'port')
 
@@ -28,7 +29,7 @@ Socket.addInitializer (opts) ->
   State.on 'data', (event, url, model) =>
     debug 'update session'
 
-    @io.emit 'update', url, model if State.isSession(url)
+    @io.emit 'update', url, model if @isSession(url)
 
   @io.on 'data', (event, url, args...) ->
     debug 'data', arguments

@@ -30,14 +30,14 @@ class Views.Player extends Backbone.Marionette.ItemView
     @$el.removeClass 'selected'
 
   choose: ->
-    return if @model.id == State.session.player.id
+    return if @model.id == State.world.session.player.id
     # TODO: also don't allow choose when you're not allowed to vote
     @model.collection.select @model
 
   serializeData: ->
     json = super
     if State.session.player.id
-      json.me = @model.id == State.session.player.id
+      json.me = @model.id == State.world.session.player.id
     #json.selected = @model.collection.selected == @model
     json
 

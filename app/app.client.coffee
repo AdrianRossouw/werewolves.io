@@ -5,6 +5,7 @@ Models = require('../models')
 
 Views = require('../views')
 _ = require('underscore')
+state = require('state')
 
 env = window.NODE_ENV or 'development'
 config = require('../config')
@@ -36,40 +37,47 @@ Socket = require('../socket')
 
 $body = $('body')
 
-App.showGame = ->
-  # we must have a good reason to show it, right?
-  @gameView.render()
-  $body.removeClass('in-lobby').addClass('in-game')
 
-App.hideGame = ->
-  $body.addClass('in-lobby').removeClass('in-game')
+state App,
+  lobby: state 'initial',
+    arrive: ->
+      $body.addClass('in-lobby')
+    exit: ->
+      $body.removeClass('in-lobby')
+  game:
+    arrive: ->
+      @gameView.render()
+      $body.addClass('in-game')
+    exit: ->
+      $body.removeClass('in-game')
+    admit: ->
+      worldState = State.world?.state()?.path()?
+      myPlayer = State.world?.session?.player?
 
-App.worldHandler =  ->
-  state = State.world.state().path()
-  if (state is 'gameplay') or State.session.player
-    @showGame()
-  else
-    @hideGame()
+      true if myPlayer or (worldState is 'gameplay')
 
-App.listenTo State, "state", (url, state) ->
-  @worldHandler() if State.isWorld(url)
 
-App.listenTo State, 'load', ->
-  @addRegions
-    game: '#game'
+App.addInitializer ->
+  @listenTo State, "state", (url, state) ->
+    @state().change 'game' if State.isWorld(url)
 
-  playNow = ->
-    App.showGame()
-    App.State.joinGame()
+  # what happens when we join
+  @listenTo State, "data", (event, coll, url, state) ->
+    @state().change 'game' if (event is 'add') and (coll is 'player')
 
-  $('.play-now').click playNow
+  @addRegions game: '#game'
 
+  $('.play-now').click -> App.State.joinGame()
   @gameView = new Views.Game el: $('#game')
 
-  @worldHandler()
+
 
 App.bootstrap = (world) ->
   App.start App.config()
   State.load world
+  Socket.start App.config()
+
+  # won't happen if the guards dont admit it
+  @state().change('game')
 
 window.App = App

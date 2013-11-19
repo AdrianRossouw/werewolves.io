@@ -9,6 +9,7 @@ Backbone = require('backbone')
 
 Picky = require('backbone.picky')
 
+
 Models.Player::initialize = (data={}, opts={}) ->
   @initState()
   @publish()
@@ -26,19 +27,17 @@ class Models.World extends Models.World
     super
 
     Object.defineProperty @, 'session',
-      get: -> State.getSession(State.playerId)
+      get: -> State.getSession(window.PLAYER_ID)
       set: (value) ->
-        session = State.getSession(State.playerId)
-        session = value
+        session = State.getSession(window.PLAYER_ID)
+        session.set(value)
         session
+
 
 State.playerId = window.PLAYER_ID
 
-State.addInitializer (opts) ->
-  @session = new Models.Session id: State.playerId
-
 State.getPlayer = ->
-  @world?.game?.players?.get(State.playerId)
+  @world?.game?.players?.get(window.PLAYER_ID)
 
 State.load = (data) ->
   @world = new Models.World(data)

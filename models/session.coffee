@@ -37,6 +37,7 @@ class Models.Session extends Models.BaseModel
         player = State.getPlayer(@id)
         player = value
         player
+
   destroy: ->
     @stopListening @
 
