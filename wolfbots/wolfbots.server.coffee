@@ -19,7 +19,7 @@ class Models.Bot extends Models.BaseModel
   initialize: (data, options) ->
     @id = data.id if data.id
     @publish()
-    @debug = Debug("werewolves:bots:#{@id}")
+    @debug = Debug("werewolves:wolfbots:#{@id}")
 
     @phantom = new _.Deferred()
     @start (err, playerId, ph) =>
@@ -64,7 +64,7 @@ Wolfbots.addInitializer (bots) ->
     # re-emit command messages
     # TODO: emit only to a specific bot
     socket.on 'wolfbot:command', (id, args..., cb = ->) ->
-      socket.emit(id, args..., cb)
+      socket.broadcast.emit(id, args..., cb)
 
     socket.on 'wolfbot:add', (id, cb = ->) ->
       console.log 'new bot added'
@@ -76,7 +76,7 @@ Wolfbots.addInitializer (bots) ->
     socket.on 'wolfbot:remove', (id, cb = ->) ->
       bot = State.bots.get(id)
 
-      state.bots.remove(bots)
+      State.bots.remove(bots)
       cb(null)
 
     socket.on 'disconnect', ->

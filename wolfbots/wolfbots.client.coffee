@@ -20,7 +20,7 @@ class Models.Bot extends Models.BaseModel
     if @mode is 'master'
       debug(args...)
     else
-      debugStr = "werewolves:bots:#{@id}" 
+      debugStr = "werewolves:wolfbots:#{@id}" 
       @io('wolfbot:debug', debugStr, args...)
 
   io: (args...) -> Socket.io.emit(args...)
@@ -40,7 +40,7 @@ class Models.Bot extends Models.BaseModel
   _command: (cmd, args...) ->
     @debug 'running command', cmd
     if @mode is 'master'
-      @io 'wolfbot:command', cmd, @id, args...
+      @io 'wolfbot:command', @id, cmd, args...
     else
       @io args...
 
@@ -62,7 +62,7 @@ Wolfbots.addInitializer (conf = {}) ->
 
      # catch all botst log messages
      Socket.io.emit 'data', 'wolfbot', (err, data) ->
-       State.bots.reset data
+       State.bots.reset data, silent: true
 
 
      @listenTo State, 'data', (event, url, model, data, args...) ->
