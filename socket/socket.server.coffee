@@ -52,6 +52,8 @@ Socket.addInitializer (opts) ->
   @listenTo @, 'connection', (socket, state) ->
 
     #Straight forward data query by the client.
+    # TODO: remove this now that we bootstrap?
+    # it's still useful for bots though...
     socket.on 'data', (url, cb = ->) ->
       debug "request #{url}"
       model = State.models[url]

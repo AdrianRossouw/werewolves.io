@@ -119,8 +119,9 @@ describe 'socket can connect', ->
     it 'fetched the world', ->
       should.exist $io.world
 
-    it 'the world should not have sessions', ->
-      should.not.exist($io.world.sessions)
+    it 'the world should only a single session', ->
+      should.exist($io.world.sessions)
+      $io.world.sessions.length.should.equal 1
 
     it 'should have a game state', ->
       should.exist($io.world.game)
@@ -191,6 +192,9 @@ describe 'socket can connect', ->
 
     it 'IO should have caught a state event', ->
       $spy.ioState.calledWith($state.url, 'online.sip').should.be.ok
+
+  describe.skip 'another socket connects to the server', ->
+    it 'should not give us that sockets session info', ->
 
   describe 'it should allow us to join the game', ->
     before (done) ->

@@ -21,8 +21,8 @@ Models.Sessions::touchSession = (sess) ->
 
 # hide sensitive information from client
 Models.World::mask = (session) ->
-  world = _.pick(@toJSON(), 'id', 'game', '_state')
-  world.sessions = @sessions.where id: session.id
+  world = _.pick(@toJSON(), 'id', 'game', '_state', 'sessions')
+  world.sessions = _(world.sessions).where id: session.id
   world
 
 # hide roles from players, unless they were seen
