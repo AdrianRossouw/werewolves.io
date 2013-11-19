@@ -50,9 +50,6 @@ Models.Sessions::mask = (session) ->
 Models.Session::mask = (session) ->
   @toJSON if @id is session.id
 
-Models.stateMask = (url, state, session) ->
-  true unless State.isSession(url) and (session.getUrl() != url)
-
 # Session middleware
 express              = require('express')
 RedisStore           = require('connect-redis')(express)
