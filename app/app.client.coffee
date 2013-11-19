@@ -3,20 +3,15 @@
 App = require('./app.coffee')
 Models = require('../models')
 
-
 Views = require('../views')
 _ = require('underscore')
 
+env = window.NODE_ENV or 'development'
+config = require('../config')
 
 # figure out config for the current environment
-_conf = require('../config')
-conf    = {}
-env     = window.NODE_ENV
-env    ?= 'development'
-
-_.defaults conf, _conf[env], _conf.defaults
-
-window.App = App
+App.config = ->
+  _.extend {}, config.defaults, config[env]
 
 # Anchor libraries.
 # We finally include jquery from bower here.
@@ -24,10 +19,8 @@ Backbone      = require("backbone")
 Marionette    = require("backbone.marionette")
 Backbone.$    = Marionette.$ = require("jquery")
 
-
 if env != 'development'
   require('../voice')
-
 
 # Load up the state instances
 State = require('../state')
@@ -61,7 +54,6 @@ App.worldHandler =  ->
 App.listenTo State, "state", (url, state) ->
   @worldHandler() if State.isWorld(url)
 
-
 App.listenTo State, 'load', ->
   @addRegions
     game: '#game'
@@ -76,4 +68,8 @@ App.listenTo State, 'load', ->
 
   @worldHandler()
 
-App.start(conf)
+App.bootstrap = (world) ->
+  App.start App.config()
+  State.load world
+
+window.App = App

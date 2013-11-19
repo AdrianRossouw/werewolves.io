@@ -21,7 +21,16 @@ Models.Players::initialize = (data={}, opts={}) ->
   _.extend @, selectOne
 
 
+class Models.World extends Models.World
+  initialize: ->
+    super
 
+    Object.defineProperty @, 'session',
+      get: -> State.getSession(State.playerId)
+      set: (value) ->
+        session = State.getSession(State.playerId)
+        session = value
+        session
 
 State.playerId = window.PLAYER_ID
 

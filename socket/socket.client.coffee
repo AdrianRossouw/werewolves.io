@@ -11,8 +11,7 @@ registerHandlers = (opts) ->
     @io.emit 'game:join'
 
 # on the client side we only care about our session
-State.isSession = (url) ->
-  url is _.result State.session, 'url'
+State.isSession = (url) -> url is State.session.getUrl()
 
 State.on 'load', registerHandlers, Socket
 Socket.addInitializer (opts) ->
@@ -25,14 +24,6 @@ Socket.addInitializer (opts) ->
     @io = socketio.connect(socketUrl)
 
   sessionUrl = _.result State.session, 'url'
-
-  @io.emit 'data', sessionUrl, (err, data) ->
-    debug 'got session data'
-    State.session.set data, silent: true
-
-  @io.emit 'data', 'world', (err, data) ->
-    debug 'got world data'
-    State.load(data)
   
   State.on 'data', (event, url, model) =>
     debug 'update session'

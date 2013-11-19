@@ -58,9 +58,10 @@ App.addInitializer (opts) ->
       host: opts.host
       env: env
       playerId: req.state.session.id
+      world: JSON.stringify(State.world.mask(req.state.session))
 
   @trigger 'before:routes', opts
-  @get "/*", defaultRoute
+  @get "/", defaultRoute
   @trigger 'routes', opts
   @use @router
 
