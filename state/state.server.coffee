@@ -48,7 +48,7 @@ Models.Sessions::mask = (session) ->
   _(@toJSON()).where id: session.id
 
 Models.Session::mask = (session) ->
-  @toJSON if @id is session.id
+  @toJSON() if @id is session.id
 
 # Session middleware
 express              = require('express')

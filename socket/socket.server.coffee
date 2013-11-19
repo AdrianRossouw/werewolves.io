@@ -112,7 +112,7 @@ Socket.addInitializer (opts) ->
         socket.emit 'data', 'add', cUrl, url, mask if mask
 
       else
-        socket.broadcast.emit 'data', args...
+        socket.emit 'data', args...
 
 
     @listenTo State, 'state', (url, newState) ->
