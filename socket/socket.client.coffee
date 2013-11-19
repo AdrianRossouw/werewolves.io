@@ -36,20 +36,23 @@ Socket.addInitializer (opts) ->
     if event is 'add'
       [mUrl, data] = args
       coll = State.models[url]
-      coll.add data
-      debug "added #{mUrl} to #{url}"
+      if coll
+        coll.add data
+        debug "added #{mUrl} to #{url}"
 
     if event is 'remove'
       [mUrl, data] = args
       coll = State.models[url]
-      coll.remove coll.get url
-      debug "removes #{mUrl} from #{url}"
+      if coll
+        coll.remove coll.get url
+        debug "removes #{mUrl} from #{url}"
 
     if event is 'change'
       [data] = args
       model = State.models[url]
-      model.set data if model
-      debug "received new data for #{url}"
+      if model
+        model.set data if model
+        debug "received new data for #{url}"
 
   @io.on 'state', (url, state) ->
     debug "received new state #{state} for #{url}"

@@ -1,5 +1,6 @@
 phantom = require("node-phantom")
-debug = require('debug')('werewolves:wolfbots:server')
+Debug = require('debug')
+debug = Debug('werewolves:wolfbots:server')
 _ = require('underscore')
 Backbone = require('backbone')
 
@@ -13,15 +14,16 @@ Wolfbots = App.module "Wolfbots",
 #require('./bots.client.coffee')
 class Models.Bot extends Models.BaseModel
   urlRoot: 'wolfbot'
-  @attribute 'owner'
   @attribute 'stateId'
 
   initialize: (data, options) ->
-    @owner = data.owner if data.owner
+    @id = data.id if data.id
+    @publish()
+    @debug = Debug("werewolves:bots:#{@id}")
+
     @phantom = new _.Deferred()
-    @session = new _.Deferred()
     @start (err, playerId, ph) =>
-      debug 'wolfbot response', err, playerId
+      @debug 'wolfbot response', err, playerId
 
       return @phantom.reject(err) if (err)
       @stateId = playerId
@@ -29,36 +31,59 @@ class Models.Bot extends Models.BaseModel
   
   stop: ->
     @phantom.then (ph) -> ph.exit()
-    
+ 
+  destroy: ->
+    @stop()
+    super
+
   start: (cb) ->
+    id = @id
     phantom.create (err, ph) ->
       ph.createPage (err, page) ->
         page.open "http://localhost:8000", (err, status) ->
-            work = -> return window.App
+            work = ->
+              App.Wolfbot.start
+                id: id
+                mode: 'slave'
             error = (err, result) -> cb(err, result, ph)
             page.evaluate work, error
 
-class Models.Bots extends Backbone.Collection
+class Models.Bots extends Models.BaseCollection
+  url: 'wolfbot'
   model: Models.Bot
 
 Wolfbots.addInitializer (bots) ->
-  @listenTo Socket, 'connection', (socket, state) ->
-    # add a bots collection for us to control them via
-    state.bots ?= new Models.Bots []
-    socket.on 'wolfbot:add', (id, cb = ->) ->
+  State.bots ?= new Models.Bots []
 
-      bot = state.bots.add
+  @listenTo Socket, 'connection', (socket, state) ->
+
+    # re-emit debug messages
+    socket.on 'wolfbot:debug', (args...) ->
+      socket.volatile.emit(args...)
+
+    # re-emit command messages
+    # TODO: emit only to a specific bot
+    socket.on 'wolfbot:command', (id, args..., cb = ->) ->
+      socket.emit(id, args..., cb)
+
+    socket.on 'wolfbot:add', (id, cb = ->) ->
+      console.log 'new bot added'
+      bot = State.bots.add
         id: id
-        owner: state.id
+
       cb(null, bot.id)
 
     socket.on 'wolfbot:remove', (id, cb = ->) ->
-      state.bots.remove(state.bots.get(id))
-      cb(null)
+      bot = State.bots.get(id)
 
+      state.bots.remove(bots)
+      cb(null)
 
     socket.on 'disconnect', ->
       socket.removeAllListeners('wolfbot:add')
+      socket.removeAllListeners('wolfbot:remove')
+      socket.removeAllListeners('wolfbot:debug')
+      socket.removeAllListeners('wolfbot:command')
 
 
 module.exports = Wolfbots

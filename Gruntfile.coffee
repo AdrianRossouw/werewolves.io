@@ -32,6 +32,8 @@ module.exports = (grunt) ->
             'voice',
             'models',
             'socket',
+            'bots',
+            'app',
             'state'
           ]
           watchedExtensions: ["coffee", "jade", 'css']

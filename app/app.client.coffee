@@ -71,6 +71,9 @@ App.addInitializer ->
   @gameView = new Views.Game el: $('#game')
 
 
+if env is 'development'
+  require('../wolfbots')
+
 
 App.bootstrap = (world) ->
   App.start App.config()
