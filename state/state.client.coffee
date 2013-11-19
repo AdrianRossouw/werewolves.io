@@ -37,7 +37,13 @@ class Models.World extends Models.World
 State.playerId = window.PLAYER_ID
 
 State.getPlayer = ->
-  @world?.game?.players?.get(window.PLAYER_ID)
+  player = @world?.game?.players?.get(window.PLAYER_ID)
+
+  # fallback for spectators
+  if @world.state().is('gameplay')
+    player ?= @world.game?.players?.first()
+ 
+  player
 
 State.load = (data) ->
   @world = new Models.World(data)
