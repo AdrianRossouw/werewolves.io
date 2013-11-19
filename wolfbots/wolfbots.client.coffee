@@ -20,7 +20,7 @@ class Models.Bot extends Models.BaseModel
     if @mode is 'master'
       debug(args...)
     else
-      debugStr = "werewolves:wolfbots:#{@id}" 
+      debugStr = "werewolves:wolfbots:#{@id}"
       @io('wolfbot:debug', debugStr, args...)
 
   io: (args...) -> Socket.io.emit(args...)
@@ -64,7 +64,6 @@ Wolfbots.addInitializer (conf = {}) ->
      Socket.io.emit 'data', 'wolfbot', (err, data) ->
        State.bots.reset data, silent: true
 
-
      @listenTo State, 'data', (event, url, model, data, args...) ->
 
        if event is 'change' and @isWolfbot(url)
@@ -79,9 +78,11 @@ Wolfbots.addInitializer (conf = {}) ->
   else
     console.log "starting in slave mode"
     @id = conf.id
-    @me = State.bots.add
+    @me = State.bots.add id: @id
 
-    @listenTo Socket, 'wolfbot:command', (id, args...) ->
+
+    @listenTo Socket.io, 'wolfbot:command', (id, args...) ->
+      window.callPhantom @me
       @me.command(args...) if id is @id
   
 

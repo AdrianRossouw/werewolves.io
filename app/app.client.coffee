@@ -80,6 +80,7 @@ App.bootstrap = (world) ->
   State.load world
   Socket.start App.config()
 
+  @trigger 'bootstrap'
   # won't happen if the guards dont admit it
   @state().change('game')
 

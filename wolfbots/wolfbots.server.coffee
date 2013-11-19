@@ -16,18 +16,16 @@ class Models.Bot extends Models.BaseModel
   urlRoot: 'wolfbot'
   @attribute 'stateId'
 
-  initialize: (data, options) ->
+  initialize: (data, options = {}) ->
     @id = data.id if data.id
     @publish()
+    @options ?= options
+
     @debug = Debug("werewolves:wolfbots:#{@id}")
 
-    @phantom = new _.Deferred()
-    @start (err, playerId, ph) =>
-      @debug 'wolfbot response', err, playerId
-
-      return @phantom.reject(err) if (err)
-      @stateId = playerId
-      @phantom.resolve(ph)
+    @phantom = @start()
+      .done( (ph) -> ph.exit() )
+      .fail( (err, ph) -> ph.exit() )
   
   stop: ->
     @phantom.then (ph) -> ph.exit()
@@ -36,17 +34,36 @@ class Models.Bot extends Models.BaseModel
     @stop()
     super
 
-  start: (cb) ->
+  _start: (id) ->
+    App.Wolfbot.start
+      id: id
+      mode: 'slave'
+
+    fn = -> App.Socket.io.emit('wolfbot:ping', "hello, #{id} here.")
+ 
+    setInterval fn, 1500
+
+  start: (cb = ->) ->
+    url = "http://localhost:#{Socket.port}"
+    dfr = new _.Deferred()
+
+    dfr.then(cb.bind(null, null), cb)
+
     id = @id
+    _start = @options.start or @_start
+    
     phantom.create (err, ph) ->
       ph.createPage (err, page) ->
-        page.open "http://localhost:8000", (err, status) ->
-            work = ->
-              App.Wolfbot.start
-                id: id
-                mode: 'slave'
+        page.onCallback = (args) ->
+          [err, msg] = args
+          dfr.reject(err, ph, msg) if err
+          dfr.resolve(ph, msg) unless err
+
+        page.open url, (err, status) ->
             error = (err, result) -> cb(err, result, ph)
-            page.evaluate work, error
+            page.evaluateAsync _start, error, id
+
+    return dfr.promise()
 
 class Models.Bots extends Models.BaseCollection
   url: 'wolfbot'
@@ -60,14 +77,13 @@ Wolfbots.addInitializer (bots) ->
     # re-emit debug messages
     socket.on 'wolfbot:debug', (args...) ->
       socket.volatile.emit(args...)
+    socket.on 'wolfbot:ping', (args...) ->
+      console.log arguments
 
-    # re-emit command messages
-    # TODO: emit only to a specific bot
     socket.on 'wolfbot:command', (id, args..., cb = ->) ->
-      socket.broadcast.emit(id, args..., cb)
+      socket.broadcast.emit('wolfbot:command', id, args..., cb)
 
     socket.on 'wolfbot:add', (id, cb = ->) ->
-      console.log 'new bot added'
       bot = State.bots.add
         id: id
 

@@ -26,7 +26,8 @@ Models.Sessions::touchSocket = (socket, sess) ->
 Socket.addInitializer (opts) ->
   @listenTo App, 'listen', (opts = {}) ->
     cookieParser = new express.cookieParser(opts.secret)
-    opts.socket ?= {}
+    opts.socket ?=
+      log: false
 
     @io = socketio.listen(App.server, opts.socket)
     @io.set("destroy upgrade",false)
@@ -41,6 +42,8 @@ Socket.addInitializer (opts) ->
           state.voice = false
           state.sip = false
           state.socket = false
+
+
 
 
 # Incoming requests from the client
@@ -110,7 +113,7 @@ Socket.addInitializer (opts) ->
         socket.emit 'data', 'add', cUrl, url, mask if mask
 
       else
-        socket.emit 'data', args...
+        socket.broadcast.emit 'data', args...
 
 
     @listenTo State, 'state', (url, newState) ->
