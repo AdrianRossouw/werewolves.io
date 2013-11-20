@@ -20,7 +20,6 @@ module.exports = (grunt) ->
         options:
           atBegin: ["default"]
           livereload: true
-
     nodemon:
       dev:
         options:
@@ -117,12 +116,23 @@ module.exports = (grunt) ->
           'build/js/app.js': [
             'build/js/vendor.js',
             'build/js/templates.js',
-            'build/js/client.js'
-          ]
+            'build/js/client.js']
           'build/js/app.min.js': [
             'build/js/vendor.min.js',
             'build/js/templates.min.js',
             'build/js/client.min.js']
+
+    mkcouchdb:
+      sessions:
+        db: 'http://localhost:5984/werewolves-sessions'
+        options:
+          okay_if_exists: true
+
+      games:
+        db: 'http://localhost:5984/werewolves-games'
+        options:
+          okay_if_exists: true
+
 
   
   grunt.loadNpmTasks "grunt-browserify"
@@ -131,6 +141,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks "grunt-contrib-watch"
   grunt.loadNpmTasks "grunt-contrib-less"
   grunt.loadNpmTasks "grunt-contrib-cssmin"
+  grunt.loadNpmTasks "grunt-couchapp"
   grunt.loadNpmTasks "grunt-nodemon"
   grunt.loadNpmTasks "grunt-concurrent"
  
@@ -150,6 +161,8 @@ module.exports = (grunt) ->
   # Default task(s).
   grunt.registerTask "default", [
     "browserify:all",
+    "mkcouchdb:sessions",
+    "mkcouchdb:games",
     "less",
     "cssmin",
     'uglify:all',

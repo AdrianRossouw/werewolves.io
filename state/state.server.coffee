@@ -52,8 +52,14 @@ Models.Session::mask = (session) ->
 
 # Session middleware
 express              = require('express')
-RedisStore           = require('connect-redis')(express)
-State.sessionStore   = new RedisStore
+CouchStore           = require('connect-couchdb')(express)
+State.sessionStore   = new CouchStore
+  name: "werewolves-sessions"
+  reapInterval: 600000
+  compactInterval: 300000
+  setThrottle: 60000
+
+
 
 State.addInitializer (opts) ->
 
