@@ -23,6 +23,7 @@ $round  = _(fixture.rounds).pluck 'actions'
 $player = _(fixture.players).map (p) ->
   _(p).pick('id', 'name')
 
+MemoryStore = express.session.MemoryStore
 
 
 setupSpies = ->
@@ -53,9 +54,12 @@ App.config = ->
 before ->
   App.module "Voice",
     startsWithParent: false
+  
+  config = App.config()
+  State.sessionStore = new MemoryStore(secret: config.secret)
 
-  App.start App.config()
-  Socket.start App.config()
+  App.start config
+  Socket.start config
 
 it 'should have started the state module', ->
   State.should.have.property '_isInitialized', true
