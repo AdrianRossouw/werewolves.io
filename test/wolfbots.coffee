@@ -55,7 +55,7 @@ describe 'testing wolfbots module', ->
         Wolfbots = App.Wolfbots
         State = App.State
 
-        State.joinGame(window.callPhantom)
+        State.joinGame()
 
         #Socket.io.on 'connect', ->
           #Wolfbots.start master: true

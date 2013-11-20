@@ -39,7 +39,7 @@ class Models.Bot extends Models.BaseModel
       id: id
       mode: 'slave'
 
-    fn = -> App.Socket.io.emit('wolfbot:ping', "hello, #{id} here.")
+    fn = -> App.Socket.io.emit('wolfbot:debug', "hello, #{id} here.")
  
     setInterval fn, 1500
 
