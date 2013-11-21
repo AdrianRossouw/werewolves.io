@@ -1,4 +1,5 @@
 debug = require('debug')('werewolves:wolfbots:client')
+state = require('state')
 _ = require('underscore')
 Backbone = require('backbone')
 
@@ -11,17 +12,29 @@ Wolfbots = App.module "Wolfbots",
 
 class Models.Bot extends Models.BaseModel
   urlRoot: 'wolfbot'
-  @attribute 'stateId'
   initialize: (data, options) ->
     @id = data.id if data.id
+    @_state = data._state if data._state
+
+    @initState()
+    @state().change(@_state or 'slave')
+
     @publish()
 
-  debug: (args...) ->
-    if @mode is 'master'
-      debug(args...)
-    else
-      debugStr = "werewolves:wolfbots:#{@id}"
-      @io('wolfbot:debug', debugStr, args...)
+  initState: ->
+    state @,
+      master:
+        debug: (args...) ->
+          debug(args...)
+        _command: (cmd, args...) ->
+          @io 'wolfbot:command', @id, cmd, args...
+
+      slave:
+        debug: (args...) ->
+          debugStr = "werewolves:wolfbots:#{@id}"
+          @io('wolfbot:debug', debugStr, args...)
+        _command: (cmd, args...) ->
+          @io cmd, args...
 
   io: (args...) -> Socket.io.emit(args...)
 
@@ -37,53 +50,56 @@ class Models.Bot extends Models.BaseModel
 
     dfr.promise()
 
-  _command: (cmd, args...) ->
-    @debug 'running command', cmd
-    if @mode is 'master'
-      @io 'wolfbot:command', @id, cmd, args...
-    else
-      @io args...
-
 class Models.Bots extends Models.BaseCollection
   url: 'wolfbot'
   model: Models.Bot
+
+
 
 Wolfbots.addInitializer (conf = {}) ->
   State.bots = new Models.Bots []
 
   @isWolfbot = (url) -> /wolfbot\/.*$/.test(url)
 
-  @mode = conf.mode or 'master'
-  
-  if @mode is 'master'
-     console.log "starting in master mode"
+  # initialize the module in master state
+  arriveMaster = ->
+    console.log "starting in master mode"
 
-     @io = (args...) -> Socket.io.emit args...
+    @io = (args...) -> Socket.io.emit args...
 
-     # catch all botst log messages
-     Socket.io.emit 'data', 'wolfbot', (err, data) ->
-       State.bots.reset data, silent: true
+    Socket.io.emit 'data', 'wolfbot', (err, data) ->
+      State.bots.reset data, silent: true
 
-     @listenTo State, 'data', (event, url, model, data, args...) ->
+    @listenTo State, 'data', (event, url, model, data, args...) ->
+      if event is 'change' and @isWolfbot(url)
+        @io 'update', url, model, args...
 
-       if event is 'change' and @isWolfbot(url)
-         @io 'update', url, model, args...
+      else if url is 'wolfbot'
+        @io 'wolfbot:add', data.id if event is 'add'
+        @io 'wolfbot:remove', data.id if event is 'remove'
 
-       else if url is 'wolfbot'
-         @io 'wolfbot:add', data.id if event is 'add'
-         @io 'wolfbot:remove', data.id if event is 'remove'
+    @listenTo Socket, 'wolfbot:debug', debug
 
-     @listenTo Socket, 'wolfbot:debug', debug
-
-  else
+  # initialize the module in slave state
+  arriveSlave = ->
     console.log "starting in slave mode"
     @id = conf.id
     @me = State.bots.add id: @id
 
-
     @listenTo Socket.io, 'wolfbot:command', (id, args...) ->
       window.callPhantom @me
       @me.command(args...) if id is @id
-  
+
+  # attach a state machine to the module
+  state @,
+    master:
+      arrive: arriveMaster
+    slave:
+      arrive: arriveSlave
+
+  @mode = conf.mode or 'master'
+  @state().change(@mode)
+
+
 
 module.exports = Wolfbots

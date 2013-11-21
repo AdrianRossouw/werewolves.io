@@ -24,8 +24,7 @@ class Models.Bot extends Models.BaseModel
     @debug = Debug("werewolves:wolfbots:#{@id}")
 
     @phantom = @start()
-      .done( (ph) -> ph.exit() )
-      .fail( (err, ph) -> ph.exit() )
+    this
   
   stop: ->
     @phantom.then (ph) -> ph.exit()
@@ -51,17 +50,19 @@ class Models.Bot extends Models.BaseModel
 
     id = @id
     _start = @options.start or @_start
-    
+    console.log _start.toString()
     phantom.create (err, ph) ->
       ph.createPage (err, page) ->
         page.onCallback = (args) ->
+          console.log args
+          console.trace()
           [err, msg] = args
           dfr.reject(err, ph, msg) if err
           dfr.resolve(ph, msg) unless err
 
         page.open url, (err, status) ->
-            error = (err, result) -> cb(err, result, ph)
-            page.evaluateAsync _start, error, id
+          error = (err, result) -> cb(err, result, ph)
+          page.evaluateAsync _start, error, id
 
     return dfr.promise()
 

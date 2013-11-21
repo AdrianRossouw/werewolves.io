@@ -51,12 +51,15 @@ describe 'testing wolfbots module', ->
     @timeout(0)
     before (done) ->
       start = (id) ->
-        Socket = App.Socket
-        Wolfbots = App.Wolfbots
-        State = App.State
+        #Socket = App.Socket
+        #Wolfbots = App.Wolfbots
+        #State = App.State
+        doSend = -> window.callPhantom({hello: 'world'}) if window.callPhantom
 
-        State.joinGame()
-
+        #setTimeout( doSend, 5)
+        doSend()
+        #State.joinGame()
+        return 123
         #Socket.io.on 'connect', ->
           #Wolfbots.start master: true
                   
@@ -70,13 +73,9 @@ describe 'testing wolfbots module', ->
 
       $state.master = new Models.Bot({}, {start:start})
 
-      $state.master.phantom.then(done.bind(null, null), done)
+      #$state.master.phantom.then(done.bind(null, null), done)
 
       Socket.on 'connection', (socket, state) ->
-        done()
-
-        console.log 'hello world1'
-        process.exit()
 
         $state.session = state
 
@@ -90,7 +89,6 @@ describe 'testing wolfbots module', ->
           socket.removeAllListeners 'wolfbot:remove'
           socket.removeAllListeners 'wolfbot:command'
           socket.removeAllListeners 'wolfbot:debug'
-
         done()
 
 
