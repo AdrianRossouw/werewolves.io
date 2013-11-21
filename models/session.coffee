@@ -23,12 +23,10 @@ class Models.Session extends Models.BaseModel
   @attribute 'voice'
   initialize: (data={}, opts={}) ->
     @id = data.id or App.ns.uuid()
-
     super
 
     @state().change(data._state or 'offline')
     @publish()
-
     @listenTo @, 'change', @upgrade
 
     Object.defineProperty @, 'player',
@@ -41,46 +39,36 @@ class Models.Session extends Models.BaseModel
   destroy: ->
     @stopListening @
 
-
-  setIdentifier: (type, id) ->
-    @[type] = id
-
-  toState: (nextState) ->
-    state.bind ->
-      next = @query(nextState)
-      # check if we meet the requirements
-      if next.call 'allow'
-        @go nextState
-        next.call 'upgrade'
-      else if not @owner.allow()
-        console.log 'hello?'
-        next.call 'downgrade'
+  upgrade: ->
+    before = @state().path()
+    @state().emit 'upgrade'
+    @upgrade() if before != @state().path()
 
   initState: ->
     state @,
-      upgrade: ->
-      downgrade: ->
       offline: state 'initial',
-        allow: -> true
-        upgrade: @toState 'session'
+        upgrade: state.bind ->
+          if @owner.session
+            @be 'session'
+          else if @owner.socket
+            @be 'socket'
+
       online: state 'abstract',
-        session: state 'default',
-          downgrade: @toState 'offline'
-          upgrade: @toState 'socket'
-          allow: -> true
+        session: state
+          upgrade: 'socket'
+          admit:
+            offline: -> true if @owner.session
         socket:
-          upgrade: @toState 'sip'
-          downgrade: @toState 'session'
-          allow: -> true if @socket
+          upgrade: 'sip'
+          admit:
+            'offline,session': -> true if @owner.socket
         sip:
-          upgrade: @toState 'voice'
-          downgrade: @toState 'socket'
-          allow: -> true if @socket and @sip
+          upgrade: 'voice'
+          admit:
+            'socket,offline': -> true if (@owner.sip && @owner.socket)
         voice:
-          allow: -> true if @socket and @voice and @sip
-          downgrade: @toState 'sip'
-
-
+          admit:
+            'sip,offline': -> true if (@owner.voice && @owner.sip && @owner.socket)
 
 class Models.Sessions extends Models.BaseCollection
   url: 'session'

@@ -28,7 +28,7 @@ Voice.listenTo App, 'state', (opts) ->
         @phone.ringTone false
         @phone.wideband true
 
-        State.session.setIdentifier 'sip', @sessionId
+        State.session.sip = @sessionId
       phone:
         onIncomingCall: (event) ->
           call = event.call

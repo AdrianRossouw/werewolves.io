@@ -194,6 +194,7 @@ describe 'upgrading connections', ->
       @m.state().path().should.equal 'offline'
 
       @m.socket = 'socket.id'
+
       @m.state().path().should.equal 'online.voice'
 
  
