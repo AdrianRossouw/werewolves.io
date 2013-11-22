@@ -64,7 +64,7 @@ class Models.Bot extends Models.BaseModel
               msg += " (in function \"#{t.function}\")" if t.function
               msgStack.push msg
 
-          console.error msgStack.join("\n")
+          dfr.reject('error', ph, msgStack.join("\n"))
 
         page.onCallback = (args) ->
           console.log args

@@ -17,7 +17,7 @@ class Models.Bot extends Models.BaseModel
     @_state = data._state if data._state
 
     @initState()
-    @state().change(@_state or 'slave')
+    @state().change(@_state or 'master')
 
     @publish()
 
@@ -62,7 +62,7 @@ Wolfbots.addInitializer (conf = {}) ->
   @isWolfbot = (url) -> /wolfbot\/.*$/.test(url)
 
   # initialize the module in master state
-  arriveMaster = ->
+  arriveMaster = =>
     console.log "starting in master mode"
 
     @io = (args...) -> Socket.io.emit args...
@@ -81,13 +81,12 @@ Wolfbots.addInitializer (conf = {}) ->
     @listenTo Socket, 'wolfbot:debug', debug
 
   # initialize the module in slave state
-  arriveSlave = ->
+  arriveSlave = =>
     console.log "starting in slave mode"
     @id = conf.id
-    @me = State.bots.add id: @id
+    @me = State.bots.add id: @id, _state:'slave'
 
-    @listenTo Socket.io, 'wolfbot:command', (id, args...) ->
-      window.callPhantom @me
+    @listenTo Socket.io, 'wolfbot:command', (id, args...) =>
       @me.command(args...) if id is @id
 
   # attach a state machine to the module

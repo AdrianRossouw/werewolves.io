@@ -88,7 +88,7 @@ describe 'testing wolfbots module', ->
           
           #bots.remove blinky
           
-          #doSend null, clyde
+          doSend null, 'ok'
 
         undefined
 
