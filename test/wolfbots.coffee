@@ -64,13 +64,28 @@ describe 'testing wolfbots module', ->
           socket.removeAllListeners 'wolfbot:remove'
           socket.removeAllListeners 'wolfbot:command'
           socket.removeAllListeners 'wolfbot:debug'
-        done()
 
       start = (id) ->
         doSend = (arg1=null, arg2=null) ->
           window.callPhantom(arg1, arg2) if window.callPhantom
 
-        doSend(null, App)
+        Socket = App.Socket
+        Wolfbots = App.Wolfbots
+        State = App.State
+
+        Socket.io.on 'connect', ->
+          Wolfbots.start master: true
+                  
+          bots = State.bots
+
+          clyde = bots.add id:'clyde'
+          clyde.command('game:join')
+          
+          blinky = bots.add id:'blinky'
+          bots.remove blinky
+          
+          doSend null, 'clyde'
+
         undefined
 
 
