@@ -58,7 +58,6 @@ module.exports = (grunt) ->
           "build/js/vendor.js": vPkg
         options:
           alias: vAlias
-          debug: true
           shim:
             jquery:
               path: "bower_components/jquery/jquery.min.js"

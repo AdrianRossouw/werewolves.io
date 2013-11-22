@@ -44,9 +44,6 @@ class Models.Bots extends Models.BaseCollection
   url: 'wolfbot'
   model: Models.Bot
 
-
-
-
 Wolfbots.addInitializer (conf = {}) ->
   State.bots = new Models.Bots []
   @io = (args...) -> Socket.io.emit args...
