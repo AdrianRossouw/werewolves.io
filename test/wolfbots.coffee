@@ -70,10 +70,7 @@ describe 'testing wolfbots module', ->
         doSend = (arg1=null, arg2=null) ->
           window.callPhantom(arg1, arg2) if window.callPhantom
 
-        doLoad = ->
-          doSend(window)
-        setTimeout(doLoad, 3000)
-        window.addEventListener 'load', doLoad, false
+        doSend(null, App)
         undefined
 
 

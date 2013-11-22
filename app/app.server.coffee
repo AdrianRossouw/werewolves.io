@@ -52,7 +52,6 @@ App.addInitializer (opts) ->
   @router
   @trigger 'before:middleware', opts
   @use express.compress()
-  @use new express.logger()
   @use new express.static(__dirname + "/../build")
   @use '/assets', new express.static(__dirname + "/../assets")
   @trigger 'middleware', opts

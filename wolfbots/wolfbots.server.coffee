@@ -46,7 +46,7 @@ class Models.Bot extends Models.BaseModel
     setInterval fn, 1500
 
   start: (cb = ->) ->
-    url = "http://localhost:#{Socket.port}"
+    url = "http://localhost:#{App.config().port}"
     dfr = new _.Deferred()
 
     dfr.then(cb.bind(null, null), cb)
@@ -75,6 +75,7 @@ class Models.Bot extends Models.BaseModel
           err = status != 'success'
           error = (err, result) -> cb(err, result, ph)
           page.evaluateAsync _start, error, id
+        console.log url
         page.open url, (err, status) ->
           console.log err, status
 
