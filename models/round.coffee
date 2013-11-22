@@ -117,19 +117,15 @@ class Models.Round extends Models.BaseModel
     top      = _(votes).where votes: victim.votes
     return if top.length == 1 then victim.id else false
 
-  choose: (me, actionName, target, opts = {}) ->
+  choose: (me, target, opts = {}) ->
     player = State.getPlayer me
-   
-    debug 'choose', me, target, player.voteAction(), actionName
-    # you cant vote while asleep
-    if player.state().isIn('asleep')
-      debug 'player is asleep'
-      return false
+    actionName = player.voteAction()
 
-    # can't do anything that the voteAction doesnt let you
-    if player.voteAction() is not actionName
+    if !actionName
       debug 'player cant do this'
       return false
+
+    debug 'choose', me, target, actionName
 
     action = @actions.findWhere
       id:me

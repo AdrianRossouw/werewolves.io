@@ -142,7 +142,7 @@ describe 'start application', ->
         @game = @world.game
         @round = @game.currentRound()
 
-        @round.choose _(@wolves).first().id, 'eat', _(@villagers).first().id
+        @round.choose _(@wolves).first().id, _(@villagers).first().id
 
       it 'should allow the wolf to vote', ->
         @round.actions.at(0).should.include
@@ -163,9 +163,9 @@ describe 'start application', ->
         @game = @world.game
         @round = @game.currentRound()
 
-        @round.choose _(@villagers).last().id, 'eat', _(@wolves).last().id
-        @round.choose _(@villagers).last().id, 'eat', _(@villagers).first().id
-        @round.choose @villagers[2].id, 'lynch', @seer.id
+        @round.choose _(@villagers).last().id, _(@wolves).last().id
+        @round.choose _(@villagers).last().id, _(@villagers).first().id
+        @round.choose @villagers[2].id, @seer.id
 
       it 'should not allow villagers to vote now', ->
         @round.actions.length.should.equal 1

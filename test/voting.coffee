@@ -60,7 +60,7 @@ describe 'init state', ->
       @currentVote.should.equal 'Juniper'
 
     it 'should change my vote', ->
-      @currentRound.choose 'Edward', 'lynch', 'Gaylord'
+      @currentRound.choose 'Edward', 'Gaylord'
 
       @myRecord.should.not.equal 'Juniper'
 
@@ -75,7 +75,7 @@ describe 'init state', ->
         done()
 
 
-      @currentRound.choose 'Edward', 'lynch', 'Juniper'
+      @currentRound.choose 'Edward', 'Juniper'
   describe 'game ending', ->
     before ->
       @currentRound = State.world.game.currentRound()
