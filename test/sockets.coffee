@@ -363,6 +363,7 @@ describe 'socket can connect', ->
 
 describe 'cleanup', ->
   before ->
+    Socket.stop()
     App.stop()
 
     App.module "Voice",

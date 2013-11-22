@@ -51,7 +51,6 @@ Socket.formatUrl = (opts) ->
     protocol: 'http'
     port: 8000
     
-  console.log 'format',  url.format parts
   url.format parts
 
 

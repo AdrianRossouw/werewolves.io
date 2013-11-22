@@ -20,9 +20,9 @@ $clock  = false
 
 App.config = ->
   _.extend {}, config.defaults,
-    port: 8004
+    port: 8006
     socket:
-      log: true
+      log: false
 
 setupSpies = ->
   $spy.remove = sinon.spy()
@@ -46,7 +46,6 @@ describe 'testing wolfbots module', ->
     Socket.start App.config()
     Wolfbots.start mode: 'master'
 
-  
   it 'should have initialized the bots collection', ->
     should.exist State.bots
     State.bots.length.should.equal 0
@@ -54,6 +53,7 @@ describe 'testing wolfbots module', ->
   describe 'spawning a master bot', ->
     @timeout(0)
     before (done) ->
+      resetSpies()
       Socket.on 'connection', (socket, state) ->
         $state.session = state
 
@@ -75,26 +75,44 @@ describe 'testing wolfbots module', ->
         Socket = App.Socket
         Wolfbots = App.Wolfbots
         State = App.State
+        io = Socket.io
 
-        Socket.io.on 'connect', ->
-          Wolfbots.start master: true
-                  
-          bots = State.bots
+        Socket.io.emit('wolfbot:debug', 'botId', id)
+        #doSend(null, id)
+        Wolfbots.start master: true
+        wb = Wolfbots
+                
+        bots = State.bots
+        
+        clyde = null
+        # just adding the bot via the emit
+        io.emit 'wolfbot:add', 'clyde'
 
-          clyde = bots.add id:'clyde'
-          blinky = bots.add id:'blinky'
+        # using solo form of helper
+        wb.add 'blinky'
+        
+        # using multiple form of helper
+        wb.add 'sid', 'gaylord'
 
-          #clyde.command('game:join')
-          
-          #bots.remove blinky
-          
-          doSend null, 'ok'
+        io.emit('wolfbot:command', 'clyde', 'test:solo1')
+
+        # solo form of command helper
+        wb.command('clyde', 'test:solo2', 'A', 'B')
+
+        # single array form of command helper
+        wb.command(['clyde'], 'test:solo3', 'C', 'D')
+      
+        wb.command(['blinky', 'sid'], 'test:group1', 'E')
+
+        wb.commandAll('test:all')
+
+        io.emit 'wolfbot:remove', 'blinky'
+       
+        setTimeout (-> doSend null, 'ok'), 5000
 
         undefined
 
-
-      $state.master = new Models.Bot({}, {start:start})
-
+      $state.master = new Models.Bot({id: 'master'}, {start:start})
       $state.master.stop().then(done.bind(null, null), done)
 
 
@@ -102,10 +120,35 @@ describe 'testing wolfbots module', ->
       should.exist $state.master
     
     it 'should have fired the add spy twice', ->
-      $spy.add.calledTwice.should.be.ok
+      $spy.add.callCount.should.equal 4
+      $spy.add.withArgs('blinky').called.should.be.ok
+      $spy.add.withArgs('clyde').called.should.be.ok
+      $spy.add.withArgs('sid').called.should.be.ok
+      $spy.add.withArgs('gaylord').called.should.be.ok
+
+    it 'should have triggered solo commands', ->
+      $spy.command.withArgs('clyde', 'test:solo1').called.should.be.ok
+      $spy.command.withArgs('clyde', 'test:solo2', 'A', 'B').called.should.be.ok
+      $spy.command.withArgs('clyde', 'test:solo3', 'C', 'D').called.should.be.ok
+
+    it 'should have triggered group commands', ->
+      $spy.command.withArgs('blinky', 'test:group1', 'E').called.should.be.ok
+      $spy.command.withArgs('sid', 'test:group1', 'E').called.should.be.ok
+
+    it 'should have triggered all commands', ->
+      console.log $spy.command.args
+      $spy.command.withArgs('blinky', 'test:all').called.should.be.ok
+      $spy.command.withArgs('clyde', 'test:all').called.should.be.ok
+      $spy.command.withArgs('sid', 'test:all').called.should.be.ok
+      $spy.command.withArgs('gaylord', 'test:all').called.should.be.ok
+
+    it 'should have fired the debug with the id parameter', ->
+      $spy.debug.withArgs('botId', 'master').called.should.be.ok
+
 
   describe 'cleanup', ->
     before ->
+      Socket.stop()
       App.stop()
       App.Voice.startWithParent= true
 

@@ -30,22 +30,26 @@ class Models.Bot extends Models.BaseModel
     console.log 'stopping phantom'
     _.when(@phantom)
       .done( (ph) -> ph.exit() )
-      .fail( (err, ph) -> ph.exit() )
+      .fail( (err, ph, msg) =>
+        debug("#{@id}:phantom:error", msg)
+        ph.exit() )
  
   destroy: ->
     @stop()
     super
 
   _start: (id) ->
-    App.Wolfbot.start
+    Socket = App.Socket
+    
+    App.Socket.io.emit('wolfbot:debug', "hello, #{id} here.")
+    App.Wolfbots.start
       id: id
       mode: 'slave'
 
-    fn = -> App.Socket.io.emit('wolfbot:debug', "hello, #{id} here.")
- 
-    setInterval fn, 1500
+
 
   start: (cb = ->) ->
+    debug "starting #{@id}"
     url = Socket.formatUrl(App.config())
     dfr = new _.Deferred()
 
@@ -56,7 +60,7 @@ class Models.Bot extends Models.BaseModel
     phantom.create (err, ph) ->
       ph.createPage (err, page) ->
         page.onError = (msg, trace) ->
-          msgStack = ["ERROR: " + msg]
+          msgStack = [msg]
           if trace and trace.length
             msgStack.push "TRACE:"
             c.forEach (t) ->
@@ -71,13 +75,13 @@ class Models.Bot extends Models.BaseModel
           [err, msg] = args
           dfr.reject(err, ph, msg) if err
           dfr.resolve(ph, msg) unless err
+
         page.onLoadFinished = (status) ->
           err = status != 'success'
-          error = (err, result) -> cb(err, result, ph)
-          page.evaluateAsync _start, error, id
-        console.log url
+          error = (err, result) ->
+          page.evaluateAsync _start, error, 0, id
+
         page.open url, (err, status) ->
-          console.log err, status
 
 
 
@@ -89,30 +93,36 @@ class Models.Bots extends Models.BaseCollection
   model: Models.Bot
 
 Wolfbots.addInitializer (bots) ->
+  debug 'starting up'
   State.bots ?= new Models.Bots []
 
   @listenTo Socket, 'connection', (socket, state) ->
 
     # re-emit debug messages
     socket.on 'wolfbot:debug', (args...) ->
-      socket.volatile.emit(args...)
-    socket.on 'wolfbot:ping', (args...) ->
-      console.log arguments
+      debug args...
+      socket.volatile.emit('wolfbot:debug', args...)
+
 
     socket.on 'wolfbot:command', (id, args..., cb = ->) ->
+      debug "wolfbot:command:#{id}", args
       socket.broadcast.emit('wolfbot:command', id, args..., cb)
 
     socket.on 'wolfbot:add', (id, cb = ->) ->
+      debug 'wolfbot:add', id
+
       bot = State.bots.add
         id: id
 
       cb(null, bot.id)
 
     socket.on 'wolfbot:remove', (id, cb = ->) ->
+      debug 'wolfbot:remove', id
       bot = State.bots.get(id)
 
-      State.bots.remove(bots)
-      cb(null)
+      bot.stop().then ->
+        State.bots.remove(bot)
+        cb(null)
 
     socket.on 'disconnect', ->
       socket.removeAllListeners('wolfbot:add')

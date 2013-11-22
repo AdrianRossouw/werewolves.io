@@ -14,29 +14,19 @@ class Models.Bot extends Models.BaseModel
   urlRoot: 'wolfbot'
   initialize: (data, options) ->
     @id = data.id if data.id
-    @_state = data._state if data._state
-
-    @initState()
-    @state().change(@_state or 'master')
-
+    @debug 'initialized'
     @publish()
 
-  initState: ->
-    state @,
-      master:
-        debug: (args...) ->
-          debug(args...)
-        _command: (cmd, args...) ->
-          @io 'wolfbot:command', @id, cmd, args...
-
-      slave:
-        debug: (args...) ->
-          debugStr = "werewolves:wolfbots:#{@id}"
-          @io('wolfbot:debug', debugStr, args...)
-        _command: (cmd, args...) ->
-          @io cmd, args...
-
   io: (args...) -> Socket.io.emit(args...)
+
+  debug: (args...) ->
+    debugStr = "werewolves:wolfbots:#{@id}"
+    @io('wolfbot:debug', debugStr, args...)
+
+  _command: (cmd, args...) ->
+    @debug "doing slave command #{cmd}"
+    @io cmd, args...
+
 
   command: (args...) ->
     dfr = new _.Deferred()
@@ -56,8 +46,10 @@ class Models.Bots extends Models.BaseCollection
 
 
 
+
 Wolfbots.addInitializer (conf = {}) ->
   State.bots = new Models.Bots []
+  @io = (args...) -> Socket.io.emit args...
 
   @isWolfbot = (url) -> /wolfbot\/.*$/.test(url)
 
@@ -65,18 +57,8 @@ Wolfbots.addInitializer (conf = {}) ->
   arriveMaster = =>
     console.log "starting in master mode"
 
-    @io = (args...) -> Socket.io.emit args...
-
-    Socket.io.emit 'data', 'wolfbot', (err, data) ->
+    @getAll (err, data) ->
       State.bots.reset data, silent: true
-
-    @listenTo State, 'data', (event, url, model, data, args...) ->
-      if event is 'change' and @isWolfbot(url)
-        @io 'update', url, model, args...
-
-      else if url is 'wolfbot'
-        @io 'wolfbot:add', data.id if event is 'add'
-        @io 'wolfbot:remove', data.id if event is 'remove'
 
     @listenTo Socket, 'wolfbot:debug', debug
 
@@ -84,17 +66,36 @@ Wolfbots.addInitializer (conf = {}) ->
   arriveSlave = =>
     console.log "starting in slave mode"
     @id = conf.id
-    @me = State.bots.add id: @id, _state:'slave'
+    @me = State.bots.add id: @id
 
     @listenTo Socket.io, 'wolfbot:command', (id, args...) =>
       @me.command(args...) if id is @id
 
   # attach a state machine to the module
   state @,
-    master:
-      arrive: arriveMaster
     slave:
       arrive: arriveSlave
+
+    master:
+      arrive: arriveMaster
+      getAll: (cb) ->
+        @io 'data', 'wolfbot', cb
+
+      add: (names...) ->
+        _(names).each (n) =>
+          @io 'wolfbot:add', n
+
+      command: (name, args...) ->
+        name = [name] if !_.isArray(name)
+        console.log name
+        _(name).map (n) =>
+          @io 'wolfbot:command', n, args...
+
+      commandAll: (args...) ->
+        @getAll (err, bots) =>
+          names = _(bots).pluck('id')
+          debug 'command all', names, args...
+          @command names, args...
 
   @mode = conf.mode or 'master'
   @state().change(@mode)
