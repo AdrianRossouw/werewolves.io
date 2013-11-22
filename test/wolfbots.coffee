@@ -20,7 +20,7 @@ App.config = ->
   _.extend {}, config.defaults,
     port: 8004
     socket:
-      log: false
+      log: true
 
 setupSpies = ->
   $spy.remove = sinon.spy()
@@ -38,6 +38,7 @@ describe 'testing wolfbots module', ->
 
   before ->
     setupSpies
+    App.Voice.startWithParent= false
     App.start App.config()
     Socket.start App.config()
     Wolfbots.start mode: 'master'
@@ -50,33 +51,7 @@ describe 'testing wolfbots module', ->
   describe 'spawning a master bot', ->
     @timeout(0)
     before (done) ->
-      start = (id) ->
-        #Socket = App.Socket
-        #Wolfbots = App.Wolfbots
-        #State = App.State
-        doSend = -> window.callPhantom({hello: 'world'}) if window.callPhantom
-
-        #setTimeout( doSend, 5)
-        doSend()
-        #State.joinGame()
-        return 123
-        #Socket.io.on 'connect', ->
-          #Wolfbots.start master: true
-                  
-          #bots = State.bots
-
-          #clyde = bots.add id:'clyde'
-
-
-          #Socket.io.emit('wolfbot:command', 'clyde', 'game:join', -> window.callPhantom(null, 'ok'))
-          #Socket.io.emit('wolfbot:command', 'game:join', 'clyde', window.callPhantom)
-
-      $state.master = new Models.Bot({}, {start:start})
-
-      #$state.master.phantom.then(done.bind(null, null), done)
-
       Socket.on 'connection', (socket, state) ->
-
         $state.session = state
 
         socket.on 'wolfbot:add', $spy.add
@@ -91,19 +66,32 @@ describe 'testing wolfbots module', ->
           socket.removeAllListeners 'wolfbot:debug'
         done()
 
+      start = (id) ->
+        doSend = (arg1=null, arg2=null) ->
+          window.callPhantom(arg1, arg2) if window.callPhantom
+
+        doLoad = ->
+          doSend(window)
+        setTimeout(doLoad, 3000)
+        window.addEventListener 'load', doLoad, false
+        undefined
+
+
+      $state.master = new Models.Bot({}, {start:start})
+
+      $state.master.stop().then(done.bind(null, null), done)
+
 
     it 'should have populated the master bot', ->
-      should.exist $state.master
+      #should.exist $state.master
     
     it 'should have fired the add spy twice', ->
-      $spy.add.calledTwice.should.be.ok
-
-    after ->
-      $state.master.stop()
+      #$spy.add.calledTwice.should.be.ok
 
   describe 'cleanup', ->
     before ->
       App.stop()
+      App.Voice.startWithParent= true
 
 
     it 'should have stopped the modules', ->

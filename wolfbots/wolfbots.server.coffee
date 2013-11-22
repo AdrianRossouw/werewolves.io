@@ -27,7 +27,10 @@ class Models.Bot extends Models.BaseModel
     this
   
   stop: ->
-    @phantom.then (ph) -> ph.exit()
+    console.log 'stopping phantom'
+    _.when(@phantom)
+      .done( (ph) -> ph.exit() )
+      .fail( (err, ph) -> ph.exit() )
  
   destroy: ->
     @stop()
@@ -50,19 +53,33 @@ class Models.Bot extends Models.BaseModel
 
     id = @id
     _start = @options.start or @_start
-    console.log _start.toString()
     phantom.create (err, ph) ->
       ph.createPage (err, page) ->
+        page.onError = (msg, trace) ->
+          msgStack = ["ERROR: " + msg]
+          if trace and trace.length
+            msgStack.push "TRACE:"
+            c.forEach (t) ->
+              msg = " -> #{t.file}: #{t.line} "
+              msg += " (in function \"#{t.function}\")" if t.function
+              msgStack.push msg
+
+          console.error msgStack.join("\n")
+
         page.onCallback = (args) ->
           console.log args
-          console.trace()
           [err, msg] = args
           dfr.reject(err, ph, msg) if err
           dfr.resolve(ph, msg) unless err
-
-        page.open url, (err, status) ->
+        page.onLoadFinished = (status) ->
+          err = status != 'success'
           error = (err, result) -> cb(err, result, ph)
           page.evaluateAsync _start, error, id
+        page.open url, (err, status) ->
+          console.log err, status
+
+
+
 
     return dfr.promise()
 
