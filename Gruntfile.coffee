@@ -56,6 +56,7 @@ module.exports = (grunt) ->
           "build/js/vendor.js": vPkg
         options:
           alias: vAlias
+          debug: true
           shim:
             jquery:
               path: "bower_components/jquery/jquery.min.js"
@@ -81,6 +82,7 @@ module.exports = (grunt) ->
         files:
           "build/js/templates.js": ["templates/*.jade", "!templates/*.server.jade"]
         options:
+          debug: true
           transform: ['jadeify2']
           aliasMappings:
             src: ['templates/*.jade', "!templates/*.server.jade"]
