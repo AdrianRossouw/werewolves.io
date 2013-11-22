@@ -5,9 +5,11 @@ Models   = require('../models')
 Wolfbots = require('../wolfbots')
 config   = require('../config')
 should   = require('should')
+express  = require('express')
 sinon    = require('sinon')
 _        = require('underscore')
 fixture  = require('./fixture/game1.coffee').game
+MemoryStore = express.session.MemoryStore
 
 $spy    = {}
 $io     = {}
@@ -37,7 +39,8 @@ restoreSpies = ->
 describe 'testing wolfbots module', ->
 
   before ->
-    setupSpies
+    setupSpies()
+    State.sessionStore = new MemoryStore(secret: config.secret)
     App.Voice.startWithParent= false
     App.start App.config()
     Socket.start App.config()
@@ -79,12 +82,13 @@ describe 'testing wolfbots module', ->
           bots = State.bots
 
           clyde = bots.add id:'clyde'
-          clyde.command('game:join')
-          
           blinky = bots.add id:'blinky'
-          bots.remove blinky
+
+          #clyde.command('game:join')
           
-          doSend null, 'clyde'
+          #bots.remove blinky
+          
+          #doSend null, clyde
 
         undefined
 
@@ -95,10 +99,10 @@ describe 'testing wolfbots module', ->
 
 
     it 'should have populated the master bot', ->
-      #should.exist $state.master
+      should.exist $state.master
     
     it 'should have fired the add spy twice', ->
-      #$spy.add.calledTwice.should.be.ok
+      $spy.add.calledTwice.should.be.ok
 
   describe 'cleanup', ->
     before ->

@@ -61,12 +61,13 @@ App.addInitializer (opts) ->
 #
 # Also mounts the router middleware in a predicatable place.
 App.addInitializer (opts) ->
-
+  console.log  App.Socket.formatUrl(opts)
   defaultRoute = (req, res, next) =>
     res.render "layout-server",
       host: opts.host
       env: env
       playerId: req.state.session.id
+      socketUrl: App.Socket.formatUrl(opts)
       world: JSON.stringify(State.world.mask(req.state.session))
 
   @trigger 'before:routes', opts

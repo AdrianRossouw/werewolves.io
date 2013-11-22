@@ -17,7 +17,7 @@ Socket.addInitializer (opts) ->
   @isSession = (url) -> url is State.world.session.getUrl()
 
   socketio.transports = ["websocket"]
-  socketUrl = url.format _.pick(opts, 'hostname', 'protocol', 'port')
+  socketUrl = window.SOCKET_URL
 
   if opts.protocol == 'https'
     @io = socketio.connect(socketUrl, { secure: true })

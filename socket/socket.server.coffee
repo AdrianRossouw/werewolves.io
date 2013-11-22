@@ -43,7 +43,16 @@ Socket.addInitializer (opts) ->
           state.sip = false
           state.socket = false
 
-
+Socket.formatUrl = (opts) ->
+  url   = require('url')
+  parts = _.pick(opts, 'hostname', 'protocol', 'port')
+  _.defaults parts,
+    hostname: 'localhost'
+    protocol: 'http'
+    port: 8000
+    
+  console.log 'format',  url.format parts
+  url.format parts
 
 
 # Incoming requests from the client

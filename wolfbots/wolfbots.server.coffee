@@ -46,7 +46,7 @@ class Models.Bot extends Models.BaseModel
     setInterval fn, 1500
 
   start: (cb = ->) ->
-    url = "http://localhost:#{App.config().port}"
+    url = Socket.formatUrl(App.config())
     dfr = new _.Deferred()
 
     dfr.then(cb.bind(null, null), cb)
