@@ -61,7 +61,6 @@ App.addInitializer (opts) ->
 #
 # Also mounts the router middleware in a predicatable place.
 App.addInitializer (opts) ->
-  console.log  App.Socket.formatUrl(opts)
   defaultRoute = (req, res, next) =>
     res.render "layout-server",
       host: opts.host

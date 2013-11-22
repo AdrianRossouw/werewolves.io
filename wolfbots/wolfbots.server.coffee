@@ -27,7 +27,7 @@ class Models.Bot extends Models.BaseModel
     this
   
   stop: ->
-    console.log 'stopping phantom'
+    debug 'phantom', 'stopping'
     _.when(@phantom)
       .done( (ph) -> ph.exit() )
       .fail( (err, ph, msg) =>
@@ -71,7 +71,6 @@ class Models.Bot extends Models.BaseModel
           dfr.reject('error', ph, msgStack.join("\n"))
 
         page.onCallback = (args) ->
-          console.log args
           [err, msg] = args
           dfr.reject(err, ph, msg) if err
           dfr.resolve(ph, msg) unless err

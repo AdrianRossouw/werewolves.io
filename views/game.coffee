@@ -26,6 +26,15 @@ getContestants = (players, round) ->
 class Views.Status extends Backbone.Marionette.ItemView
   render: -> this
 
+class Views.Round extends Backbone.Marionette.CollectionView
+  className: 'round'
+
+  itemView: Views.Contestant
+
+  buildItemView: (item, ItemView) ->
+    view = new Views.Contestant model: item, collection: item.votes
+    view
+
 class Views.Game extends Backbone.Marionette.ItemView
   template: require('../templates/game.jade')
 

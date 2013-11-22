@@ -39,11 +39,10 @@ restoreSpies = ->
 describe 'testing wolfbots module', ->
 
   before ->
-    setupSpies()
     State.sessionStore = new MemoryStore(secret: config.secret)
     App.Voice.startWithParent= false
-    App.start App.config()
     Socket.start App.config()
+    App.start App.config()
     Wolfbots.start mode: 'master'
 
   it 'should have initialized the bots collection', ->
@@ -53,7 +52,7 @@ describe 'testing wolfbots module', ->
   describe 'spawning a master bot', ->
     @timeout(0)
     before (done) ->
-      resetSpies()
+      setupSpies()
       Socket.on 'connection', (socket, state) ->
         $state.session = state
 
@@ -108,7 +107,7 @@ describe 'testing wolfbots module', ->
 
         io.emit 'wolfbot:remove', 'blinky'
        
-        setTimeout (-> doSend null, 'ok'), 5000
+        setTimeout (-> doSend null, 'ok'), 500
 
         undefined
 
@@ -136,7 +135,6 @@ describe 'testing wolfbots module', ->
       $spy.command.withArgs('sid', 'test:group1', 'E').called.should.be.ok
 
     it 'should have triggered all commands', ->
-      console.log $spy.command.args
       $spy.command.withArgs('blinky', 'test:all').called.should.be.ok
       $spy.command.withArgs('clyde', 'test:all').called.should.be.ok
       $spy.command.withArgs('sid', 'test:all').called.should.be.ok
@@ -147,7 +145,9 @@ describe 'testing wolfbots module', ->
 
 
   describe 'cleanup', ->
-    before ->
+    before (done) ->
+      restoreSpies()
+      App.once 'close', done
       Socket.stop()
       App.stop()
       App.Voice.startWithParent= true

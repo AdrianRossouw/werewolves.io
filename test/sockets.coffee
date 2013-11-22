@@ -38,6 +38,7 @@ setupSpies = ->
   $spy.state.withArgs('state')
 
 resetSpies = -> _($spy).invoke 'reset'
+
 restoreSpies = ->
   $spy.state.restore()
   $spy.socket.restore()
@@ -58,8 +59,8 @@ before ->
   config = App.config()
   State.sessionStore = new MemoryStore(secret: config.secret)
 
-  App.start config
   Socket.start config
+  App.start config
 
 it 'should have started the state module', ->
   State.should.have.property '_isInitialized', true
@@ -68,7 +69,7 @@ describe 'socket can connect', ->
 
   before (done) ->
     setupSpies()
-    $io.socket = socketio.connect('http://localhost:8001')
+    $io.socket = socketio.connect(Socket.formatUrl(App.config()))
     $io.socket.on 'connect', -> done()
     $io.socket.on 'data', $spy.ioData
     $io.socket.on 'state', $spy.ioState
@@ -358,11 +359,12 @@ describe 'socket can connect', ->
 
     after -> $clock.restore()
 
-  after restoreSpies
-
 
 describe 'cleanup', ->
-  before ->
+  before (done) ->
+    restoreSpies()
+    App.once 'close', done
+
     Socket.stop()
     App.stop()
 
