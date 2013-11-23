@@ -50,6 +50,8 @@ class Models.Game extends Models.BaseModel
         @state('-> night.first')
 
       addPlayer: (player) ->
+        # order player joined in.
+        player.seqId = @players.length + 1
         result = @players.add(player)
         @lastPlayerAdded = Date.now()
         @state('-> ready')
