@@ -80,6 +80,14 @@ describe 'init state', ->
     before ->
       @currentRound = State.world.game.currentRound()
 
+    it 'should collate the votes correctly', ->
+      votes = @currentRound.getVotes()
+
+      votes[0].should.include { id: 'Edward', votes: [ 'Juniper', 'Gaylord' ] }
+      votes[1].should.include { id: 'Juniper', votes: [ 'Edward' ] }
+      votes[2].should.include { id: 'Dafydd', votes: [ 'Florence' ]}
+      votes[3].should.include { id: 'Florence', votes: [ 'Dafydd' ]}
+
     it 'should count the votes correctly', ->
       votes = @currentRound.countVotes()
 

@@ -97,19 +97,27 @@ class Models.Round extends Models.BaseModel
     @state().change('complete.died')
     @state().change('complete.survived')
 
-  countVotes: ->
+  # transform an array of actions into a single
+  # array of votes (player id only), indexed
+  # by who they voted for
+  getVotes: ->
     action = if @phase is 'day' then 'lynch' else 'eat'
-
     byTarget      = (a)    -> a.target
-    toLengthList  = (l, k) -> { id: k, votes: l.length }
-    sortByLength  = (a)    -> -a.length
+    sortByLength  = (a)    -> -a.votes?.length
+    makeArray     = (v, k) ->
+      id: k,
+      votes: _(v).pluck('id')
 
     @actions.chain()
       .where(action: action)
       .groupBy(byTarget)
-      .map(toLengthList)
+      .map(makeArray)
       .sortBy(sortByLength)
       .value()
+
+  countVotes: ->
+    _(@getVotes()).map (v) ->
+      _.extend {}, v, votes: v.votes.length
 
   getDeath: ->
     votes    = @countVotes()
