@@ -33,6 +33,7 @@ class Models.Player extends Models.BaseModel
   @attribute 'name'
   @attribute 'role'
   @attribute 'occupation'
+  @attribute 'seqId'
 
   initialize: (data={}, opts={}) ->
     @id = @id or App.ns.uuid()
