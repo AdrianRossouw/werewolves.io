@@ -35,52 +35,63 @@ App.addInitializer (opts) ->
 # Load up the state instances
 Socket = require('../socket')
 
-$body = $('body')
-
-
-state App,
-  lobby: state 'initial',
-    arrive: ->
-      $body.addClass('in-lobby')
-    exit: ->
-      $body.removeClass('in-lobby')
-  game:
-    arrive: ->
-      @gameView.render()
-      $body.addClass('in-game')
-    exit: ->
-      $body.removeClass('in-game')
-    admit: ->
-      worldState = State.world?.state()?.path()?
-      myPlayer = State.world?.session?.player?
-
-      true if myPlayer or (worldState is 'gameplay')
-
 
 App.addInitializer ->
+  # pity we don't have ui: in the app itself
+  @$body = $('body')
+
+  @addRegions
+    'game': '#game-area'
+    'status': '#status-area'
+
+  state App,
+    lobby: state 'initial',
+      arrive: ->
+        @$body.addClass('in-lobby')
+      exit: ->
+        @$body.removeClass('in-lobby')
+
+    game:
+      arrive: ->
+        @game.show new Views.Game
+          game: State.world.game
+          world: State.world
+          player: State.getPlayer()
+
+        @$body.addClass('in-game')
+
+      exit: ->
+        @game.close()
+        @$body.removeClass('in-game')
+
+      admit: ->
+        worldState = State.world?.state()?.path()?
+        myPlayer = State.world?.session?.player?
+
+        true if myPlayer or (worldState is 'gameplay')
+
   @listenTo State, "state", (url, state) ->
     @state().change 'game' if State.isWorld(url)
 
   # what happens when we join
   @listenTo State, "data", (event, coll, url, state) ->
     @state().change 'game' if (event is 'add') and (coll is 'player')
-
-  @addRegions game: '#game'
-
+ 
   $('.play-now').click -> App.State.joinGame()
-  @gameView = new Views.Game el: $('#game')
-
 
 if env is 'development'
   require('../wolfbots')
 
 
 App.bootstrap = (world) ->
-  App.start App.config()
+  config = App.config()
+
+  App.start config
   State.load world
-  Socket.start App.config()
+  Socket.start config
 
   @trigger 'bootstrap'
+
   # won't happen if the guards dont admit it
   @state().change('game')
 

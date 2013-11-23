@@ -6,11 +6,13 @@ Backbone = require('backbone')
 Views = App.module "Views"
 Models = App.module "Models"
 
+class Views.Opponents extends Backbone.Marionette.CollectionView
+  id: 'opponents'
 
+  itemView: Views.Opponent
 
-class Views.Player extends Backbone.Marionette.ItemView
+class Views.Opponent extends Backbone.Marionette.ItemView
   className: 'player'
-
   template: require('../templates/player.jade')
 
   events:
@@ -18,6 +20,8 @@ class Views.Player extends Backbone.Marionette.ItemView
 
   modelEvents:
     'change': 'render'
+    'selected': 'selected'
+    'deselected': 'deselected'
 
   initialize: ->
     @listenTo @model, 'selected', @selected
@@ -34,17 +38,17 @@ class Views.Player extends Backbone.Marionette.ItemView
     # TODO: also don't allow choose when you're not allowed to vote
     @model.collection.select @model
 
-  serializeData: ->
-    json = super
-    if State.session.player.id
-      json.me = @model.id == State.world.session.player.id
-    #json.selected = @model.collection.selected == @model
-    json
 
-class Views.Players extends Backbone.Marionette.CollectionView
-  className: 'players'
+class Views.Player extends Backbone.Marionette.ItemView
+  className: 'player'
 
-  itemView: Views.Player
+  template: require('../templates/player.jade')
+  modelEvents:
+    'change': 'render'
+
+
+
+
 
 class Views.PlayerLog extends Backbone.Marionette.ItemView
   className: 'playerlog'

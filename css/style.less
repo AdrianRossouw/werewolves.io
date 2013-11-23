@@ -451,12 +451,21 @@ video {
 .status-wrap {
   background-color: #333;
 }
+#status-area {
+  .status-wrap;
+}
+
 .status {
   max-width: @maxWidth;
   margin: 0 auto;
   padding: 0 20px;
   position: relative;
 }
+
+#status {
+  .status
+}
+
 .timer {
   position: absolute;
   top: 0;
