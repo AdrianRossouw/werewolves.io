@@ -6,7 +6,6 @@ Backbone = require('backbone')
 Views = App.module "Views"
 Models = App.module "Models"
 
-
 class Views.Opponent extends Backbone.Marionette.ItemView
   className: 'player'
   template: require('../templates/player.jade')
@@ -32,8 +31,6 @@ class Views.Opponent extends Backbone.Marionette.ItemView
   choose: ->
     @model.collection.select @model
 
-
-
 class Views.Opponents extends Backbone.Marionette.CollectionView
   id: 'opponents'
   className: 'opponents'
@@ -42,13 +39,9 @@ class Views.Opponents extends Backbone.Marionette.CollectionView
 
 class Views.Player extends Backbone.Marionette.ItemView
   className: 'player'
-
   template: require('../templates/player.jade')
   modelEvents:
     'change': 'render'
-
-
-
 
 
 class Views.PlayerLog extends Backbone.Marionette.ItemView

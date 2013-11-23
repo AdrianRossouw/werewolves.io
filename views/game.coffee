@@ -6,7 +6,6 @@ Backbone = require('backbone')
 Views = App.module "Views"
 Models = App.module "Models"
 
-
 class Views.Game extends Backbone.Marionette.Layout
   id: 'game'
   className: 'game'
