@@ -1,45 +1,39 @@
-App = require('../app')
-State = require('../state')
-
 Backbone = require('backbone')
-
+App = require('../app')
 Views = App.module "Views"
-Models = App.module "Models"
 
+# Renders the current voting summary block in the sidebar
+#
+# This uses the helper method on the round model, that
+# collates and builds a map of player id's that are used.
+#
+# We then pass in the players collection to the template too,
+# so it can fetch the player properties out of there using
+# the indexes
+class Views.Round extends Backbone.Marionette.ItemView
+  className: 'round'
+  template: require('../templates/round.jade')
 
-class Views.Player extends Backbone.Marionette.ItemView
-  className: 'player'
+  initialize: (options) ->
+    super
+    @players ?= options.players
+    @
 
-  template: require('../templates/player.jade')
-
-  events:
-    click: 'choose'
-
-  initialize: ->
-    @listenTo @model, 'selected', @selected
-    @listenTo @model, 'deselected', @deselected
-
-  selected: ->
-    @$el.addClass 'selected'
-
-  deselected: ->
-    @$el.removeClass 'selected'
-
-  choose: ->
-    player = State.world.session.player or @model.collection.first()
-    return if @model.id == player.id
-    # TODO: also don't allow choose when you're not allowed to vote
-    @model.collection.select @model
-
+  # pass the players as a top level variable
+  # to the template.
   serializeData: ->
     json = super
-    player = State.world.session.player or @model.collection.first()
-    json.me = @model.id == player.id
-    #json.selected = @model.collection.selected == @model
+    json.targets = @model.getVotes()
+    json.players = @players
     json
 
-class Views.Players extends Backbone.Marionette.CollectionView
-  className: 'players'
 
-  itemView: Views.Player
+  # re-render whenever the actions get modified
+  # you can only ever modify or add a new vote
+  onShow: ->
+    @listenTo @model.actions, 'add', @render
+    @listenTo @model.actions, 'change', @render
+
+  onClose: ->
+    @stopListening()
 

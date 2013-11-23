@@ -6,6 +6,7 @@ Backbone = require('backbone')
 Views = App.module "Views"
 Models = App.module "Models"
 
+
 class Views.Game extends Backbone.Marionette.Layout
   id: 'game'
   className: 'game'
@@ -37,9 +38,11 @@ class Views.Game extends Backbone.Marionette.Layout
 
 
   showCurrentRound: ->
-    round = @gameState.currentRound()
-    @round.show new Views.Round(model:round) if round
-
+    opts =
+      model: @gameState.currentRound()
+      players: @gameState.players
+    
+    @round.show new Views.Round(opts) if opts.model
 
   onClose: ->
     @stopListening()

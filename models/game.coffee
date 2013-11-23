@@ -114,6 +114,6 @@ class Models.Game extends Models.BaseModel
     cleanup: state 'final'
 
     # default addplayer method
-    addPlayer: -> console.log 'can not add player any more'
-    currentRound: -> console.log 'no rounds yet'
+    addPlayer: -> debug 'can not add player any more'
+    currentRound: -> debug 'no rounds yet'
 

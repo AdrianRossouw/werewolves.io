@@ -1,0 +1,9 @@
+- for target in targets
+  - var tp = players.get(target.id)
+  .contestant
+    .pic(class="color-#{tp.seqId}", title=tp.name)
+      img(src="/assets/player_#{tp.role}_default.svg")
+    .votes
+      -for voter in target.votes
+        - var vp = players.get(voter)
+        .vote(class="color-#{vp.seqId}", title=vp.name)

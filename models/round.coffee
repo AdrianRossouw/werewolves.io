@@ -115,16 +115,26 @@ class Models.Round extends Models.BaseModel
       .sortBy(sortByLength)
       .value()
 
+  # Do a simple transform on the votes to give us
+  # the vote count instead of a list of people who
+  # voted for them.
   countVotes: ->
     _(@getVotes()).map (v) ->
       _.extend {}, v, votes: v.votes.length
 
+  # make sure there is only a single victim of the
+  # voting / eating process.
+  #
+  # returns the player id meant to die,
+  # otherwise returns false for draws.
   getDeath: ->
     votes    = @countVotes()
     victim   =  _(votes).first()
     top      = _(votes).where votes: victim.votes
     return if top.length == 1 then victim.id else false
 
+
+  # Pick a victim to kill.
   choose: (me, target, opts = {}) ->
     player = State.getPlayer me
     actionName = player.voteAction()
