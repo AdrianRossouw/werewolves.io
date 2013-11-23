@@ -26,6 +26,9 @@ describe 'start application', ->
   it 'should have a game object', ->
     should.exist(@world.game)
 
+  it 'should have a timer object', ->
+    should.exist(@world.timer)
+
   it 'should return game as the url()', ->
     @world.url.should.equal('world')
 

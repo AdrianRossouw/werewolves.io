@@ -93,6 +93,7 @@ describe 'socket can connect', ->
       $state.url = _.result $state.session, 'url'
       $state.id = $state.session.id
       $state.world = State.world
+      $state.timer = State.world.timer
       $state.game = State.world.game
       $state.players = State.world.game.players
 
@@ -136,6 +137,12 @@ describe 'socket can connect', ->
       should.exist $io.world.game._state
       $io.world.game.id.should.equal $state.game.id
       $io.world.game._state.should.equal $state.game.state().path()
+ 
+    it 'gives me the same timer on both sides', ->
+      should.exist $io.world.timer
+      should.exist $io.world.timer._state
+      $io.world.timer._state.should.equal $state.timer.state().path()
+
 
   describe 'getting session from server', ->
     before (done) ->

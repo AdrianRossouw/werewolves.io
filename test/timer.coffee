@@ -6,6 +6,8 @@ should   = require('should')
 sinon    = require('sinon')
 _ = require('underscore')
 
+$json = {}
+
 describe 'timer model', ->
   before ->
     @clock = sinon.useFakeTimers()
@@ -44,10 +46,12 @@ describe 'timer model', ->
       @timer.remaining().should.equal @timer.limit
       @clock.tick 60000
       @timer.remaining().should.equal @timer.limit
-
+    
   describe 'starting the timer', ->
     before ->
+      $json.stopped = @timer.toJSON()
       @timer.start()
+      $json.started = @timer.toJSON()
 
 
     it 'should be in the active state', ->
@@ -89,6 +93,7 @@ describe 'timer model', ->
       @deadline = @timer.deadline()
       @remaining = @timer.remaining()
       @timer.pause()
+      $json.paused = @timer.toJSON()
 
       @clock.tick 5000 # move another 5 seconds up in time
 
@@ -122,8 +127,6 @@ describe 'timer model', ->
 
     it 'should be in active state', ->
       @timer.state().path().should.equal 'active'
-
-
 
   describe 'once the timer is active again', ->
     before ->
@@ -191,6 +194,99 @@ describe 'timer model', ->
 
     after ->
       @timer.off 'end', @spy
+
+  describe 'serializing the timer', ->
+
+    describe 'stopped timers', ->
+      it 'got serialized', ->
+        should.exist $json.stopped
+
+      it 'have a state', ->
+        should.exist $json.stopped._state
+        $json.stopped._state.should.equal 'inactive.stopped'
+
+      it 'have a limit', ->
+        should.exist $json.stopped.limit
+        $json.stopped.limit.should.equal 30000
+
+      it 'dont have an endTime or remaining', ->
+        should.not.exist $json.stopped._endTime
+        should.not.exist $json.stopped._remaining
+
+
+    describe 'started timers', ->
+      it 'got serialized', ->
+        should.exist $json.started
+
+      it 'have a state', ->
+        should.exist $json.started._state
+        $json.started._state.should.equal 'active'
+
+      it 'have a limit', ->
+        should.exist $json.started.limit
+        $json.started.limit.should.equal 30000
+
+      it 'have an endTime and remaining', ->
+        should.exist $json.started._endTime
+        should.exist $json.started._remaining
+
+
+    describe 'paused timers', ->
+      it 'got serialized', ->
+        should.exist $json.paused
+
+      it 'have a state', ->
+        should.exist $json.paused._state
+        $json.paused._state.should.equal 'inactive.paused'
+
+      it 'have a limit', ->
+        should.exist $json.paused.limit
+        $json.paused.limit.should.equal 30000
+
+      it 'have _remaining', ->
+        should.exist $json.paused._remaining
+
+      it 'not have _endTime', ->
+        should.not.exist $json.paused._endTime
+
+
+  describe 'initializing the timer', ->
+
+    describe 'stopped timers', ->
+      before ->
+        @timer = new Models.Timer($json.stopped)
+
+      it 'have received their state', ->
+        @timer.state().path().should.equal 'inactive.stopped'
+
+      it 'should have all their correct attributes', ->
+        @timer.limit.should.equal 30000
+        should.not.exist @timer._endTime
+        should.not.exist @timer._remaining
+
+     describe 'started timers', ->
+      before ->
+        @timer = new Models.Timer($json.started)
+
+      it 'have received their state', ->
+        @timer.state().path().should.equal 'active'
+
+      it 'should have all their correct attributes', ->
+        @timer.limit.should.equal 30000
+        @timer._endTime.should.equal $json.started._endTime
+        @timer._remaining.should.equal $json.started._remaining
+
+     describe 'paused timers', ->
+      before ->
+        @timer = new Models.Timer($json.paused)
+
+      it 'have received their state', ->
+        @timer.state().path().should.equal 'inactive.paused'
+
+      it 'should have all their correct attributes', ->
+        @timer.limit.should.equal 30000
+        should.not.exist @timer._endTime
+        @timer._remaining.should.equal $json.paused._remaining
 
   after ->
     @clock.restore()

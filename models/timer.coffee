@@ -30,9 +30,16 @@ class Models.Timer extends Models.BaseModel
 
   initialize: (data = {}) ->
     @limit = data.limit or 0
+    @_endTime ?= data._endTime
+    @_remaining ?= data._remaining
     super
     @state().change(data._state or 'stopped')
     @publish()
+
+  toJSON: ->
+    json = super
+    json._state = @state().path()
+    json
 
   # return the ms remaining on the counter.
   remaining: -> @limit
@@ -91,10 +98,7 @@ class Models.Timer extends Models.BaseModel
             @_remaining = @limit
 
         # remaining time kept.
-        # only admit from running -> paused
         paused:
-          admit:
-            active: true
           remaining: -> @_remaining
 
 
@@ -105,7 +109,7 @@ class Models.Timer extends Models.BaseModel
         arrive: ->
           @_interval = setInterval @tick, 1000
           @_timeout = setTimeout @end, @_remaining
-          @_endTime = Date.now() + @_remaining
+          @_endTime ?= Date.now() + @_remaining
 
         deadline: -> @_endTime
         remaining: -> @_endTime - Date.now()

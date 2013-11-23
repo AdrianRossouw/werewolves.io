@@ -26,6 +26,7 @@ class Models.World extends Models.BaseModel
     obj = super
     obj._state = @state().path()
     obj.sessions = @sessions.toJSON()
+    obj.timer = @timer.toJSON()
     obj.game = @game.toJSON()
     obj
 

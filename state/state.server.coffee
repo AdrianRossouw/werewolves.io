@@ -21,7 +21,7 @@ Models.Sessions::touchSession = (sess) ->
 
 # hide sensitive information from client
 Models.World::mask = (session) ->
-  world = _.pick(@toJSON(), 'id', 'game', '_state', 'sessions')
+  world = _.pick(@toJSON(), 'id', 'game', '_state', 'sessions', 'timer')
   world.sessions = _(world.sessions).where id: session.id
   world
 
