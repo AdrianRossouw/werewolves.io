@@ -65,7 +65,8 @@
     "connect-couchdb": "~0.4.1",
     "nano": "~4.2.1",
     "grunt-couchapp": "~0.2.1",
-    "node-phantom": "~0.2.5"
+    "node-phantom": "~0.2.5",
+    "backbone.projections": "~1.0.0"
   },
   "engines": {
     "node": "0.10.x"

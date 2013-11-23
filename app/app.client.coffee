@@ -19,6 +19,7 @@ App.config = ->
 Backbone      = require("backbone")
 Marionette    = require("backbone.marionette")
 Backbone.$    = Marionette.$ = require("jquery")
+{Filtered}    = require("backbone.projections")
 
 if env != 'development'
   require('../voice')
@@ -53,10 +54,15 @@ App.addInitializer ->
 
     game:
       arrive: ->
+        player = State.getPlayer()
+        players = State.world.game.players
+        opponents = new Filtered(players, filter: (p) -> p.id != player.id)
+
         @game.show new Views.Game
           game: State.world.game
           world: State.world
-          player: State.getPlayer()
+          player: player
+          opponents: opponents
 
         @$body.addClass('in-game')
 

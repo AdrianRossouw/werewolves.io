@@ -21,6 +21,7 @@ class Views.Game extends Backbone.Marionette.Layout
     @gameState = options.game
     @worldState = options.world
     @playerState = options.player
+    @opponentState = options.opponents
     super
     @
 
@@ -28,15 +29,17 @@ class Views.Game extends Backbone.Marionette.Layout
     @player.show new Views.Player
       model: @playerState
 
-    # TODO: filter through a decorator
     @main.show new Views.Opponents
-      collection: @gameState.players
+      collection: @opponentState
 
-    # this is a no-op if there are no rounds yet.
     @showCurrentRound()
     @listenTo @gameState.rounds, 'add', @showCurrentRound
 
 
+  # this is a no-op if there are no rounds yet.
+  #
+  # we pass all players, not just opponents, since
+  # people can vote for you too.
   showCurrentRound: ->
     opts =
       model: @gameState.currentRound()

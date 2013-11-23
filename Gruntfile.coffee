@@ -2,7 +2,7 @@ _ = require('underscore')
 
 module.exports = (grunt) ->
   vPkg = [
-    "jquery", "underscore", "state", "buzz", "phono"
+    "jquery", "underscore", "state", "buzz", "phono", "backbone.projections",
     "backbone", "backbone.marionette", "url", "backbone.picky"
     "socket.io-client", "underscore.deferred", "debug"
   ]
