@@ -39,7 +39,7 @@ Socket = require('../socket')
 App.addInitializer ->
   # pity we don't have ui: in the app itself
   @$body = $('body')
-
+  
   @addRegions
     'game': '#game-area'
     'status': '#status-area'

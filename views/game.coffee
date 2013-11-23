@@ -8,6 +8,8 @@ Models = App.module "Models"
 
 
 class Views.Game extends Backbone.Marionette.Layout
+  id: 'game'
+  className: 'game'
   template: require('../templates/game.jade')
 
   regions:
@@ -20,6 +22,7 @@ class Views.Game extends Backbone.Marionette.Layout
     @worldState = options.world
     @playerState = options.player
     super
+    @
 
   onShow: ->
     @player.show new Views.Player
@@ -31,7 +34,7 @@ class Views.Game extends Backbone.Marionette.Layout
 
     # this is a no-op if there are no rounds yet.
     @showCurrentRound()
-    @listen @gamestate.rounds, 'add', @showCurrentRound
+    @listenTo @gameState.rounds, 'add', @showCurrentRound
 
 
   showCurrentRound: ->

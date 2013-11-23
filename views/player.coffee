@@ -6,10 +6,6 @@ Backbone = require('backbone')
 Views = App.module "Views"
 Models = App.module "Models"
 
-class Views.Opponents extends Backbone.Marionette.CollectionView
-  id: 'opponents'
-
-  itemView: Views.Opponent
 
 class Views.Opponent extends Backbone.Marionette.ItemView
   className: 'player'
@@ -34,9 +30,14 @@ class Views.Opponent extends Backbone.Marionette.ItemView
     @$el.removeClass 'selected'
 
   choose: ->
-    return if @model.id == State.world.session.player.id
-    # TODO: also don't allow choose when you're not allowed to vote
     @model.collection.select @model
+
+
+
+class Views.Opponents extends Backbone.Marionette.CollectionView
+  id: 'opponents'
+  className: 'opponents'
+  itemView: Views.Opponent
 
 
 class Views.Player extends Backbone.Marionette.ItemView
