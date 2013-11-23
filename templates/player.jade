@@ -1,9 +1,6 @@
 .card
   .pic(class="color-#{seqId}")
-    - if (me && role)
-      img(src="/assets/player_#{role}_default.svg")
-    - else
-      img(src="/assets/player_villager_default.svg")
+    img(src="/assets/player_#{role}_default.svg")
   .info
     .name= name
     .occupation= occupation
