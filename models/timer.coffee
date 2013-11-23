@@ -63,8 +63,9 @@ class Models.Timer extends Models.BaseModel
   
   # reset the countdown
   reset: ->
+    before = @state().name
     @stop()
-    @start()
+    @start() if before is 'active'
 
   # end the timer, triggering the 'end' event
   end: =>

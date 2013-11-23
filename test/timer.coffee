@@ -46,7 +46,14 @@ describe 'timer model', ->
       @timer.remaining().should.equal @timer.limit
       @clock.tick 60000
       @timer.remaining().should.equal @timer.limit
-    
+
+  describe 'resetting a stopped timer', ->
+    before ->
+      @timer.reset()
+
+    it 'should still be stopped', ->
+      @timer.state().path().should.equal 'inactive.stopped'
+
   describe 'starting the timer', ->
     before ->
       $json.stopped = @timer.toJSON()

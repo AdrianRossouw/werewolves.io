@@ -16,6 +16,7 @@ class Models.World extends Models.BaseModel
     @state().change(data._state or 'attract')
     @publish()
 
+
   destroy: ->
     @sessions.invoke 'destroy'
     @game.destroy()
@@ -50,15 +51,24 @@ class Models.World extends Models.BaseModel
     # the first player joined
     startup:
       arrive: ->
+        @timer.limit = 30000
+
+        @listenTo @timer, 'end', @startGame
+
+        @listenTo @game.players, 'add', ->
+          @timer.reset()
+
         @listenTo @game.state('recruit.ready'), 'arrive', =>
-          _.delay @startGame, 30000
+          @timer.start()
 
       exit: ->
         @stopListening @game.state('recruit.ready'), 'arrive'
+        @stopListening @game.timer, 'end'
+        @stopListening @game.players, 'add'
 
     # there is an active game running
     gameplay:
-     enter: ->
+      enter: ->
         @game.startGame()
 
     # the last game finished

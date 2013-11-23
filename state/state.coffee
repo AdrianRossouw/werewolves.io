@@ -93,6 +93,7 @@ State.getPlayer = (player) ->
 State.getSession = (session) ->
   @world?.sessions?.get(session)
 
+State.getTimer = -> @world?.timer
 
 # Noop implementations of some methods.
 State.load = (data = {}) ->
