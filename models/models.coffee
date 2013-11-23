@@ -54,6 +54,7 @@ class Models.BaseCollection extends Backbone.Collection
   publish:  -> @
   unpublish:  -> @
 
+require('./timer.coffee')
 require('./session.coffee')
 require('./player.coffee')
 require('./round.coffee')
