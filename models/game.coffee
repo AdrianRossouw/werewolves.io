@@ -73,6 +73,7 @@ class Models.Game extends Models.BaseModel
         # this should only happen when the round reaches complete.died stage
         @listenTo @rounds, 'change:death', (model, death) ->
           @players.kill death if death
+          @next()
 
       depart: ->
         @stopListening @rounds, 'change:death'

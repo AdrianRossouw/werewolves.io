@@ -128,8 +128,19 @@ describe 'start application', ->
       @villagers = @game.players.where
         role:'villager'
 
+      # first night
       @victim1 = @villagers[0]
       @seen1 = @victim1
+
+      # first day
+      @victim2 = @villagers[1]
+
+      # second night
+      @victim3 = @villagers[2]
+      @seen2 = @wolf
+
+      # second day
+      @victim4 = @wolf
 
 
     describe 'during the first night', ->
@@ -216,13 +227,11 @@ describe 'start application', ->
       it 'should not allow villagers to vote now', ->
         @round.actions.length.should.equal 2
 
-    describe 'ending the round', ->
+    describe 'ending the first night', ->
       before (done) ->
         @round = @game.currentRound()
         @timer.once 'end', done
         @clock.tick 30000
-        #todo .. replace this
-        @game.next()
         @nextRound = @game.currentRound()
 
       it 'should have moved the round to complete.died', ->
@@ -242,7 +251,14 @@ describe 'start application', ->
 
     describe 'during the first day', ->
 
-      it 'should have 8 active players', ->
+      before ->
+        @round = @game.currentRound()
+        @round.choose @seer.id, @victim2.id
+        @round.choose @wolf.id, @victim2.id
+        _(@villagers).each (a) =>
+          @round.choose a.id, @victim2.id
+
+      it 'should have 7 active players', ->
         @game.players.activeTotal().should.equal 7
 
       it 'all should be in lynching state', ->
@@ -253,25 +269,103 @@ describe 'start application', ->
           else
             path.should.equal 'alive.day.lynching'
 
-    describe 'during the next night', ->
-      before () ->
-        @clock.tick(100)
-        @game.next()
+      it 'should allow all the votes', ->
+        @round.actions.length.should.equal 7
 
+      it 'should identify the correct victim', ->
+        @round.getDeath().should.equal @victim2.id
+
+    describe 'hurried daytime timer', ->
+      before ->
+        @round = @game.currentRound()
+
+      it 'should have changed the timer length', ->
+        @timer.remaining().should.equal 30000
+
+      it 'should still be running', ->
+        @timer.state().path().should.equal 'active'
+
+    describe 'ending the day', ->
+      before ->
+        @round = @game.currentRound()
+        @clock.tick 30000
+
+      it 'should have killed second victim', ->
+        @victim2.state().path().should.equal 'dead'
+
+      it 'should have set the round to complete.died', ->
+        @round.state().path().should.equal 'complete.died'
+
+      it 'should have 2 active players', ->
+        @game.players.activeTotal().should.equal 2
+
+      it 'should add a round', ->
+        @game.rounds.length.should.equal 3
+        @game.currentRound().should.not.equal @round
+
+      it 'should be in a night phase', ->
+        @game.currentRound().phase.should.equal 'night'
 
       it 'should go to the next night round', ->
         @game.state().path().should.equal 'round.night'
-        @game.rounds.length.should.equal 3
+
+      it 'should be in the votes.none state', ->
+        @game.currentRound().state().path().should.equal 'votes.none'
+
+
+    describe 'during the next night', ->
+      before () ->
+        @round = @game.currentRound()
+        @round.choose @wolf.id, @victim3.id
+        @round.choose @seer.id, @wolf.id
+
+      it 'should allow all the votes', ->
+        @round.actions.length.should.equal 2
+
+      it 'should go to votes.all state', ->
+        @round.state().path().should.equal 'votes.all'
+
+    describe 'hurried nightime timer', ->
+      before ->
+        @round = @game.currentRound()
+
+      it 'should have changed the timer length', ->
+        @timer.remaining().should.equal 30000
+
+      it 'should still be running', ->
+        @timer.state().path().should.equal 'active'
+
+    describe 'ending the night', ->
+      before ->
+        @clock.tick @timer.remaining()
+
+      it 'should have 5 active players', ->
+        @game.players.activeTotal().should.equal 5
+
+      it 'should have killed third', ->
+        @victim3.state().path().should.equal 'dead'
 
     describe 'during the next day', ->
       before () ->
-        @clock.tick(100)
-        @game.next()
-
+        @round = @game.currentRound()
+        @round.choose @seer.id, @wolf.id
+        @round.choose @wolf.id, @seer.id
+        _(@villagers).each (a) =>
+          @round.choose a.id, @wolf.id
 
       it 'should go to the next day round', ->
         @game.state().path().should.equal 'round.day'
         @game.rounds.length.should.equal 4
+
+      it 'should allow all the votes', ->
+        @round.actions.length.should.equal 5
+
+    describe 'villagers lynch the wolf', ->
+      before ->
+        @clock.tick 30000
+
+      it 'should have killed a wolf', ->
+        @wolf.state().path().should.equal 'dead'
 
 
 describe 'cleanup', ->

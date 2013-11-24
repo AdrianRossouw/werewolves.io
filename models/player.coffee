@@ -55,7 +55,7 @@ class Models.Player extends Models.BaseModel
           @state('-> dead')
 
         startPhase: (phase) ->
-          debug('phase', @state().path(), phase)
+          debug('phase', @name, @state().path(), phase)
           if phase is 'day'
             @state('-> lynching')
           else
@@ -63,19 +63,18 @@ class Models.Player extends Models.BaseModel
             @state('-> asleep')
             @state('-> eating')
 
-
         night: state 'abstract',
           # guards set on the states based on roles
           asleep:
             admit:
-              'alive': -> @owner.role is 'villager'
+              'alive,alive.day.*': -> @owner.role is 'villager'
           seeing:
             admit:
-              'alive': -> @owner.role is 'seer'
+              'alive,alive.day.*': -> @owner.role is 'seer'
             voteAction: -> 'see'
           eating:
             admit:
-              'alive': -> @owner.role is 'werewolf'
+              'alive,alive.day.*': -> @owner.role is 'werewolf'
             voteAction: -> 'eat'
         day: state 'abstract',
           # every living player lynches

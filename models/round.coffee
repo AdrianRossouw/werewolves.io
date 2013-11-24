@@ -81,7 +81,7 @@ class Models.Round extends Models.BaseModel
       # we have all the votes
       all:
         enter: ->
-          if @timer.remaining() > 30000
+          if @timer.remaining() >= 30000
             @timer.limit = 30000
             @timer.reset()
         admit:
