@@ -12,15 +12,13 @@ class Models.Game extends Models.BaseModel
   @attribute 'phaseTime'
   initialize: (data = {}, opts={}) ->
     @id = App.ns.uuid()
-    @timer = opts.timer
-    super
     @players = new Models.Players []
     @rounds = new Models.Rounds []
-    @publish()
-    @state().change(data._state or 'recruit')
     @players.reset data.players if data.players
     @rounds.reset data.rounds if data.rounds
-
+    super
+    @state().change(data._state or 'recruit')
+    @publish()
 
   destroy: ->
     @players.invoke('destroy')
@@ -32,19 +30,6 @@ class Models.Game extends Models.BaseModel
     obj.players = @players.toJSON()
     obj.rounds = @rounds.toJSON()
     obj
-
-  status: ->
-    switch @state().path()
-      when 'recruit.waiting' then "#{@players.length} players. #{7 - @players.length} more needed."
-      when 'recruit.ready' then "Starting game with #{@players.length} players."
-      when 'round.night.first' then "First night"
-      when 'round.day.first' then "First day"
-      when 'round.night' then "Nightime"
-      when 'round.day' then "Daytime"
-      when 'victory.werewolves' then "Werewolves win!"
-      when 'victory.villagers' then "Villagers win!"
-      when 'cleanup' then 'Game over!'
-
 
 
   # try to go to the next phase
@@ -79,7 +64,7 @@ class Models.Game extends Models.BaseModel
 
       # assign the roles when we leave the recruit state
       exit: ->
-        @players.assignRoles()
+        @players.assignRoles() if App.server
 
     round: state 'abstract',
 
@@ -102,7 +87,6 @@ class Models.Game extends Models.BaseModel
 
       addRound: (phase) ->
         @players.startPhase(phase)
-
         round =
           id: App.ns.uuid()
           number: @rounds.length + 1

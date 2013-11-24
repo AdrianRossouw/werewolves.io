@@ -26,17 +26,22 @@ class Models.Round extends Models.BaseModel
   @attribute 'number'
   @attribute 'activeTotal'
   initialize: (data = {}, opts = {}) ->
+    @timer = State.getTimer()
     @id = data.id or App.ns.uuid()
     @players ?= opts.players
-    super
     @actions = new Models.Actions []
     @actions.reset data.actions if data.actions
+    @timer.limit = @activeTotal * 30000
+    super
     @state().change(data._state or 'votes.none')
     @publish()
 
-  destroy: ->
-    super
+    @listenTo @timer, 'end', @endPhase
 
+  destroy: ->
+    @stopListening @timer
+
+    super
     delete @players
 
     @actions.destroy()
@@ -57,45 +62,35 @@ class Models.Round extends Models.BaseModel
       admit:
           'complete.*': false
 
-      enter: ->
-        #@timer = State.getTimer()
-        #@timer.limit = @activeTotal * 30000
-
-        #@listenTo @timer, 'end', @endPhase
-
-        #@timer.start()
-
-      exit: ->
-        #@stopListening @timer
       # waiting for the first vote to be cast
       none: state 'default',
         admit:
           '*': -> !@owner.actions.length
+        arrive: ->
+          @timer.start()
 
       # we have  votes
       some:
         admit:
-          'none': ->
-            (1 <= @owner.actions.length <= @owner.activeTotal)
+          'none': -> (1 <= @owner.actions.length <= @owner.activeTotal)
 
       # we have all the votes
       all:
+        enter: ->
+          if @timer.remaining() > 30000
+            @timer.limit = 30000
+            @timer.reset()
         admit:
-          '': -> true
-          'some': ->
-            @owner.actions.length == @owner.activeTotal
-        arrive: ->
-          #@timer.limit = 30000
-          #@timer.reset()
+          'some': -> @owner.actions.length == @owner.activeTotal
         exit: ->
-          #@death = @getDeath()
+          @death = @getDeath()
 
     complete: state 'conclusive',
       # there is a death
       died: state 'final',
         arrive: ->
         admit:
-          '': -> true
+          '': true
           'votes.all': -> @owner.death
 
       # there wasn't one
@@ -108,8 +103,7 @@ class Models.Round extends Models.BaseModel
         origin: 'votes.all',
         target: 'complete.died'
         action: ->
-          process.exit()
-          #@owner.players.kill @owner.death
+          @owner.players.kill @owner.death
           @end()
 
   endPhase: ->

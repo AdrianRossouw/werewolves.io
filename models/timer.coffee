@@ -41,6 +41,11 @@ class Models.Timer extends Models.BaseModel
     json._state = @state().path()
     json
 
+  destroy: ->
+    super
+    @stopListening()
+    @off
+    
   # return the ms remaining on the counter.
   remaining: -> @limit
 
@@ -69,8 +74,8 @@ class Models.Timer extends Models.BaseModel
 
   # end the timer, triggering the 'end' event
   end: =>
-    @trigger 'end'
     @stop()
+    @trigger 'end'
 
   # while running, trigger a tick event every second
   #

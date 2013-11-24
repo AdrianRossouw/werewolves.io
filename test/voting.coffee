@@ -12,12 +12,13 @@ it 'should have returned a module', ->
 
 describe 'init state', ->
   before ->
-    State.load(fixture)
     State.start()
+    State.load(fixture)
 
   it 'did the loading of records', ->
     should.exist State.world
     should.exist State.world.sessions
+    should.exist State.world.timer
     should.exist State.world.game
     should.exist State.world.game.players
     should.exist State.world.game.rounds

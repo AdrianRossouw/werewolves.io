@@ -41,8 +41,8 @@ game.rounds.push
   activeTotal: 1
   _state: 'complete.died'
   actions: [
-    { action: 'eaten', id: 'Edward', target: 'Narrator' }
-    { action: 'seen', id: 'Gaylord', target: 'Arturo' }
+    { action: 'eat', id: 'Edward', target: 'Narrator' }
+    { action: 'see', id: 'Gaylord', target: 'Arturo' }
   ]
   death: 'Narrator'
 
@@ -71,8 +71,8 @@ game.rounds.push
   activeTotal: 2
   _state: 'complete.died'
   actions: [
-    { action: 'seen', id: 'Gaylord', target: 'Edward'}
-    { action: 'eaten', id: 'Edward', target: 'Arturo'}
+    { action: 'see', id: 'Gaylord', target: 'Edward'}
+    { action: 'eat', id: 'Edward', target: 'Arturo'}
   ]
   death: 'Arturo'
 

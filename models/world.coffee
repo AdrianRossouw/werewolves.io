@@ -9,17 +9,17 @@ Models   = App.module "Models"
 class Models.World extends Models.BaseModel
   url: 'world'
   initialize: (data = {}, opts = {}) ->
-    super
     @timer = new Models.Timer(data.timer or {})
     @sessions = new Models.Sessions(data.sessions or [])
-    @game = new Models.Game(data.game or {}, {timer: @timer})
+    @game = new Models.Game(data.game or {})
+    super
     @state().change(data._state or 'attract')
     @publish()
-
 
   destroy: ->
     @sessions.invoke 'destroy'
     @game.destroy()
+    @timer.destroy()
     super
     @stopListening()
 
@@ -30,15 +30,8 @@ class Models.World extends Models.BaseModel
     obj.timer = @timer.toJSON()
     obj.game = @game.toJSON()
     obj
-
-  status: ->
-    switch @state().name
-      when 'attract' then 'waiting for players'
-      when 'startup' then @game.status()
-      when 'gameplay' then @game.status()
-      when 'cleanup' then 'game ending'
-
   startGame: =>
+    @timer.stop()
     @state('-> gameplay')
 
   initState: -> state @,

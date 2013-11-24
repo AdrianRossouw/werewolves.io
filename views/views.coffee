@@ -24,17 +24,7 @@ class Backbone.Marionette.ItemView extends Backbone.Marionette.ItemView
     json
 
 
-# Status line view
-#
-# Prints out based on the current world state
-# (which is passed in as it's model)
-class Views.Status extends Backbone.Marionette.ItemView
-  id: 'status',
-  template: =>
-    @model.status()
-  onShow: ->
-    @listenTo State, 'state', @render
-
+require('./status.coffee')
 require('./timer.coffee')
 require('./player.coffee')
 require('./round.coffee')
