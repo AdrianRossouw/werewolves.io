@@ -46,7 +46,7 @@ class Models.Game extends Models.BaseModel
       # we are still waiting for enough players to join
       waiting: {}
       ready:
-        next: 'round.night.first'
+        next: 'round.firstNight'
         admit:
           # only admit state changes from .waiting when ...
           waiting: ->
@@ -79,22 +79,23 @@ class Models.Game extends Models.BaseModel
 
       # won't come back here from victory state
       admit:
-        'victory.*': -> false
+        'victory.*': false
+
+      firstNight: state
+        arrive: -> @addRound 'night'
+        next: 'round.firstDay'
+
+      firstDay: state
+        arrive: -> @addRound 'day'
+        next: 'night'
 
       night: state
-        first: state
-          events:
-            next: 'round.day.first'
+        arrive: -> @addRound 'night'
+        next: 'day'
 
-        enter: -> @addRound 'night'
-        events:
-          next: 'day'
-
-      day:
-        enter: -> @addRound 'day'
+      day: state
+        arrive: -> @addRound 'day'
         next: 'night'
-        first: state
-          next: 'night'
 
       addRound: (phase) ->
         @players.startPhase(phase)

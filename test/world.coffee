@@ -99,8 +99,8 @@ describe 'start application', ->
       counts.werewolf.should.equal 1
       counts.villager.should.equal 7
 
-    it 'should have moved to the night.first round', ->
-      @game.state().path().should.equal 'round.night.first'
+    it 'should have moved to the firstNight round', ->
+      @game.state().path().should.equal 'round.firstNight'
 
     it 'should have added a night round', ->
       @game.rounds.length.should.equal 1
@@ -232,7 +232,7 @@ describe 'start application', ->
         @round.death.should.equal @victim1.id
 
       it 'should go to the first day round', ->
-        @game.state().path().should.equal 'round.day.first'
+        @game.state().path().should.equal 'round.firstDay'
 
       it 'should add a round', ->
         @game.rounds.length.should.equal 2

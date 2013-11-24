@@ -30,8 +30,8 @@ class Views.Status extends Backbone.Marionette.ItemView
     switch @model.game.state().path()
       when 'recruit.waiting' then "#{players} players. #{7 - players} more needed."
       when 'recruit.ready' then "Starting game with #{players} players."
-      when 'round.night.first' then "First night. #{@playerStatus()}"
-      when 'round.day.first' then "First day. #{@playerStatus()}"
+      when 'round.firstNight' then "First night. #{@playerStatus()}"
+      when 'round.firstDay' then "First day. #{@playerStatus()}"
       when 'round.night' then "Nightime. #{@playerStatus()}"
       when 'round.day' then "Daytime. #{@playerStatus()}"
       when 'victory.werewolves' then "Werewolves win!"

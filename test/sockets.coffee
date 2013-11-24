@@ -318,7 +318,7 @@ describe 'socket can connect', ->
         $state.world.state().is('gameplay').should.be.ok
 
       it 'changed the world state to the first night', ->
-        $state.game.state().is('round.night.first').should.be.ok
+        $state.game.state().is('round.firstNight').should.be.ok
 
       it 'set all the players to one of the night states', ->
         $state.players.each (p) ->
@@ -327,7 +327,7 @@ describe 'socket can connect', ->
 
       it 'triggered all state changes over the state module', ->
         $spy.state.calledWith('state', 'world', 'gameplay').should.be.ok
-        $spy.state.calledWith('state', $state.game.getUrl(), 'round.night.first').should.be.ok
+        $spy.state.calledWith('state', $state.game.getUrl(), 'round.firstNight').should.be.ok
         $state.players.each (p) ->
           $spy.state.calledWith('state', p.getUrl(), p.state().path()).should.be.ok
 

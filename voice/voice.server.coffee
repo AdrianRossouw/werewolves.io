@@ -177,9 +177,9 @@ Voice.listenTo App, 'before:routes', (opts) ->
     # play the right files for each phase
     if not env.world.state().isIn('gameplay')
       @intro tropo, env
-    else if env.game.state().isIn('night.first')
+    else if env.game.state().isIn('firstNight')
       @firstNight tropo, env
-    else if env.game.state().isIn('day.first')
+    else if env.game.state().isIn('firstDay')
       @firstDay tropo, env
     else if env.game.state().isIn('night')
       @night tropo, env
