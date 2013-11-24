@@ -9,7 +9,6 @@ Models   = App.module "Models"
 # A game that is running or will be starting.
 class Models.Game extends Models.BaseModel
   urlRoot: 'game'
-  @attribute 'startTime'
   @attribute 'phaseTime'
   initialize: (data = {}, opts={}) ->
     @id = App.ns.uuid()
@@ -45,7 +44,13 @@ class Models.Game extends Models.BaseModel
       when 'cleanup' then 'Game over!'
 
 
-  recruitStatus: ->
+
+  # try to go to the next phase
+  next: ->
+    @state().change('victory.werewolves')
+    @state().change('victory.villagers')
+    console.log 'emitting next', @state().path()
+    @state().emit 'next'
 
   initState: -> state @,
     # This game hasn't started yet
@@ -54,15 +59,14 @@ class Models.Game extends Models.BaseModel
       # we are still waiting for enough players to join
       waiting: {}
       ready:
+        next: 'round.night.first'
         admit:
           # only admit state changes from .waiting when ...
           waiting: ->
             @owner.players.length >= 7
 
       # startgame method.
-      startGame: ->
-        @startTime = Date.now()
-        @state('-> night.first')
+      startGame: -> @next()
 
       addPlayer: (player) ->
         # order player joined in.
@@ -82,17 +86,17 @@ class Models.Game extends Models.BaseModel
       admit:
         'victory.*': -> false
 
-      night:
+      night: state
+        first: state
+          next: 'round.day.first'
+
         enter: -> @addRound 'night'
-        nextPhase: -> @state('-> day')
-        first:
-          nextPhase: -> @state('-> day.first')
+        next: 'day'
 
       day:
         enter: -> @addRound 'day'
-        nextPhase: -> @state('-> night')
-        first:
-          nextPhase: -> @state('-> night')
+        next: 'night'
+        first: state
 
       addRound: (phase) ->
         round =
@@ -104,11 +108,6 @@ class Models.Game extends Models.BaseModel
           players: @players
 
         @players.startPhase(phase)
-
-      next: ->
-        @state('-> victory.werewolves')
-        @state('-> victory.villagers')
-        @nextPhase()
 
       currentRound: ->
         @rounds.last()
