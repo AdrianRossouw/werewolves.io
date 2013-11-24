@@ -44,6 +44,7 @@ App.addInitializer ->
   @addRegions
     'game': '#game-area'
     'status': '#status-area'
+    'timer': '#timer-area'
 
   state App,
     lobby: state 'initial',
@@ -82,7 +83,7 @@ App.addInitializer ->
   # what happens when we join
   @listenTo State, "data", (event, coll, url, state) ->
     @state().change 'game' if (event is 'add') and (coll is 'player')
- 
+
   $('.play-now').click -> App.State.joinGame()
 
 if env is 'development'
@@ -95,6 +96,9 @@ App.bootstrap = (world) ->
   App.start config
   State.load world
   Socket.start config
+
+  @timer.show new Views.Timer
+    model: State.world.timer
 
   @trigger 'bootstrap'
 

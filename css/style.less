@@ -456,21 +456,23 @@ video {
 }
 
 .status {
-  max-width: @maxWidth;
   margin: 0 auto;
   padding: 0 20px;
   position: relative;
 }
 
 #status {
+  max-width: @maxWidth - 200;
   .status
 }
 
-.timer {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 20px 40px;
+
+#timer {
+  .status;
+  max-width: 200px;
+  display:block;
+  color: #efefef;
+  font-weight: bold;
 }
 strong {
   font-weight: bold;

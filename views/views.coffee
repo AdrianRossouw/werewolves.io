@@ -32,6 +32,7 @@ class Views.Status extends Backbone.Marionette.ItemView
   id: 'status',
   template: _.template "<%=status%>"
 
+require('./timer.coffee')
 require('./player.coffee')
 require('./round.coffee')
 require('./game.coffee')
