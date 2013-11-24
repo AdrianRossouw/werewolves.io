@@ -58,15 +58,15 @@ class Models.Round extends Models.BaseModel
           'complete.*': false
 
       enter: ->
-        @timer = State.getTimer()
-        @timer.limit = @activeTotal * 30000
+        #@timer = State.getTimer()
+        #@timer.limit = @activeTotal * 30000
 
-        @listenTo @timer, 'end', @endPhase
+        #@listenTo @timer, 'end', @endPhase
 
-        @timer.start()
+        #@timer.start()
 
       exit: ->
-        @stopListening @timer
+        #@stopListening @timer
       # waiting for the first vote to be cast
       none: state 'default',
         admit:
@@ -85,10 +85,10 @@ class Models.Round extends Models.BaseModel
           'some': ->
             @owner.actions.length == @owner.activeTotal
         arrive: ->
-          @timer.limit = 30000
-          @timer.reset()
+          #@timer.limit = 30000
+          #@timer.reset()
         exit: ->
-          @death = @getDeath()
+          #@death = @getDeath()
 
     complete: state 'conclusive',
       # there is a death
@@ -109,7 +109,7 @@ class Models.Round extends Models.BaseModel
         target: 'complete.died'
         action: ->
           process.exit()
-          @owner.players.kill @owner.death
+          #@owner.players.kill @owner.death
           @end()
 
   endPhase: ->

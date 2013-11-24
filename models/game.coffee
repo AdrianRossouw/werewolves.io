@@ -12,6 +12,7 @@ class Models.Game extends Models.BaseModel
   @attribute 'phaseTime'
   initialize: (data = {}, opts={}) ->
     @id = App.ns.uuid()
+    @timer = opts.timer
     super
     @players = new Models.Players []
     @rounds = new Models.Rounds []
