@@ -121,12 +121,16 @@ describe 'start application', ->
       @game = @world.game
       @timer = State.getTimer()
 
-      @wolves = @game.players.where
+      @wolf = @game.players.findWhere
         role:'werewolf'
       @seer = @game.players.findWhere
         role:'seer'
       @villagers = @game.players.where
         role:'villager'
+
+      @victim1 = @villagers[0]
+      @seen1 = @victim1
+
 
     describe 'during the first night', ->
       before () ->
@@ -140,7 +144,7 @@ describe 'start application', ->
         @seer.state().path().should.equal 'alive.night.seeing'
 
       it 'should have put the wolf in eating state', ->
-        _(@wolves).each((v) -> v.state().path().should.equal 'alive.night.eating')
+        @wolf.state().path().should.equal 'alive.night.eating'
 
       it 'should have put the rest in sleep state', ->
         _(@villagers).each((v) -> v.state().path().should.equal 'alive.night.asleep')
@@ -163,30 +167,30 @@ describe 'start application', ->
     describe 'wolf voting', ->
       before ->
         @round = @game.currentRound()
-        @round.choose _(@wolves).first().id, _(@villagers).first().id
+        @round.choose @wolf.id, @victim1.id
 
       it 'should allow the wolf to vote', ->
         @round.actions.at(0).should.include
-          id: _(@wolves).first().id
+          id: @wolf.id
           action: 'eat'
-          target: _(@villagers).first().id
+          target: @victim1.id
 
       it 'should have set the state to votes.some', ->
         @round.state().path().should.equal 'votes.some'
 
       it 'should correctly identify who would die next', ->
-        @round.getDeath().should.equal(_(@villagers).first().id)
+        @round.getDeath().should.equal @victim1.id
 
     describe 'seer voting', ->
       before ->
         @round = @game.currentRound()
-        @round.choose @seer.id, _(@villagers).first().id
+        @round.choose @seer.id, @seen1.id
 
       it 'should allow the seer to vote', ->
         @round.actions.at(1).should.include
           id: @seer.id
           action: 'see'
-          target: _(@villagers).first().id
+          target: @seen1.id
 
       it 'should have set the state to votes.all', ->
         @round.state().path().should.equal 'votes.all'
@@ -196,37 +200,58 @@ describe 'start application', ->
         @round = @game.currentRound()
 
       it 'should have changed the timer length', ->
-        @round.getDeath().should.equal(_(@villagers).first().id)
+        @timer.remaining().should.equal 30000
+
+      it 'should still be running', ->
+        @timer.state().path().should.equal 'active'
 
     describe 'villagers are really asleep', ->
       before ->
-        @clock.tick(100)
         @round = @game.currentRound()
 
-        @round.choose _(@villagers).last().id, _(@wolves).last().id
-        @round.choose _(@villagers).last().id, _(@villagers).first().id
+        @round.choose _(@villagers).last().id, @wolf.id
+        @round.choose _(@villagers).last().id, @victim1.id
         @round.choose @villagers[2].id, @seer.id
 
       it 'should not allow villagers to vote now', ->
         @round.actions.length.should.equal 2
 
-    describe 'during the first day', ->
-      before () ->
-        @clock.tick(100)
+    describe 'ending the round', ->
+      before (done) ->
+        @round = @game.currentRound()
+        @timer.once 'end', done
+        @clock.tick 30000
+        #todo .. replace this
         @game.next()
+        @nextRound = @game.currentRound()
 
-      # TODO: why is this broken ?
-      it.skip 'should go to the first day round', ->
-        @game.rounds.length.should.equal 2
+      it 'should have moved the round to complete.died', ->
+        @round.state().path().should.equal 'complete.died'
+
+      it 'should have killed someone', ->
+        @round.death.should.equal @victim1.id
+
+      it 'should go to the first day round', ->
         @game.state().path().should.equal 'round.day.first'
+
+      it 'should add a round', ->
+        @game.rounds.length.should.equal 2
+
+      it 'should be in a day phase', ->
         @game.currentRound().phase.should.equal 'day'
 
+    describe 'during the first day', ->
+
       it 'should have 8 active players', ->
-        @game.players.activeTotal().should.equal 8
+        @game.players.activeTotal().should.equal 7
 
       it 'all should be in lynching state', ->
-        @game.players.each (p) ->
-          p.state().path().should.equal 'alive.day.lynching'
+        @game.players.each (p) =>
+          path = p.state().path()
+          if p.id is @victim1.id
+            path.should.equal 'dead'
+          else
+            path.should.equal 'alive.day.lynching'
 
     describe 'during the next night', ->
       before () ->

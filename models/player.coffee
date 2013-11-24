@@ -92,6 +92,9 @@ class Models.Players extends Models.BaseCollection
     @each (player) ->
       player.set('role', roles.shift())
 
+  kill: (id) ->
+    @get(id).kill()
+
   aliveTotal: ->
     isAlive = (p) -> p.state().isIn('alive')
     @filter(isAlive).length

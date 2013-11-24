@@ -34,9 +34,10 @@ class Models.Game extends Models.BaseModel
 
   # try to go to the next phase
   next: ->
+    before = @state().path()
     @state().change('victory.werewolves')
     @state().change('victory.villagers')
-    @state().emit 'next'
+    @state().emit 'next' if before is @state().path()
 
   initState: -> state @,
     # This game hasn't started yet
@@ -67,6 +68,14 @@ class Models.Game extends Models.BaseModel
         @players.assignRoles() if App.server
 
     round: state 'abstract',
+      enter: ->
+        # kill someone if the death property gets changed
+        # this should only happen when the round reaches complete.died stage
+        @listenTo @rounds, 'change:death', (model, death) ->
+          @players.kill death if death
+
+      depart: ->
+        @stopListening @rounds, 'change:death'
 
       # won't come back here from victory state
       admit:
@@ -74,10 +83,12 @@ class Models.Game extends Models.BaseModel
 
       night: state
         first: state
-          next: 'round.day.first'
+          events:
+            next: 'round.day.first'
 
         enter: -> @addRound 'night'
-        next: 'day'
+        events:
+          next: 'day'
 
       day:
         enter: -> @addRound 'day'

@@ -57,6 +57,10 @@ class Models.Round extends Models.BaseModel
     obj.actions = @actions.toJSON()
     obj
 
+  endPhase: ->
+    @state().change('complete.died')
+    @state().change('complete.survived')
+
   initState: -> state @,
     votes: state 'abstract',
       admit:
@@ -82,33 +86,21 @@ class Models.Round extends Models.BaseModel
             @timer.reset()
         admit:
           'some': -> @owner.actions.length == @owner.activeTotal
-        exit: ->
-          @death = @getDeath()
 
     complete: state 'conclusive',
       # there is a death
       died: state 'final',
         arrive: ->
+          @death = @getDeath()
         admit:
-          '': true
-          'votes.all': -> @owner.death
+          'votes.all': -> !!@owner.getDeath()
+          'complete.*': false
 
       # there wasn't one
       survived: state 'final',
         admit:
-          '': true
-          'votes.all': -> !@owner.death
-    transitions:
-      KillSomeone:
-        origin: 'votes.all',
-        target: 'complete.died'
-        action: ->
-          @owner.players.kill @owner.death
-          @end()
-
-  endPhase: ->
-    @state().change('complete.died')
-    @state().change('complete.survived')
+          'votes.all': -> !@owner.getDeath()
+          'complete.*': false
 
   # transform an array of actions into a single
   # array of votes (player id only), indexed
