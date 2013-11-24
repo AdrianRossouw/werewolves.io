@@ -4,6 +4,10 @@ game =
   startTime: 1384027686714
   _state: 'round.day'
   players: []
+  timer: {
+    _state: 'inactive.stopped'
+    limit: '30000'
+  }
   rounds: []
 
 game.players.push { id: 'Edward', name: 'Edward', role: 'werewolf' }

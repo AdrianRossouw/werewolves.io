@@ -24,16 +24,14 @@ class Models.Round extends Models.BaseModel
   @attribute 'death'
   @attribute 'phase'
   @attribute 'number'
-
+  @attribute 'activeTotal'
   initialize: (data = {}, opts = {}) ->
     @id = data.id or App.ns.uuid()
+    @players ?= opts.players
     super
     @actions = new Models.Actions []
-    @players = opts.players
     @actions.reset data.actions if data.actions
     @state().change(data._state or 'votes.none')
-    @listenTo @state('votes.all'), 'arrive', @endPhase
-
     @publish()
 
   destroy: ->
@@ -45,18 +43,30 @@ class Models.Round extends Models.BaseModel
     delete @actions
 
   voteState: ->
-    @lastChoice = Date.now()
-
     @state('-> votes.none')
     @state('-> votes.some')
     @state('-> votes.all')
-  
+
   toJSON: ->
     obj = super
     obj.actions = @actions.toJSON()
     obj
+
   initState: -> state @,
     votes: state 'abstract',
+      admit:
+          'complete.*': false
+
+      enter: ->
+        @timer = State.getTimer()
+        @timer.limit = @activeTotal * 30000
+
+        @listenTo @timer, 'end', @endPhase
+
+        @timer.start()
+
+      exit: ->
+        @stopListening @timer
       # waiting for the first vote to be cast
       none: state 'default',
         admit:
@@ -66,32 +76,41 @@ class Models.Round extends Models.BaseModel
       some:
         admit:
           'none': ->
-            activeTotal = @owner.players.activeTotal()
-            (1 <= @owner.actions.length <= activeTotal)
+            (1 <= @owner.actions.length <= @owner.activeTotal)
 
-        arrive: ->
-          @firstVotes = Date.now()
-
+      # we have all the votes
       all:
         admit:
           '': -> true
           'some': ->
-            activeTotal = @owner.players.activeTotal()
-            @owner.actions.length == activeTotal
+            @owner.actions.length == @owner.activeTotal
+        arrive: ->
+          @timer.limit = 30000
+          @timer.reset()
+        exit: ->
+          @death = @getDeath()
 
     complete: state 'conclusive',
       # there is a death
       died: state 'final',
         arrive: ->
-          @death = @getDeath()
-          @players.kill @death
         admit:
-          'votes.all': -> @owner.getDeath()
+          '': -> true
+          'votes.all': -> @owner.death
 
       # there wasn't one
       survived: state 'final',
         admit:
-          'votes.all': -> !@owner.getDeath()
+          '': true
+          'votes.all': -> !@owner.death
+    transitions:
+      KillSomeone:
+        origin: 'votes.all',
+        target: 'complete.died'
+        action: ->
+          process.exit()
+          @owner.players.kill @owner.death
+          @end()
 
   endPhase: ->
     @state().change('complete.died')

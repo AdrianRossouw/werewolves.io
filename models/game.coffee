@@ -19,47 +19,6 @@ class Models.Game extends Models.BaseModel
     @state().change(data._state or 'recruit')
     @players.reset data.players if data.players
     @rounds.reset data.rounds if data.rounds
-    @setupLatestRound()
-
-
-  setupLatestRound: ->
-    @latestRound = new Capped @rounds,
-      cap: 1
-      comparator: (r) -> -r.number
-    # when a new round is added, remove the listeners from the old one.
-    @listenTo @latestRound, 'add', (round) -> @addRoundListeners(round)
-    @listenTo @latestRound, 'reset', (rounds) -> @addRoundListeners(rounds.at(0))
-    @listenTo @latestRound, 'remove', (round) -> @removeRoundListeners(round)
-
-  addRoundListeners: (round) =>
-    @timer = App.State.getTimer()
-    console.log @timer
-    @listenTo @timer, 'end', ->
-      round.endPhase()
-
-    @roundTimer()
-
-    @listenTo round.state('votes.all'), 'arrive', =>
-      @roundTimerHurry()
-
-  removeRoundListeners: (round) =>
-    @stopListening(round.state('votes.all'), 'arrive')
-    @stopListening(round)
-    @stopListening(@timer)
-
-
-  # overall timer for entire phase is 30 seconds per player
-  # TODO: make it for living players only
-  roundTimer: ->
-    @timer.limit = @players.length * 30000
-    @timer.start()
-
-  # once we have all the votes for a round, the game speeds
-  # up leaving only 1 minute until the vote is counted (unless
-  # the round timer is shorter)
-  roundTimerHurry: ->
-    @timer.limit = 30000
-    @timer.reset()
 
 
   destroy: ->
@@ -141,15 +100,18 @@ class Models.Game extends Models.BaseModel
           next: 'night'
 
       addRound: (phase) ->
+        @players.startPhase(phase)
+
         round =
           id: App.ns.uuid()
           number: @rounds.length + 1
           phase: phase or 'night'
+          activeTotal: @players.activeTotal()
 
-        @rounds.add round,
+        round = @rounds.add round,
+          timer: @timer
           players: @players
 
-        @players.startPhase(phase)
 
       currentRound: ->
         @rounds.last()
