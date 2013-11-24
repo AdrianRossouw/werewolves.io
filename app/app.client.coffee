@@ -43,8 +43,8 @@ App.addInitializer ->
   
   @addRegions
     'game': '#game-area'
-    'status': '#status-area'
-    'timer': '#timer-area'
+    'status': '#status'
+    'timer': '#timer'
 
   state App,
     lobby: state 'initial',
@@ -96,6 +96,9 @@ App.bootstrap = (world) ->
   App.start config
   State.load world
   Socket.start config
+
+  @status.show new Views.Status
+    model: State.world
 
   @timer.show new Views.Timer
     model: State.world.timer

@@ -47,5 +47,3 @@ class Views.Game extends Backbone.Marionette.Layout
     
     @round.show new Views.Round(opts) if opts.model
 
-  onClose: ->
-    @stopListening()

@@ -30,7 +30,10 @@ class Backbone.Marionette.ItemView extends Backbone.Marionette.ItemView
 # (which is passed in as it's model)
 class Views.Status extends Backbone.Marionette.ItemView
   id: 'status',
-  template: _.template "<%=status%>"
+  template: =>
+    @model.status()
+  onShow: ->
+    @listenTo State, 'state', @render
 
 require('./timer.coffee')
 require('./player.coffee')

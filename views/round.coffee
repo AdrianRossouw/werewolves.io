@@ -33,7 +33,3 @@ class Views.Round extends Backbone.Marionette.ItemView
   onShow: ->
     @listenTo @model.actions, 'add', @render
     @listenTo @model.actions, 'change', @render
-
-  onClose: ->
-    @stopListening()
-

@@ -6,8 +6,15 @@ class Views.Timer extends Backbone.Marionette.ItemView
   tagName: 'span'
   className: 'timer'
   template: =>
-    @model.remaining() / 1000
+    "#{Math.round(@model.remaining() / 1000)} seconds remaining"
 
   modelEvents:
     'tick': 'render'
+    'change': 'render'
+
+  onRender: ->
+    if @model.state().name is 'active'
+      @$el.removeClass 'hide'
+    else
+      @$el.addClass 'hide'
 

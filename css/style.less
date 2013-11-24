@@ -448,32 +448,27 @@ video {
   }
 }
 
-.status-wrap {
-  background-color: #333;
-}
 #status-area {
-  .status-wrap;
-}
-
-.status {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #333;
+  max-width: @maxWidth;
   margin: 0 auto;
   padding: 0 20px;
-  position: relative;
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  border-radius: 5px 0 0 0;
+  .in-lobby & {
+    color: #aaa;
+  }
 }
 
 #status {
-  max-width: @maxWidth - 200;
-  .status
 }
-
 
 #timer {
-  .status;
-  max-width: 200px;
-  display:block;
-  color: #efefef;
-  font-weight: bold;
 }
+
 strong {
   font-weight: bold;
 }

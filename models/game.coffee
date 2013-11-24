@@ -32,6 +32,21 @@ class Models.Game extends Models.BaseModel
     obj.rounds = @rounds.toJSON()
     obj
 
+  status: ->
+    switch @state().path()
+      when 'recruit.waiting' then "#{@players.length} players. #{7 - @players.length} more needed."
+      when 'recruit.ready' then "#{@players.length} players. Starting game."
+      when 'round.night.first' then "First night"
+      when 'round.day.first' then "First day"
+      when 'round.night' then "Nightime"
+      when 'round.day' then "Daytime"
+      when 'victory.werewolves' then "Werewolves win!"
+      when 'victory.villagers' then "Villagers win!"
+      when 'cleanup' then 'Game over!'
+
+
+  recruitStatus: ->
+
   initState: -> state @,
     # This game hasn't started yet
     recruit: state 'abstract',

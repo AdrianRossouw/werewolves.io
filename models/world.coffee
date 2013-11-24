@@ -31,6 +31,13 @@ class Models.World extends Models.BaseModel
     obj.game = @game.toJSON()
     obj
 
+  status: ->
+    switch @state().name
+      when 'attract' then 'waiting for players'
+      when 'startup' then @game.status()
+      when 'gameplay' then @game.status()
+      when 'cleanup' then 'game ending'
+
   startGame: =>
     @state('-> gameplay')
 
