@@ -10,9 +10,9 @@ class Models.World extends Models.BaseModel
   url: 'world'
   initialize: (data = {}, opts = {}) ->
     super
+    @timer = new Models.Timer(data.timer or {})
     @sessions = new Models.Sessions(data.sessions or [])
     @game = new Models.Game(data.game or {})
-    @timer = new Models.Timer(data.timer or {})
     @state().change(data._state or 'attract')
     @publish()
 

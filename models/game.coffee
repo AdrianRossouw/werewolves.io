@@ -4,7 +4,7 @@ _        = require('underscore')
 Backbone = require('backbone')
 debug    = require('debug')('werewolves:model:game')
 Models   = App.module "Models"
-
+{Capped} = require('backbone.projections')
 
 # A game that is running or will be starting.
 class Models.Game extends Models.BaseModel
@@ -19,6 +19,48 @@ class Models.Game extends Models.BaseModel
     @state().change(data._state or 'recruit')
     @players.reset data.players if data.players
     @rounds.reset data.rounds if data.rounds
+    @setupLatestRound()
+
+
+  setupLatestRound: ->
+    @latestRound = new Capped @rounds,
+      cap: 1
+      comparator: (r) -> -r.number
+    # when a new round is added, remove the listeners from the old one.
+    @listenTo @latestRound, 'add', (round) -> @addRoundListeners(round)
+    @listenTo @latestRound, 'reset', (rounds) -> @addRoundListeners(rounds.at(0))
+    @listenTo @latestRound, 'remove', (round) -> @removeRoundListeners(round)
+
+  addRoundListeners: (round) =>
+    @timer = App.State.getTimer()
+    console.log @timer
+    @listenTo @timer, 'end', ->
+      round.endPhase()
+
+    @roundTimer()
+
+    @listenTo round.state('votes.all'), 'arrive', =>
+      @roundTimerHurry()
+
+  removeRoundListeners: (round) =>
+    @stopListening(round.state('votes.all'), 'arrive')
+    @stopListening(round)
+    @stopListening(@timer)
+
+
+  # overall timer for entire phase is 30 seconds per player
+  # TODO: make it for living players only
+  roundTimer: ->
+    @timer.limit = @players.length * 30000
+    @timer.start()
+
+  # once we have all the votes for a round, the game speeds
+  # up leaving only 1 minute until the vote is counted (unless
+  # the round timer is shorter)
+  roundTimerHurry: ->
+    @timer.limit = 30000
+    @timer.reset()
+
 
   destroy: ->
     @players.invoke('destroy')
@@ -34,7 +76,7 @@ class Models.Game extends Models.BaseModel
   status: ->
     switch @state().path()
       when 'recruit.waiting' then "#{@players.length} players. #{7 - @players.length} more needed."
-      when 'recruit.ready' then "#{@players.length} players. Starting game."
+      when 'recruit.ready' then "Starting game with #{@players.length} players."
       when 'round.night.first' then "First night"
       when 'round.day.first' then "First day"
       when 'round.night' then "Nightime"
@@ -49,7 +91,6 @@ class Models.Game extends Models.BaseModel
   next: ->
     @state().change('victory.werewolves')
     @state().change('victory.villagers')
-    console.log 'emitting next', @state().path()
     @state().emit 'next'
 
   initState: -> state @,
@@ -97,6 +138,7 @@ class Models.Game extends Models.BaseModel
         enter: -> @addRound 'day'
         next: 'night'
         first: state
+          next: 'night'
 
       addRound: (phase) ->
         round =
