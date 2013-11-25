@@ -10,6 +10,10 @@ class Models.World extends Models.BaseModel
   url: 'world'
   initialize: (data = {}, opts = {}) ->
     @timer = new Models.Timer(data.timer or {})
+    # we need to attach the timer to the state module
+    # so the rest of the system being initialized can
+    # access it.
+    App.State.timer = @timer
     @sessions = new Models.Sessions(data.sessions or [])
     @game = new Models.Game(data.game or {})
     super
