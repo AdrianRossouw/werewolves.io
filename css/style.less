@@ -1,5 +1,5 @@
 @import "mixins.less";
-
+@import "lesshat.less";
 @import "reset.less";
 
 
@@ -243,8 +243,12 @@ video {
 .opponents {
   overflow: hidden;
 }
+
+.keyframes(~'breathe-head, 0% { transform: rotate(1deg) translate(0px, 0px)} 40% { transform: rotate(-3deg) translate(-2px, -1px)} 100% { transform: rotate(1deg) translate(0px, 0px)}');
+
 .player {
   img {
+    .animation(breathe-head 3000ms infinite both ease-in-out);
     width: 100%;
     height: auto;
   }

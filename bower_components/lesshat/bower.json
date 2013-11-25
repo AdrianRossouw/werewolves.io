@@ -1,0 +1,5 @@
+{
+  "name": "lesshat",
+  "version": "2.0.7",
+  "main": "./build/lesshat.less"
+}
