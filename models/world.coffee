@@ -68,8 +68,20 @@ class Models.World extends Models.BaseModel
 
     # there is an active game running
     gameplay:
-      enter: ->
+      next: 'cleanup'
+      arrive: ->
         @game.startGame()
+        @listenTo @game, 'game:end', => @state().go 'cleanup'
 
+      exit: ->
+        @stopListening @game, 'game:end'
     # the last game finished
-    cleanup: {}
+    cleanup:
+      arrive: ->
+        @listenTo @timer, 'end', => @state().go 'attract'
+        @timer.start()
+
+      exit: ->
+        @stopListening @timer, 'end'
+        @game.destroy()
+        @game = new Models.Game()

@@ -116,7 +116,7 @@ class Models.Game extends Models.BaseModel
 
     # victory conditions
     victory: state 'abstract',
-
+      enter: -> @trigger 'game:end'
       werewolves:
         admit:
           'round.*': ->

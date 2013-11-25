@@ -362,13 +362,51 @@ describe 'start application', ->
 
     describe 'villagers lynch the wolf', ->
       before ->
+        @spy = sinon.spy()
+        @game.once 'game:end', @spy
+        @round = @game.currentRound()
         @clock.tick 30000
 
       it 'should have killed a wolf', ->
         @wolf.state().path().should.equal 'dead'
+ 
+      it 'should have made it to complete.died', ->
+        @round.state().path().should.equal 'complete.died'
+
+      it 'should have change game to victory.villagers', ->
+        @game.state().path().should.equal 'victory.villagers'
+
+      it 'should have changed the world to cleanup', ->
+        @world.state().path().should.equal 'cleanup'
+
+      it 'should have started the timer again', ->
+        @timer.state().path().should.equal 'active'
+
+      it 'should have fired the game:end event', ->
+        @spy.called.should.be.ok
+
+      it 'should have given it 30 seconds before a new game', ->
+        @timer.remaining().should.equal 30000
+
+    describe 'ready for next game', ->
+      before ->
+        @clock.tick 30000
+        @newGame = State.world.game
+      
+      it 'should go to attract mode again', ->
+        @world.state().path().should.equal 'attract'
 
 
-describe 'cleanup', ->
+      it 'should have created an empty new game', ->
+        @newGame.should.not.equal @game
+
+      it 'should have no players or rounds yet', ->
+        @newGame.players.length.should.equal 0
+        @newGame.rounds.length.should.equal 0
+      it 'should be recruit.waiting state', ->
+        @newGame.state().path().should.equal 'recruit.waiting'
+
+describe 'cleanup test', ->
   before ->
     App.stop()
     @clock.restore()
