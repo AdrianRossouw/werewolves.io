@@ -94,9 +94,12 @@ class Models.Players extends Models.BaseCollection
   kill: (id) ->
     @get(id).kill()
 
-  aliveTotal: ->
+  active: ->
     isAlive = (p) -> p.state().isIn('alive')
-    @filter(isAlive).length
+    @filter(isAlive)
+
+  aliveTotal: ->
+    @active().length
 
   activeTotal: ->
     isActive = (p) ->

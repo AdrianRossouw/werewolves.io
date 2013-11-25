@@ -31,6 +31,9 @@ Socket.addInitializer (opts) ->
 
     @io.emit 'update', url, model if @isSession(url)
 
+  State.on 'choose', (id, target) =>
+    @io.emit 'round:action', target
+
   @io.on 'data', (event, url, args...) ->
     debug 'data', arguments
     if event is 'add'

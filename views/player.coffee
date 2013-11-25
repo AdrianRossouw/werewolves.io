@@ -10,8 +10,8 @@ class Views.Opponent extends Backbone.Marionette.ItemView
   className: 'player'
   template: require('../templates/player.jade')
 
-  events:
-    click: 'choose'
+  triggers:
+    'click .card': 'choose'
 
   modelEvents:
     'change': 'render'
@@ -28,8 +28,7 @@ class Views.Opponent extends Backbone.Marionette.ItemView
   deselected: ->
     @$el.removeClass 'selected'
 
-  choose: ->
-    @model.collection.select @model
+  onChoose: ->  @model.select()
 
 class Views.Opponents extends Backbone.Marionette.CollectionView
   id: 'opponents'

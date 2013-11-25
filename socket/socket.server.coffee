@@ -88,7 +88,7 @@ Socket.addInitializer (opts) ->
     # allow players to pick one of the currently active players.
     socket.on 'round:action', (target, cb=->) ->
       round = State.world.game.currentRound()
-      result = round.choose(state.id, target)
+      result = round?.choose(state.id, target)
       return cb(403, {message: 'denied'}) if not result
       return cb(null, 'ok')
 

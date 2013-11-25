@@ -52,12 +52,8 @@ State.load = (data) ->
 State.joinGame = ->
   @trigger 'game:join'
 
-###
-  @listenTo @world.game.players, 'select:one', (model) =>
-    id = @world.game.player.id
-    round = @world.game.rounds.last()
-    console.log id, model, arguments
-    round.choose id, 'lynch', model.id
-    console.log id, model
-###
+State.choose = (id, target) ->
+  @trigger 'choose', id, target
+
+
 module.exports = State

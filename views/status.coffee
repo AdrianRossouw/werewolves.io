@@ -24,6 +24,7 @@ class Views.Status extends Backbone.Marionette.ItemView
       when 'startup' then @gameStatus()
       when 'gameplay' then @gameStatus()
       when 'cleanup' then 'game ending'
+      else ''
 
   gameStatus: ->
     players = @model.game.players.length
@@ -37,6 +38,7 @@ class Views.Status extends Backbone.Marionette.ItemView
       when 'victory.werewolves' then "Werewolves win!"
       when 'victory.villagers' then "Villagers win!"
       when 'cleanup' then 'Game over!'
+      else ''
 
   playerStatus: ->
     player = State.getPlayer()
