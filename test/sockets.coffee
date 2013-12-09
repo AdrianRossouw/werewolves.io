@@ -448,18 +448,6 @@ describe 'socket can connect', ->
         wolf2.called.should.be.ok
         wolf2.args[0][2].role.should.equal 'villager'
 
-        ###
-        $state.players.each (p) ->
-          isMe = p.id is $state.id
-          isNotVillager = p.role is not 'villager'
-
-          if isMe and isNotVillager
-            $spy.wolfIoData.calledWith('change', p.getUrl()).should.be.ok
-            $spy.seerIoData.calledWith('change', p.getUrl()).should.not.be.ok
-          else
-            withArgs = $spy.wolfIoData.withArgs('change', p.getUrl())
-            withArgs.callCount.should.equal 0
-        ###
     describe 'first night', ->
 
 
