@@ -405,6 +405,7 @@ describe 'socket can connect', ->
     describe 'all players got roles', ->
       before ->
         $state.roles = $state.players.groupBy((p) -> p.role)
+        $state.wolf2 = $state.players.at(3)
 
       it 'handed out the right roles', ->
         $state.roles.werewolf.length.should.equal 2
@@ -413,16 +414,32 @@ describe 'socket can connect', ->
 
         $state.wolf.get('role').should.equal 'werewolf'
         $state.seer.get('role').should.equal 'seer'
+        $state.villager.get('role').should.equal 'villager'
 
       it 'triggered all the data events for role changes', ->
-        resetSpies()
         $state.players.each (p) ->
-          if p.role is not 'villager'
+          if p.role != 'villager'
             $spy.state.calledWith('data', 'change', p.getUrl()).should.be.ok
           else
             $spy.state.calledWith('data', 'change', p.getUrl()).should.not.be.ok
 
-      it 'only sent us our role. not everybodys', ->
+      it 'have sent the wolf his role', ->
+        $spy.wolfIoData.calledWith('change', $state.wolf.getUrl()).should.be.ok
+
+      it 'should not have sent the wolf the seer', ->
+        $spy.wolfIoData.calledWith('change', $state.seer.getUrl()).should.not.be.ok
+
+      it 'should have sent the wolf the other wolf', ->
+        $spy.wolfIoData.calledWith('change', $state.wolf2.getUrl()).should.be.ok
+
+      it 'have sent the seer his role', ->
+        $spy.seerIoData.calledWith('change', $state.seer.getUrl()).should.be.ok
+
+      it 'should not have sent the seer the wolves yet', ->
+        $spy.seerIoData.calledWith('change', $state.wolf.getUrl()).should.not.be.ok
+        $spy.seerIoData.calledWith('change', $state.wolf2.getUrl()).should.be.ok
+
+        ###
         $state.players.each (p) ->
           isMe = p.id is $state.id
           isNotVillager = p.role is not 'villager'
@@ -433,7 +450,7 @@ describe 'socket can connect', ->
           else
             withArgs = $spy.wolfIoData.withArgs('change', p.getUrl())
             withArgs.callCount.should.equal 0
-
+        ###
     describe 'first night', ->
 
 
