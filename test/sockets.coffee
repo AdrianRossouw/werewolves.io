@@ -1,6 +1,7 @@
 App      = require('../app/app.server.coffee')
 State    = require('../state')
 Socket   = require('../socket')
+Models   = require('../models')
 config   = require('../config')
 should   = require('should')
 express  = require('express')
@@ -25,12 +26,14 @@ $player = _(fixture.players).map (p) ->
 
 MemoryStore = express.session.MemoryStore
 
-
 setupSpies = ->
   $spy.state = sinon.spy State, 'trigger'
   $spy.socket = sinon.spy Socket, 'trigger'
   $spy.ioData = sinon.spy()
   $spy.ioState = sinon.spy()
+
+  $spy.ioData2 = sinon.spy()
+  $spy.ioState2 = sinon.spy()
 
   $spy.socket.withArgs('connection')
   $spy.state.withArgs('data', 'add', 'session')
@@ -265,10 +268,13 @@ describe 'socket can connect', ->
         'force new connection': true
 
       $io.socket2.on 'connect', -> done()
+      $io.socket2.on 'data', $spy.ioData2
+      $io.socket2.on 'state', $spy.ioState2
 
-    it 'should not give us that sockets session info', ->
+    it 'should not leak session info between sockets', ->
       $spy.ioState.called.should.not.be.ok
       $spy.ioData.called.should.not.be.ok
+
 
 
   describe 'adding another player to the game', ->
@@ -284,10 +290,15 @@ describe 'socket can connect', ->
     it 'should have fired the data add player event', ->
       $spy.state.calledWith('data', 'add', 'player', $state.player2.getUrl()).should.be.ok
 
-    it 'should have passed the data add to the socket', ->
+    it 'should have passed the data add to the first socket', ->
       $spy.ioData.calledWith('add', 'player', $state.player2.getUrl()).should.be.ok
       withArgs = $spy.ioData.withArgs('add', 'player', $state.player2.getUrl())
       $io.player2 = withArgs.firstCall.args[3]
+
+    it 'should have passed the data add to the second socket', ->
+      $spy.ioData2.calledWith('add', 'player', $state.player2.getUrl()).should.be.ok
+      withArgs = $spy.ioData2.withArgs('add', 'player', $state.player2.getUrl())
+
 
     it 'should have given the new player the right state', ->
       $io.player2._state.should.equal 'alive'
@@ -318,7 +329,7 @@ describe 'socket can connect', ->
       it 'should have changed the game state', ->
         $state.game.state().path().should.equal('recruit.ready')
 
-      it 'socket should have picked up 7 player add events', ->
+      it 'sockets should have picked up 7 player add events', ->
         $spy.ioData.withArgs('add', 'player').callCount.should.equal 7
 
       it 'socket should have gotten the game state change', ->
@@ -350,9 +361,7 @@ describe 'socket can connect', ->
       before ->
         $state.roles = $state.players.groupBy((p) -> p.role)
 
-
       it 'handed out the right roles', ->
-
         $state.roles.werewolf.length.should.equal 2
         $state.roles.seer.length.should.equal 1
         $state.roles.villager.length.should.equal 6
@@ -365,8 +374,6 @@ describe 'socket can connect', ->
           else
             $spy.state.calledWith('data', 'change', p.getUrl()).should.not.be.ok
 
-        $clock.tick(10000)
-
       it 'only sent us our role. not everybodys', ->
         $state.players.each (p) ->
           isMe = p.id is $state.id
@@ -374,9 +381,12 @@ describe 'socket can connect', ->
 
           if isMe and isNotVillager
             $spy.ioData.calledWith('change', p.getUrl()).should.be.ok
+            $spy.ioData2.calledWith('change', p.getUrl()).should.not.be.ok
           else
             withArgs = $spy.ioData.withArgs('change', p.getUrl())
             withArgs.callCount.should.equal 0
+
+    describe 'first night', ->
 
 
     after -> $clock.restore()
