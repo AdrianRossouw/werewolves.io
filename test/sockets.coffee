@@ -450,6 +450,7 @@ describe 'socket can connect', ->
 
     describe 'first night', ->
       before (done) ->
+        resetSpies()
         next = _.after 2, done
         $state.victim1 = $state.players.at(5)
 
@@ -461,6 +462,45 @@ describe 'socket can connect', ->
       it 'should have allowed everyone to vote', ->
         should.exist @round.actions
         @round.actions.length.should.equal 3
+        @round.state().path().should.equal('votes.all')
+
+      it 'should have signaled the round status to everyone', ->
+        $spy.wolfIoState.calledWith(@round.getUrl(), 'votes.some').should.be.ok
+        $spy.seerIoState.calledWith(@round.getUrl(), 'votes.some').should.be.ok
+        $spy.villagerIoState.calledWith(@round.getUrl(), 'votes.all').should.be.ok
+
+
+    describe 'night ends', ->
+      before ->
+        resetSpies()
+        @lastRound = $state.game.currentRound()
+        $clock.tick(30100)
+        @round = $state.game.currentRound()
+
+      it 'should have signaled the night end', ->
+        $spy.wolfIoState.calledWith(@lastRound.getUrl(), 'complete.died').should.be.ok
+
+      it 'should have signaled the death via state', ->
+        $spy.wolfIoState.calledWith($state.victim1.getUrl(), 'dead').should.be.ok
+        $spy.villagerIoState.calledWith($state.victim1.getUrl(), 'dead').should.be.ok
+
+      it 'should have set the death property on the last round', ->
+        withArgs = $spy.seerIoData.withArgs('change', @lastRound.getUrl())
+        withArgs.args[0][2].death.should.equal $state.victim1.id
+
+      it 'should have signalled the new day', ->
+        $spy.villagerIoState.calledWith($state.game.getUrl(), 'round.firstDay').should.be.ok
+        $spy.wolfIoData.calledWith('add', 'round', @round.getUrl()).should.be.ok
+
+      it 'should have told all sockets they are voting now', ->
+        $spy.wolfIoState.calledWith($state.wolf.getUrl(), 'alive.day.lynching').should.be.ok
+        $spy.seerIoState.calledWith($state.seer.getUrl(), 'alive.day.lynching').should.be.ok
+        $spy.villagerIoState.calledWith($state.villager.getUrl(), 'alive.day.lynching').should.be.ok
+
+      it 'should have passed them the state for all the others too', ->
+        match = sinon.match(/player\/.*$/)
+        $spy.wolfIoState.withArgs(match).callCount.should.equal(9)
+
 
 
     after ->
