@@ -47,11 +47,16 @@ setupSpies = ->
   $spy.state.withArgs('data', 'change')
   $spy.state.withArgs('state')
 
+  $stub.roles = sinon.stub Models, '_getRoles'
+  $stub.roles.returns $roles
+
+
 resetSpies = -> _($spy).invoke 'reset'
 
 restoreSpies = ->
   $spy.state.restore()
   $spy.socket.restore()
+  Models._getRoles.restore()
 
 # Configuration things we need to do
 socketio.transports = ["websocket"]
@@ -79,8 +84,6 @@ describe 'socket can connect', ->
 
   before (done) ->
     setupSpies()
-    $stub.roles = sinon.stub Models, '_getRoles'
-    $stub.roles.returns $roles
     $io.socket = socketio.connect(Socket.formatUrl(App.config()))
     $io.socket.on 'connect', -> done()
     $io.socket.on 'data', $spy.wolfIoData
@@ -403,7 +406,6 @@ describe 'socket can connect', ->
 
 
     after ->
-      Models._getRoles.restore()
       $clock.restore()
 
 
