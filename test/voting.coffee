@@ -1,6 +1,7 @@
 App = require('../app')
 State = require('../state')
 should = require('should')
+sinon   = require('sinon')
 
 fixture = require('./fixture/game1.coffee')
 
@@ -12,8 +13,12 @@ it 'should have returned a module', ->
 
 describe 'init state', ->
   before ->
+    @clock = sinon.useFakeTimers()
+    @data = fixture
+    @nextRound = @data.game.rounds.pop()
     State.start()
-    State.load(fixture)
+    State.load(@data)
+
 
   it 'did the loading of records', ->
     should.exist State.world
@@ -34,6 +39,7 @@ describe 'init state', ->
       @world = State.world
       @game = @world.game
       @currentRound = @game.currentRound()
+      @currentRound.choose a.id, a.target for a in @nextRound.actions
       @myRecord = @currentRound.actions.findWhere
         id: 'Edward'
         action: 'lynch'
@@ -101,5 +107,6 @@ describe 'init state', ->
       @currentRound.getDeath().should.equal 'Edward'
       
   after () ->
+    @clock.restore()
     State.stop()
 

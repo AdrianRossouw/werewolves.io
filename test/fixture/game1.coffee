@@ -1,14 +1,13 @@
 _ = require('underscore')
 
 game =
-  startTime: 1384027686714
   _state: 'round.day'
   players: []
-  timer: {
-    _state: 'inactive.stopped'
-    limit: '30000'
-  }
   rounds: []
+
+timer =
+  _state: 'inactive.stopped'
+  limit: '30000'
 
 game.players.push { id: 'Edward', name: 'Edward', role: 'werewolf' }
 game.players.push { id: 'Narrator', name: 'Narrator', role: 'villager' }
@@ -93,3 +92,4 @@ game.rounds.push
 
 module.exports =
   game: game
+  timer: timer
