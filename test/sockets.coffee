@@ -38,8 +38,8 @@ setupSpies = ->
   $spy.ioData = sinon.spy()
   $spy.ioState = sinon.spy()
 
-  $spy.ioData2 = sinon.spy()
-  $spy.ioState2 = sinon.spy()
+  $spy.seerIoData = sinon.spy()
+  $spy.seerIoState = sinon.spy()
 
   $spy.socket.withArgs('connection')
   $spy.state.withArgs('data', 'add', 'session')
@@ -221,28 +221,28 @@ describe 'socket can connect', ->
       $io.socket.emit 'game:join', (err, player) ->
         return done(err) if err
 
-        $io.player = player
-        $state.player = State.getPlayer($io.player.id)
-        $state.playerUrl = _.result $state.player, 'url'
+        $io.werewolf = player
+        $state.werewolf = State.getPlayer($io.werewolf.id)
+        $state.wolfUrl = _.result $state.werewolf, 'url'
         done()
     
     it 'should have passed back a player model', ->
-      should.exist $io.player
-      should.exist $state.player
+      should.exist $io.werewolf
+      should.exist $state.werewolf
 
     it 'should have right defaults', ->
-      $io.player.role.should.equal 'villager'
-      $io.player.name.should.be.ok
-      $io.player.occupation.should.be.ok
+      $io.werewolf.role.should.equal 'villager'
+      $io.werewolf.name.should.be.ok
+      $io.werewolf.occupation.should.be.ok
 
     it 'should have the same id as session', ->
-      $io.player.id.should.equal $state.session.id
-      $io.player.id.should.equal $io.session.id
-      $state.player.id.should.equal $io.player.id
+      $io.werewolf.id.should.equal $state.session.id
+      $io.werewolf.id.should.equal $io.session.id
+      $state.werewolf.id.should.equal $io.werewolf.id
  
     it 'should have an initial player state', ->
-      $io.player._state.should.equal 'alive'
-      $state.player.state().path().should.equal 'alive'
+      $io.werewolf._state.should.equal 'alive'
+      $state.werewolf.state().path().should.equal 'alive'
 
     it 'should have added us to the players list', ->
       $state.players.length.should.equal 1
@@ -254,7 +254,7 @@ describe 'socket can connect', ->
       $spy.state.calledWith('state', 'world', 'startup').should.be.ok
 
     it 'should have fired the data add player event', ->
-      $spy.state.calledWith('data', 'add', 'player', $state.playerUrl).should.be.ok
+      $spy.state.calledWith('data', 'add', 'player', $state.wolfUrl).should.be.ok
 
   describe 'can only join once', ->
     before (done) ->
@@ -270,12 +270,12 @@ describe 'socket can connect', ->
     before (done) ->
       resetSpies()
       url = Socket.formatUrl(App.config())
-      $io.socket2 = socketio.connect url,
+      $io.seerSocket = socketio.connect url,
         'force new connection': true
 
-      $io.socket2.on 'connect', -> done()
-      $io.socket2.on 'data', $spy.ioData2
-      $io.socket2.on 'state', $spy.ioState2
+      $io.seerSocket.on 'connect', -> done()
+      $io.seerSocket.on 'data', $spy.seerIoData
+      $io.seerSocket.on 'state', $spy.seerIoState
 
     it 'should not leak session info between sockets', ->
       $spy.ioState.called.should.not.be.ok
@@ -286,33 +286,33 @@ describe 'socket can connect', ->
   describe 'adding another player to the game', ->
     before (done) ->
       resetSpies()
-      $io.socket2.emit 'game:join', (err, player) ->
-        $state.player2 = State.getPlayer player.id
+      $io.seerSocket.emit 'game:join', (err, player) ->
+        $state.seer = State.getPlayer player.id
         done()
 
     it 'should have added them to the players list', ->
       $state.players.length.should.equal 2
 
     it 'should have fired the data add player event', ->
-      $spy.state.calledWith('data', 'add', 'player', $state.player2.getUrl()).should.be.ok
+      $spy.state.calledWith('data', 'add', 'player', $state.seer.getUrl()).should.be.ok
 
     it 'should have passed the data add to the first socket', ->
-      $spy.ioData.calledWith('add', 'player', $state.player2.getUrl()).should.be.ok
-      withArgs = $spy.ioData.withArgs('add', 'player', $state.player2.getUrl())
-      $io.player2 = withArgs.firstCall.args[3]
+      $spy.ioData.calledWith('add', 'player', $state.seer.getUrl()).should.be.ok
+      withArgs = $spy.ioData.withArgs('add', 'player', $state.seer.getUrl())
+      $io.seer = withArgs.firstCall.args[3]
 
     it 'should have passed the data add to the second socket', ->
-      $spy.ioData2.calledWith('add', 'player', $state.player2.getUrl()).should.be.ok
-      withArgs = $spy.ioData2.withArgs('add', 'player', $state.player2.getUrl())
+      $spy.seerIoData.calledWith('add', 'player', $state.seer.getUrl()).should.be.ok
+      withArgs = $spy.seerIoData.withArgs('add', 'player', $state.seer.getUrl())
 
 
     it 'should have given the new player the right state', ->
-      $io.player2._state.should.equal 'alive'
+      $io.seer._state.should.equal 'alive'
 
     it 'should have right defaults', ->
-      $io.player2.role.should.equal 'villager'
-      $io.player2.name.should.be.ok
-      $io.player2.occupation.should.be.ok
+      $io.seer.role.should.equal 'villager'
+      $io.seer.name.should.be.ok
+      $io.seer.occupation.should.be.ok
 
   # only this part uses fake timers
   describe 'starting the game', ->
@@ -389,7 +389,7 @@ describe 'socket can connect', ->
 
           if isMe and isNotVillager
             $spy.ioData.calledWith('change', p.getUrl()).should.be.ok
-            $spy.ioData2.calledWith('change', p.getUrl()).should.not.be.ok
+            $spy.seerIoData.calledWith('change', p.getUrl()).should.not.be.ok
           else
             withArgs = $spy.ioData.withArgs('change', p.getUrl())
             withArgs.callCount.should.equal 0
