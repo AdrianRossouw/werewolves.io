@@ -42,6 +42,9 @@ setupSpies = ->
   $spy.seerIoData = sinon.spy()
   $spy.seerIoState = sinon.spy()
 
+  $spy.villagerIoData = sinon.spy()
+  $spy.villagerIoState = sinon.spy()
+
   $spy.socket.withArgs('connection')
   $spy.state.withArgs('data', 'add', 'session')
   $spy.state.withArgs('data', 'change')
@@ -289,7 +292,7 @@ describe 'socket can connect', ->
 
 
 
-  describe 'adding another player to the game', ->
+  describe 'adding the seer to the game', ->
     before (done) ->
       resetSpies()
       $io.seerSocket.emit 'game:join', (err, player) ->
@@ -309,8 +312,6 @@ describe 'socket can connect', ->
 
     it 'should have passed the data add to the second socket', ->
       $spy.seerIoData.calledWith('add', 'player', $state.seer.getUrl()).should.be.ok
-      withArgs = $spy.seerIoData.withArgs('add', 'player', $state.seer.getUrl())
-
 
     it 'should have given the new player the right state', ->
       $io.seer._state.should.equal 'alive'
@@ -319,6 +320,37 @@ describe 'socket can connect', ->
       $io.seer.role.should.equal 'villager'
       $io.seer.name.should.be.ok
       $io.seer.occupation.should.be.ok
+
+  describe 'adding a villager to the game', ->
+    before (done) ->
+      resetSpies()
+      url = Socket.formatUrl(App.config())
+      $io.villagerSocket = socketio.connect url,
+        'force new connection': true
+
+      $io.villagerSocket.on 'data', $spy.villagerIoData
+      $io.villagerSocket.on 'state', $spy.villagerIoState
+
+      $io.villagerSocket.on 'connect', ->
+        $io.villagerSocket.emit 'game:join', (err, player) ->
+          $state.villager = State.getPlayer player.id
+          done()
+
+    it 'should have passed the data add to the other sockets', ->
+      $spy.wolfIoData.calledWith('add', 'player', $state.villager.getUrl()).should.be.ok
+      withArgs = $spy.wolfIoData.withArgs('add', 'player', $state.villager.getUrl())
+      $io.villager = withArgs.firstCall.args[3]
+
+    it 'should have passed the data add to the second socket', ->
+      $spy.villagerIoData.calledWith('add', 'player', $state.villager.getUrl()).should.be.ok
+
+    it 'should have given the new player the right state', ->
+      $io.villager._state.should.equal 'alive'
+
+    it 'should have right defaults', ->
+      $io.villager.role.should.equal 'villager'
+      $io.villager.name.should.be.ok
+      $io.villager.occupation.should.be.ok
 
   # only this part uses fake timers
   describe 'starting the game', ->
@@ -331,19 +363,19 @@ describe 'socket can connect', ->
     describe 'adding more players, 10 seconds apart', ->
       before ->
         resetSpies()
-        rest = _($player).rest()
+        rest = _($player).rest(2)
         _(rest).each (p) ->
           $clock.tick 10000
           $state.game.addPlayer p
    
-      it 'should have fired 7 player add data events', ->
-        $spy.state.withArgs('data', 'add', 'player').callCount.should.equal 7
+      it 'should have fired 6 player add data events', ->
+        $spy.state.withArgs('data', 'add', 'player').callCount.should.equal 6
 
       it 'should have changed the game state', ->
         $state.game.state().path().should.equal('recruit.ready')
 
-      it 'sockets should have picked up 7 player add events', ->
-        $spy.wolfIoData.withArgs('add', 'player').callCount.should.equal 7
+      it 'sockets should have picked up 6 player add events', ->
+        $spy.wolfIoData.withArgs('add', 'player').callCount.should.equal 6
 
       it 'socket should have gotten the game state change', ->
         $spy.wolfIoState.withArgs($state.game.getUrl(), 'recruit.ready').called.should.be.ok
