@@ -427,7 +427,11 @@ describe 'socket can connect', ->
         $spy.wolfIoData.calledWith('change', $state.wolf.getUrl()).should.be.ok
 
       it 'should not have sent the wolf the seer', ->
-        $spy.wolfIoData.calledWith('change', $state.seer.getUrl()).should.not.be.ok
+        withArgs = $spy.wolfIoData.withArgs('change', $state.seer.getUrl())
+        # TODO: fix this so it doesnt send any messages, or sends for everyone
+        withArgs.called.should.be.ok
+        withArgs.args[0][2].role.should.equal 'villager'
+
 
       it 'should have sent the wolf the other wolf', ->
         $spy.wolfIoData.calledWith('change', $state.wolf2.getUrl()).should.be.ok
@@ -436,8 +440,13 @@ describe 'socket can connect', ->
         $spy.seerIoData.calledWith('change', $state.seer.getUrl()).should.be.ok
 
       it 'should not have sent the seer the wolves yet', ->
-        $spy.seerIoData.calledWith('change', $state.wolf.getUrl()).should.not.be.ok
-        $spy.seerIoData.calledWith('change', $state.wolf2.getUrl()).should.be.ok
+        wolf1 = $spy.seerIoData.withArgs('change', $state.wolf.getUrl())
+        wolf1.called.should.be.ok
+        wolf1.args[0][2].role.should.equal 'villager'
+
+        wolf2 = $spy.seerIoData.withArgs('change', $state.wolf2.getUrl())
+        wolf2.called.should.be.ok
+        wolf2.args[0][2].role.should.equal 'villager'
 
         ###
         $state.players.each (p) ->

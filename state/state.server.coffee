@@ -28,21 +28,28 @@ Models.World::mask = (session) ->
 # hide roles from players, unless they were seen
 Models.Player::mask = (session) ->
   result = @toJSON()
-  
-  # dead roles are known
+
+  # dead players roles are known
   return result if @state().is('dead')
 
-  player = session.player
   # your own role is known
-  return result if session.id is player?.id
+  player = State.getPlayer(session.id)
+  return result if player?.id == @id
 
-  seen = player?.seen or []
+  # werewolves get other wolves
+  if player?.role == 'werewolf'
+    return result if @role == 'werewolf'
 
-  # seer could have seen you
-  if (player?.role != 'seer') and (@id not in seen)
-    result.role = 'villager'
+  # seers get anyone they have seen before.
+  if (player?.role == 'seer')
+    seen = player?.seen or []
+    return result if @id in seen
 
-  result
+  # villagers get nothing else.
+  result.role = 'villager'
+  return result
+
+
 
 Models.Sessions::mask = (session) ->
   _(@toJSON()).where id: session.id
