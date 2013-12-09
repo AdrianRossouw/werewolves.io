@@ -449,8 +449,18 @@ describe 'socket can connect', ->
         wolf2.args[0][2].role.should.equal 'villager'
 
     describe 'first night', ->
-      before ->
-        #_.after 3, done
+      before (done) ->
+        next = _.after 2, done
+        $state.victim1 = $state.players.at(5)
+
+        $io.wolfSocket.emit('round:action', $state.victim1.id, next)
+        $io.seerSocket.emit('round:action', $state.wolf2.id, next)
+        @round = $state.game.currentRound()
+        @round.choose($state.wolf2.id, $state.victim1.id)
+
+      it 'should have allowed everyone to vote', ->
+        should.exist @round.actions
+        @round.actions.length.should.equal 3
 
 
     after ->
