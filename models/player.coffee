@@ -5,7 +5,7 @@ debug    = require('debug')('werewolves:model:player')
 Backbone = require('backbone')
 Models   = App.module "Models"
 
-Models._getRoles = _getRoles = (numPlayers) ->
+Models._getRoles = (numPlayers) ->
   #werewolf, seer, villager
   # rules:
   # < 12: 2
@@ -25,7 +25,6 @@ Models._getRoles = _getRoles = (numPlayers) ->
 
   roles = _.shuffle roles
   roles
-
 
 # A player who has joined an active or upcoming
 # game.
@@ -88,7 +87,7 @@ class Models.Players extends Models.BaseCollection
   model: Models.Player
 
   assignRoles: (roles) ->
-    roles = _getRoles(@length)
+    roles = _.clone(Models._getRoles(@length))
     @each (player) ->
       player.set('role', roles.shift())
 
@@ -111,7 +110,6 @@ class Models.Players extends Models.BaseCollection
 
   startPhase: (phase) ->
     @invoke 'startPhase', phase
-
 
   aliveByRole: ->
     isAlive = (p) -> p.state().isIn('alive')

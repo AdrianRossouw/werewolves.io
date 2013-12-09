@@ -14,6 +14,7 @@ fixture  = require('./fixture/game1.coffee').game
 # we collect along the way
 
 $spy    = {}
+$stub   = {}
 $io     = {}
 $socket = {}
 $state  = {}
@@ -25,8 +26,8 @@ $player = _(fixture.players).map (p) ->
   _(p).pick('id', 'name')
 
 $roles = [
-  'werewolf', 'seer',
-  'villager', 'villager', 'villager',
+  'werewolf', 'seer', 'villager',
+  'werewolf', 'villager', 'villager',
   'villager', 'villager', 'villager'
 ]
 
@@ -35,8 +36,8 @@ MemoryStore = express.session.MemoryStore
 setupSpies = ->
   $spy.state = sinon.spy State, 'trigger'
   $spy.socket = sinon.spy Socket, 'trigger'
-  $spy.ioData = sinon.spy()
-  $spy.ioState = sinon.spy()
+  $spy.wolfIoData = sinon.spy()
+  $spy.wolfIoState = sinon.spy()
 
   $spy.seerIoData = sinon.spy()
   $spy.seerIoState = sinon.spy()
@@ -78,10 +79,12 @@ describe 'socket can connect', ->
 
   before (done) ->
     setupSpies()
+    $stub.roles = sinon.stub Models, '_getRoles'
+    $stub.roles.returns $roles
     $io.socket = socketio.connect(Socket.formatUrl(App.config()))
     $io.socket.on 'connect', -> done()
-    $io.socket.on 'data', $spy.ioData
-    $io.socket.on 'state', $spy.ioState
+    $io.socket.on 'data', $spy.wolfIoData
+    $io.socket.on 'state', $spy.wolfIoState
 
 
   it 'should have set up the environment', ->
@@ -186,10 +189,10 @@ describe 'socket can connect', ->
       $spy.state.calledWith('state', $state.url, 'online.sip').should.be.ok
 
     it 'IO should have caught a data change event', ->
-      $spy.ioData.calledWith('change', $state.url).should.be.ok
+      $spy.wolfIoData.calledWith('change', $state.url).should.be.ok
 
     it 'IO should have caught a state event', ->
-      $spy.ioState.calledWith($state.url, 'online.sip').should.be.ok
+      $spy.wolfIoState.calledWith($state.url, 'online.sip').should.be.ok
 
 
   describe 'upgrading session from server', ->
@@ -209,10 +212,10 @@ describe 'socket can connect', ->
       $spy.state.calledWith('state', $state.url, 'online.voice').should.be.ok
 
     it 'IO should have caught a data change event', ->
-      $spy.ioData.calledWith('change', $state.url).should.be.ok
+      $spy.wolfIoData.calledWith('change', $state.url).should.be.ok
 
     it 'IO should have caught a state event', ->
-      $spy.ioState.calledWith($state.url, 'online.sip').should.be.ok
+      $spy.wolfIoState.calledWith($state.url, 'online.sip').should.be.ok
 
 
 
@@ -221,28 +224,28 @@ describe 'socket can connect', ->
       $io.socket.emit 'game:join', (err, player) ->
         return done(err) if err
 
-        $io.werewolf = player
-        $state.werewolf = State.getPlayer($io.werewolf.id)
-        $state.wolfUrl = _.result $state.werewolf, 'url'
+        $io.wolf = player
+        $state.wolf = State.getPlayer($io.wolf.id)
+        $state.wolfUrl = _.result $state.wolf, 'url'
         done()
     
     it 'should have passed back a player model', ->
-      should.exist $io.werewolf
-      should.exist $state.werewolf
+      should.exist $io.wolf
+      should.exist $state.wolf
 
     it 'should have right defaults', ->
-      $io.werewolf.role.should.equal 'villager'
-      $io.werewolf.name.should.be.ok
-      $io.werewolf.occupation.should.be.ok
+      $io.wolf.role.should.equal 'villager'
+      $io.wolf.name.should.be.ok
+      $io.wolf.occupation.should.be.ok
 
     it 'should have the same id as session', ->
-      $io.werewolf.id.should.equal $state.session.id
-      $io.werewolf.id.should.equal $io.session.id
-      $state.werewolf.id.should.equal $io.werewolf.id
+      $io.wolf.id.should.equal $state.session.id
+      $io.wolf.id.should.equal $io.session.id
+      $state.wolf.id.should.equal $io.wolf.id
  
     it 'should have an initial player state', ->
-      $io.werewolf._state.should.equal 'alive'
-      $state.werewolf.state().path().should.equal 'alive'
+      $io.wolf._state.should.equal 'alive'
+      $state.wolf.state().path().should.equal 'alive'
 
     it 'should have added us to the players list', ->
       $state.players.length.should.equal 1
@@ -278,8 +281,8 @@ describe 'socket can connect', ->
       $io.seerSocket.on 'state', $spy.seerIoState
 
     it 'should not leak session info between sockets', ->
-      $spy.ioState.called.should.not.be.ok
-      $spy.ioData.called.should.not.be.ok
+      $spy.wolfIoState.called.should.not.be.ok
+      $spy.wolfIoData.called.should.not.be.ok
 
 
 
@@ -297,8 +300,8 @@ describe 'socket can connect', ->
       $spy.state.calledWith('data', 'add', 'player', $state.seer.getUrl()).should.be.ok
 
     it 'should have passed the data add to the first socket', ->
-      $spy.ioData.calledWith('add', 'player', $state.seer.getUrl()).should.be.ok
-      withArgs = $spy.ioData.withArgs('add', 'player', $state.seer.getUrl())
+      $spy.wolfIoData.calledWith('add', 'player', $state.seer.getUrl()).should.be.ok
+      withArgs = $spy.wolfIoData.withArgs('add', 'player', $state.seer.getUrl())
       $io.seer = withArgs.firstCall.args[3]
 
     it 'should have passed the data add to the second socket', ->
@@ -319,8 +322,7 @@ describe 'socket can connect', ->
 
     before ->
       resetSpies()
-      $spy.roleStub = sinon.stub Models, '_getRoles'
-      $spy.roleStub.returns $roles
+
       $clock = sinon.useFakeTimers()
    
     describe 'adding more players, 10 seconds apart', ->
@@ -338,10 +340,10 @@ describe 'socket can connect', ->
         $state.game.state().path().should.equal('recruit.ready')
 
       it 'sockets should have picked up 7 player add events', ->
-        $spy.ioData.withArgs('add', 'player').callCount.should.equal 7
+        $spy.wolfIoData.withArgs('add', 'player').callCount.should.equal 7
 
       it 'socket should have gotten the game state change', ->
-        $spy.ioState.withArgs($state.game.getUrl(), 'recruit.ready').called.should.be.ok
+        $spy.wolfIoState.withArgs($state.game.getUrl(), 'recruit.ready').called.should.be.ok
 
     describe 'game starts in another 30 seconds', ->
       before ->
@@ -374,6 +376,9 @@ describe 'socket can connect', ->
         $state.roles.seer.length.should.equal 1
         $state.roles.villager.length.should.equal 6
 
+        $state.wolf.get('role').should.equal 'werewolf'
+        $state.seer.get('role').should.equal 'seer'
+
       it 'triggered all the data events for role changes', ->
         resetSpies()
         $state.players.each (p) ->
@@ -388,10 +393,10 @@ describe 'socket can connect', ->
           isNotVillager = p.role is not 'villager'
 
           if isMe and isNotVillager
-            $spy.ioData.calledWith('change', p.getUrl()).should.be.ok
+            $spy.wolfIoData.calledWith('change', p.getUrl()).should.be.ok
             $spy.seerIoData.calledWith('change', p.getUrl()).should.not.be.ok
           else
-            withArgs = $spy.ioData.withArgs('change', p.getUrl())
+            withArgs = $spy.wolfIoData.withArgs('change', p.getUrl())
             withArgs.callCount.should.equal 0
 
     describe 'first night', ->
