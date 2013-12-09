@@ -24,6 +24,12 @@ $round  = _(fixture.rounds).pluck 'actions'
 $player = _(fixture.players).map (p) ->
   _(p).pick('id', 'name')
 
+$roles = [
+  'werewolf', 'seer',
+  'villager', 'villager', 'villager',
+  'villager', 'villager', 'villager'
+]
+
 MemoryStore = express.session.MemoryStore
 
 setupSpies = ->
@@ -313,6 +319,8 @@ describe 'socket can connect', ->
 
     before ->
       resetSpies()
+      $spy.roleStub = sinon.stub Models, '_getRoles'
+      $spy.roleStub.returns $roles
       $clock = sinon.useFakeTimers()
    
     describe 'adding more players, 10 seconds apart', ->
@@ -389,7 +397,9 @@ describe 'socket can connect', ->
     describe 'first night', ->
 
 
-    after -> $clock.restore()
+    after ->
+      Models._getRoles.restore()
+      $clock.restore()
 
 
 describe 'cleanup', ->
