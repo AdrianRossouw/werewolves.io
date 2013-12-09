@@ -205,8 +205,7 @@ describe 'socket can connect', ->
     it 'IO should have caught a state event', ->
       $spy.ioState.calledWith($state.url, 'online.sip').should.be.ok
 
-  describe.skip 'another socket connects to the server', ->
-    it 'should not give us that sockets session info', ->
+
 
   describe 'it should allow us to join the game', ->
     before (done) ->
@@ -248,7 +247,6 @@ describe 'socket can connect', ->
     it 'should have fired the data add player event', ->
       $spy.state.calledWith('data', 'add', 'player', $state.playerUrl).should.be.ok
 
-
   describe 'can only join once', ->
     before (done) ->
       resetSpies()
@@ -259,9 +257,26 @@ describe 'socket can connect', ->
     it 'shouldnt have added us again', ->
       $state.players.length.should.equal 1
 
+  describe 'another socket connects to the server', ->
+    before (done) ->
+      resetSpies()
+      url = Socket.formatUrl(App.config())
+      $io.socket2 = socketio.connect url,
+        'force new connection': true
+
+      $io.socket2.on 'connect', -> done()
+
+    it 'should not give us that sockets session info', ->
+      $spy.ioState.called.should.not.be.ok
+      $spy.ioData.called.should.not.be.ok
+
+
   describe 'adding another player to the game', ->
-    before ->
-      $state.player2 = $state.game.addPlayer _($player).first()
+    before (done) ->
+      resetSpies()
+      $io.socket2.emit 'game:join', (err, player) ->
+        $state.player2 = State.getPlayer player.id
+        done()
 
     it 'should have added them to the players list', ->
       $state.players.length.should.equal 2
