@@ -470,7 +470,7 @@ describe 'socket can connect', ->
         $spy.villagerIoState.calledWith(@round.getUrl(), 'votes.all').should.be.ok
 
 
-    describe 'night ends', ->
+    describe 'next day', ->
       before ->
         resetSpies()
         @lastRound = $state.game.currentRound()
@@ -501,7 +501,112 @@ describe 'socket can connect', ->
         match = sinon.match(/player\/.*$/)
         $spy.wolfIoState.withArgs(match).callCount.should.equal(9)
 
+    describe 'lynching', ->
+      before ->
+        resetSpies()
+        @round = $state.game.currentRound()
 
+        $state.players.each (p) =>
+          @round.choose p.id, $state.wolf2.id
+
+        $clock.tick(30100)
+
+      it 'should have signaled the day end', ->
+        $spy.wolfIoState.calledWith(@round.getUrl(), 'complete.died').should.be.ok
+
+
+      it 'should have killed the second wolf', ->
+        $spy.villagerIoState.calledWith($state.wolf2.getUrl(), 'dead').should.be.ok
+
+    describe 'next night', ->
+      before (done) ->
+        resetSpies()
+        @round = $state.game.currentRound()
+        next = _.after 2, ->
+          $clock.tick(30100)
+          done()
+        $io.wolfSocket.emit('round:action', $state.seer.id, next)
+        $io.seerSocket.emit('round:action', $state.wolf.id, next)
+
+      it 'should have signaled the day end', ->
+        $spy.wolfIoState.calledWith(@round.getUrl(), 'complete.died').should.be.ok
+
+      it 'should kill the seer', ->
+        $spy.villagerIoState.calledWith($state.seer.getUrl(), 'dead').should.be.ok
+
+    describe 'next day - nobody dies', ->
+      before ->
+        resetSpies()
+        @round = $state.game.currentRound()
+        $state.players.each (p) =>  @round.choose p.id, p.id
+        $clock.tick 30100
+
+      it 'should have signaled the day end', ->
+        $spy.wolfIoState.calledWith(@round.getUrl(), 'complete.survived').should.be.ok
+
+      it 'did not kill anyone', ->
+        match = sinon.match(/player\/.*$/)
+        $spy.villagerIoState.calledWithMatch(match, 'dead').should.not.be.ok
+
+    describe 'next night - wolf kills', ->
+      before ->
+        resetSpies()
+        @round = $state.game.currentRound()
+        $state.victim = $state.players.at(4)
+        @round.choose($state.wolf.id, $state.victim.id)
+        $clock.tick 30100
+
+      it 'should have signaled the day end', ->
+        $spy.wolfIoState.calledWith(@round.getUrl(), 'complete.died').should.be.ok
+
+      it 'should kill a villager', ->
+        $spy.villagerIoState.calledWith($state.victim.getUrl(), 'dead').should.be.ok
+
+    describe 'next day - lynch villager', ->
+      before ->
+        resetSpies()
+        @round = $state.game.currentRound()
+        $state.victim = $state.players.at(6)
+        $state.players.each (p) =>  @round.choose p.id, $state.victim.id
+        $clock.tick 30100
+
+      it 'should have signaled the day end', ->
+        $spy.wolfIoState.calledWith(@round.getUrl(), 'complete.died').should.be.ok
+
+      it 'should kill a villager', ->
+        $spy.villagerIoState.calledWith($state.victim.getUrl(), 'dead').should.be.ok
+
+    describe 'next night - wolf kills', ->
+      before ->
+        resetSpies()
+        @round = $state.game.currentRound()
+        $state.victim = $state.players.at(7)
+        @round.choose($state.wolf.id, $state.victim.id)
+        $clock.tick 30100
+
+      it 'should have signaled the day end', ->
+        $spy.wolfIoState.calledWith(@round.getUrl(), 'complete.died').should.be.ok
+
+      it 'should kill a villager', ->
+        $spy.villagerIoState.calledWith($state.victim.getUrl(), 'dead').should.be.ok
+
+
+    describe 'last day - lynch villager', ->
+      before ->
+        resetSpies()
+        @round = $state.game.currentRound()
+        $state.victim = $state.players.last()
+        $state.players.each (p) =>  @round.choose p.id, $state.victim.id
+        $clock.tick 30100
+
+      it 'should have signaled the day end', ->
+        $spy.wolfIoState.calledWith(@round.getUrl(), 'complete.died').should.be.ok
+
+      it 'should kill a villager', ->
+        $spy.villagerIoState.calledWith($state.victim.getUrl(), 'dead').should.be.ok
+
+      it 'should end the game', ->
+        $spy.wolfIoState.calledWith($state.game.getUrl(), 'victory.werewolves').should.be.ok
 
     after ->
       $clock.restore()

@@ -88,10 +88,10 @@ class Models.Round extends Models.BaseModel
           'some': -> @owner.actions.length == @owner.activeTotal
 
     complete: state 'conclusive',
+      enter: ->
+        @death = @getDeath()
       # there is a death
       died: state 'final',
-        arrive: ->
-          @death = @getDeath()
         admit:
           'votes.all': -> !!@owner.getDeath()
           'complete.*': false
