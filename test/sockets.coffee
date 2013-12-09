@@ -87,14 +87,14 @@ describe 'socket can connect', ->
 
   before (done) ->
     setupSpies()
-    $io.socket = socketio.connect(Socket.formatUrl(App.config()))
-    $io.socket.on 'connect', -> done()
-    $io.socket.on 'data', $spy.wolfIoData
-    $io.socket.on 'state', $spy.wolfIoState
+    $io.wolfSocket = socketio.connect(Socket.formatUrl(App.config()))
+    $io.wolfSocket.on 'connect', -> done()
+    $io.wolfSocket.on 'data', $spy.wolfIoData
+    $io.wolfSocket.on 'state', $spy.wolfIoState
 
 
   it 'should have set up the environment', ->
-    should.exist $io.socket
+    should.exist $io.wolfSocket
 
   it 'should have called the socket connection event', ->
     $spy.socket.calledWith('connection').should.be.ok
@@ -135,7 +135,7 @@ describe 'socket can connect', ->
       
   describe 'getting initial data from the server', ->
     before (done) ->
-      $io.socket.emit 'data', 'world', (err, data) =>
+      $io.wolfSocket.emit 'data', 'world', (err, data) =>
         return done(err) if err
         $io.world = data
         done()
@@ -164,7 +164,7 @@ describe 'socket can connect', ->
 
   describe 'getting session from server', ->
     before (done) ->
-      $io.socket.emit 'data', $state.url, (err, data) =>
+      $io.wolfSocket.emit 'data', $state.url, (err, data) =>
         return done(err) if err
         $io.session = data
         done()
@@ -179,7 +179,7 @@ describe 'socket can connect', ->
   describe 'upgrading session from client', ->
     before (done) ->
       $io.session.sip = 'test@test.com'
-      $io.socket.emit 'update', $state.url, $io.session, done
+      $io.wolfSocket.emit 'update', $state.url, $io.session, done
 
     it 'should have changed the server records', ->
       $server.session.sip.should.equal $io.session.sip
@@ -227,7 +227,7 @@ describe 'socket can connect', ->
 
   describe 'it should allow us to join the game', ->
     before (done) ->
-      $io.socket.emit 'game:join', (err, player) ->
+      $io.wolfSocket.emit 'game:join', (err, player) ->
         return done(err) if err
 
         $io.wolf = player
@@ -268,7 +268,7 @@ describe 'socket can connect', ->
   describe 'can only join once', ->
     before (done) ->
       resetSpies()
-      $io.socket.emit 'game:join', (err, player) ->
+      $io.wolfSocket.emit 'game:join', (err, player) ->
         return done(err) if err
         done()
 
@@ -449,6 +449,8 @@ describe 'socket can connect', ->
         wolf2.args[0][2].role.should.equal 'villager'
 
     describe 'first night', ->
+      before ->
+        #_.after 3, done
 
 
     after ->
