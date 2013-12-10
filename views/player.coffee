@@ -10,8 +10,13 @@ class Views.Opponent extends Backbone.Marionette.ItemView
   className: 'player'
   template: require('../templates/player.jade')
 
+  serializeData: ->
+    data = super
+    data.state = @model.state().path().replace('.', ' ')
+    data
+
   triggers:
-    'click .card': 'choose'
+    'click .alive.card': 'choose'
 
   modelEvents:
     'change': 'render'
@@ -42,6 +47,10 @@ class Views.Player extends Backbone.Marionette.ItemView
   modelEvents:
     'change': 'render'
 
+  serializeData: ->
+    data = super
+    data.state = @model.state().path().replace('.', ' ')
+    data
 
 class Views.PlayerLog extends Backbone.Marionette.ItemView
   className: 'playerlog'
