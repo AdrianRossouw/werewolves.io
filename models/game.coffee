@@ -36,7 +36,8 @@ class Models.Game extends Models.BaseModel
     before = @state().path()
     @go('victory.werewolves')
     @go('victory.villagers')
-    @state().emit 'next' if before is @state().path()
+    if App.server
+      @state().emit 'next' if before is @state().path()
 
   initState: -> state @,
     # This game hasn't started yet

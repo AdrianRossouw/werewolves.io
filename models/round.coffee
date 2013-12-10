@@ -48,9 +48,9 @@ class Models.Round extends Models.BaseModel
     delete @actions
 
   voteState: ->
-    @state('-> votes.none')
-    @state('-> votes.some')
-    @state('-> votes.all')
+    @go('votes.none')
+    @go('votes.some')
+    @go('votes.all')
 
   toJSON: ->
     obj = super
