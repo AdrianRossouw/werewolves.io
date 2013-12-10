@@ -16,7 +16,7 @@ class Views.Opponent extends Backbone.Marionette.ItemView
     data
 
   triggers:
-    'click .alive.card': 'choose'
+    'click .card': 'choose'
 
   modelEvents:
     'change': 'render'
