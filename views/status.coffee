@@ -16,9 +16,7 @@ class Views.Status extends Backbone.Marionette.ItemView
   template: =>
     @status()
   onShow: ->
-    @listenTo State, 'state', @render
-    @listenTo State, 'state', ->
-      debug('state show', arguments, @template(@))
+    @listenTo State, 'state data', @render
 
   status: ->
     switch @model.state().name

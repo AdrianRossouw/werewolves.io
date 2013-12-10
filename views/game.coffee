@@ -31,6 +31,7 @@ class Views.Game extends Backbone.Marionette.Layout
 
     @main.show new Views.Opponents
       collection: @opponentState
+      player: @playerState
 
     @showCurrentRound()
     @listenTo @gameState.rounds, 'add', @showCurrentRound

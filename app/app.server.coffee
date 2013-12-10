@@ -33,9 +33,6 @@ Wolfbots = require('../wolfbots')
 Wolfbots.start()
 
 
-
-
-
 # Set up express with some default things.
 App.addInitializer (opts) ->
   @trigger 'before:settings', opts

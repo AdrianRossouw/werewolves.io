@@ -40,7 +40,10 @@ Socket.addInitializer (opts) ->
       [mUrl, data] = args
       coll = State.models[url]
       if coll
-        coll.add data
+        record = coll.add data
+        record.state().change(data._state) if data._state
+        record.trigger('state', data._state)
+
         debug "added #{mUrl} to #{url}"
 
     if event is 'remove'
@@ -61,5 +64,6 @@ Socket.addInitializer (opts) ->
     debug "received new state #{state} for #{url}"
     model = State.models[url]
     model.state().change(state) if model
+    model.trigger('state', state) if model
 
 module.exports = Socket

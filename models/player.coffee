@@ -40,7 +40,7 @@ class Models.Player extends Models.BaseModel
     super
     @set('name', App.ns.name()) unless @name
     @set('occupation', App.ns.jobTitle()) unless @occupation
-    @set('role', 'villager') unless @villager
+    @set('role', 'villager') unless @role
     @state().change(data._state or 'alive')
     @publish()
 
