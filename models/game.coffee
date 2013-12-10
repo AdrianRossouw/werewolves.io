@@ -99,6 +99,7 @@ class Models.Game extends Models.BaseModel
         next: 'night'
 
       addRound: (phase) ->
+        return null if !App.server
         @players.startPhase(phase)
         round =
           id: App.ns.uuid()
