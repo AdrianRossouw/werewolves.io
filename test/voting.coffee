@@ -16,6 +16,7 @@ describe 'init state', ->
     @clock = sinon.useFakeTimers()
     @data = fixture
     @nextRound = @data.game.rounds.pop()
+    App.server = true
     State.start()
     State.load(@data)
 
