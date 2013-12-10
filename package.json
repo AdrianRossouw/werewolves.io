@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "ls -1 test/*.coffee  | xargs -n2 -J%  mocha -R spec %"
+    "test": "ls -1 test/*.coffee  | xargs -n2  mocha -R spec "
   },
   "repository": {
     "type": "git",
