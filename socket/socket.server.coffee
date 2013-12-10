@@ -44,6 +44,7 @@ Socket.addInitializer (opts) ->
           state.socket = false
 
 Socket.formatUrl = (opts) ->
+  return opts.socketUrl if opts.socketUrl
   url   = require('url')
   parts = _.pick(opts, 'hostname', 'protocol', 'port')
   _.defaults parts,

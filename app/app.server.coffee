@@ -100,6 +100,6 @@ App.addInitializer (opts) ->
 
 # figure out config for the current environment
 App.config = ->
-  _.extend({}, conf[env], conf.defaults)
+  _.defaults({}, conf[env], conf.defaults)
 
 module.exports = App
