@@ -44,9 +44,7 @@ class Views.Opponent extends Views.Player
     player = State.getPlayer()
     isIn = player.state().isIn.bind(player.state())
 
-    @model.select() if (isIn('lynching')
-                    or isIn('eating')
-                    or isIn('seeing'))
+    @model.select() if (isIn('lynching') or isIn('eating') or isIn('seeing'))
 
 class Views.Opponents extends Backbone.Marionette.CollectionView
   id: 'opponents'
