@@ -24,6 +24,7 @@
     "bootstrap": "~3.0.2",
     "jquery": "~2.0.3",
     "buzz": "~1.1.0",
-    "backbone.picky": "~0.2.0"
+    "backbone.picky": "~0.2.0",
+    "lesshat": "~2.0.11"
   }
 }

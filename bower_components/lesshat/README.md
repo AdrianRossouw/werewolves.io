@@ -11,12 +11,12 @@ README.md file is automatically generated.
 
 ---
 **[Download latest](https://raw.github.com/csshat/lesshat/master/build/lesshat.less)** (or **[Prefixed - great with Bootstrap](https://raw.github.com/csshat/lesshat/master/build/lesshat-prefixed.less)**) **|**
-**[Get Starded](#get-started) |**
+**[Get Started](#get-started) |**
 **[Contribute](#contribute) |**
 **[Documentation](#documentation) |**
 
 ---
-### Current version: v2.0.7 (2013-11-18)
+### Current version: v2.0.11 (2013-12-04)
 ## Intro
 Why LESS Hat? In August 2012, while we were developing and extending [CSS Hat](www.csshat.com) for LESS we needed universal mixins. Unfortunately, none of available were good enough that would satisfy our needs and that’s  why we created new custom ones on our own, which have become the most popular mixin library for the whole LESS CSS. 
 
@@ -44,7 +44,7 @@ The structure of this repo is:
 * **.gitignore** – is a list of files that git will ignore. I know you know that, but it's convention. 
 * **.travis.yml** – Configuration file for Travis CI. Travis CI is a hosted continuous integration service for the open source community.
 * **Gruntfle.js** – task runner. If you don't want to use lesshat-devstack ignore it.
-* **LICENCE** – self-explanatory
+* **LICENSE** – self-explanatory
 * **README-template.md** – If you want to edit readme, edit it in this file. README.md is generated.
 * **README.md** – please don't edit this file. Either edit README-template.md or documentation inside mixins/<mixin-name> folder.
 * **Bower** – is like NPM for frontend. NPM is like Gems for JavaScript. I could go on forever…
@@ -1759,7 +1759,8 @@ Resources: **[WebPlatform](http://docs.webplatform.org/wiki/css/atrules/@keyfram
 
 **Tips and tricks:**
 
-  Properties inside `<keyframes-definition>` are automatically prefixed, if it's needed.
+  Properties inside `<keyframes-definition>` are automatically prefixed, if it's needed.  
+  Keyframes mixin supports prefix configuration but it's computationally demanding so it is commented out and all prefixes are rendered. Feel free to uncommented that if you need it.
   
 **Example:**
 
@@ -2637,7 +2638,19 @@ Resources: **[WebPlatform](http://docs.webplatform.org/wiki/css/properties/trans
           time += 's';
         }
 
-  And also properties inside `transition` definition are automatically prefixed, if it is needed.
+  And also properties inside `transition` definition are automatically prefixed, if it is needed.  
+  **W3C property value is appending all prefixed values.**  
+  Why? Some browsers support W3C unprefixed properties, but values must be sometimes prefixed.
+  Let's consider this example:
+
+    div {
+    -webkit-transition: -webkit-filter .3s ease;
+    -moz-transition: -moz-filter .3s ease;
+    -o-transition: filter .3s ease;
+
+    // There is a problem! Webkit needs -webkit-filter property
+    transition: filter .3s ease;
+    }
 
 **Example:**
 
@@ -2748,20 +2761,32 @@ Resources: **[WebPlatform](http://docs.webplatform.org/wiki/css/properties/trans
 
 **Tips and tricks:**
 
-  And also properties inside `transition-property` definition are automatically prefixed, if it is needed.
+  And also properties inside `transition-property` definition are automatically prefixed, if it is needed.  
+  **W3C property value is appending all prefixed values.**  
+  Why? Some browsers support W3C unprefixed properties, but values must be sometimes prefixed.
+  Let's consider this example:
+
+    div {
+    -webkit-transition: -webkit-filter .3s ease;
+    -moz-transition: -moz-filter .3s ease;
+    -o-transition: filter .3s ease;
+
+    // There is a problem! Webkit needs -webkit-filter property
+    transition: filter .3s ease;
+    }
 
 **Example:**
 
     div {
-     .transition-property(box-shadow);
+     .transition-property(transform);
     }
     
     // Result
     div {
-     -webkit-transition-property: -webkit-box-shadow;
-     -moz-transition-property: -moz-box-shadow;
-     -o-transition-property: box-shadow;
-     transition-property: box-shadow;
+     -webkit-transition-property: -webkit-transform;
+     -moz-transition-property: -moz-transform;
+     -o-transition-property: -o-transform;
+     transition-property: -webkit-transform,-moz-transform,-o-transform,transform;
     }
 
 
