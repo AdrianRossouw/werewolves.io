@@ -52,16 +52,16 @@ class Models.Player extends Models.BaseModel
         startPhase: ->
       alive:
         kill: ->
-          @state('-> dead')
+          @go('dead')
 
         startPhase: (phase) ->
           debug('phase', @name, @state().path(), phase)
           if phase is 'day'
-            @state('-> lynching')
+            @go('lynching')
           else
-            @state('-> seeing')
-            @state('-> asleep')
-            @state('-> eating')
+            @go('seeing')
+            @go('asleep')
+            @go('eating')
 
         night: state 'abstract',
           # guards set on the states based on roles

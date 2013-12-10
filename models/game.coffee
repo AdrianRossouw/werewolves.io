@@ -59,7 +59,7 @@ class Models.Game extends Models.BaseModel
         player.seqId = @players.length + 1
         result = @players.add(player)
         @lastPlayerAdded = Date.now()
-        @state('-> ready')
+        @go('ready')
         result
 
       # assign the roles when we leave the recruit state

@@ -1,6 +1,6 @@
 # This test is built to confirm that the session
 # state machine behaves as expected.
-
+App      = require('../app')
 Models   = require('../models')
 should   = require('should')
 sinon    = require('sinon')
@@ -10,6 +10,7 @@ $json = {}
 
 describe 'timer model', ->
   before ->
+    App.server = true
     @clock = sinon.useFakeTimers()
     @timer = new Models.Timer()
 

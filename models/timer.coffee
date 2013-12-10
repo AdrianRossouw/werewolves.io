@@ -55,16 +55,16 @@ class Models.Timer extends Models.BaseModel
   ## section: methods
   # start the countdown.
   start: ->
-    @state().change('active')
+    @go('active')
 
   # pause the coundown where it is
-  pause: -> @state().change('paused')
+  pause: -> @go('paused')
 
   # resume the countdown (alias for start)
   resume: -> @start()
 
   # stop the countdown and reset to 0.
-  stop: -> @state().change('stopped')
+  stop: -> @go('stopped')
   
   # reset the countdown
   reset: ->

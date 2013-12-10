@@ -58,8 +58,8 @@ class Models.Round extends Models.BaseModel
     obj
 
   endPhase: ->
-    @state().change('complete.died')
-    @state().change('complete.survived')
+    @go('complete.died')
+    @go('complete.survived')
 
   initState: -> state @,
     votes: state 'abstract',
