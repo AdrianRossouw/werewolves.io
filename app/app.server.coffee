@@ -28,9 +28,9 @@ App.addInitializer (opts) ->
 Socket = require('../socket')
 Voice = require('../voice')
 
-if env is 'development'
-  Wolfbots = require('../wolfbots')
-  Wolfbots.start()
+#if env is 'development'
+Wolfbots = require('../wolfbots')
+Wolfbots.start()
 
 
 
