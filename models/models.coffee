@@ -19,6 +19,9 @@ class Models.BaseModel extends Backbone.Model
   destroy: ->
     @unpublish()
 
+  go: (to) ->
+    @state().go(to) if App.server
+
   initState: ->
   mask: (session) -> @toJSON()
   publish:  -> @

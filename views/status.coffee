@@ -1,6 +1,6 @@
 App = require('../app')
 State = require('../state')
-
+debug = require('debug')('werewolves:view:status')
 Backbone = require('backbone')
 
 Views = App.module "Views"
@@ -17,6 +17,8 @@ class Views.Status extends Backbone.Marionette.ItemView
     @status()
   onShow: ->
     @listenTo State, 'state', @render
+    @listenTo State, 'state', ->
+      debug('state show', arguments, @template(@))
 
   status: ->
     switch @model.state().name

@@ -31,12 +31,11 @@ class Models.Game extends Models.BaseModel
     obj.rounds = @rounds.toJSON()
     obj
 
-
   # try to go to the next phase
   next: ->
     before = @state().path()
-    @state().change('victory.werewolves')
-    @state().change('victory.villagers')
+    @go('victory.werewolves')
+    @go('victory.villagers')
     @state().emit 'next' if before is @state().path()
 
   initState: -> state @,

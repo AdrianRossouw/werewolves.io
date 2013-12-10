@@ -36,7 +36,7 @@ class Models.World extends Models.BaseModel
     obj
   startGame: =>
     @timer.stop()
-    @state('-> gameplay')
+    @go('gameplay')
 
   initState: -> state @,
     joinGame: (id) ->
@@ -47,7 +47,7 @@ class Models.World extends Models.BaseModel
       arrive: ->
         # on the first user added, go to startup
         @listenTo @game.players, 'add', ->
-          @state('-> startup')
+          @go('startup')
   
       exit: ->
         @stopListening @game.players, 'add'
@@ -75,14 +75,14 @@ class Models.World extends Models.BaseModel
       next: 'cleanup'
       arrive: ->
         @game.startGame()
-        @listenTo @game, 'game:end', => @state().go 'cleanup'
+        @listenTo @game, 'game:end', => @go 'cleanup'
 
       exit: ->
         @stopListening @game, 'game:end'
     # the last game finished
     cleanup:
       arrive: ->
-        @listenTo @timer, 'end', => @state().go 'attract'
+        @listenTo @timer, 'end', => @go 'attract'
         @timer.start()
 
       exit: ->
