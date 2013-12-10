@@ -50,7 +50,7 @@ module.exports = (grunt) ->
         options:
           sourceMap: true
           sourceMapFile: 'css/style.less'
-          paths: ["bower_components/lesshat/build/"]
+          paths: ["./bower_components/lesshat/build/"]
     browserify:
       vendor:
         files:

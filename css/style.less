@@ -1,5 +1,5 @@
 @import "mixins.less";
-//@import "lesshat.less";
+@import "lesshat.less";
 @import "reset.less";
 
 
@@ -24,14 +24,6 @@ h1, h2, h3, h4, h5, h6 {
   font-family: Georgia, "Adobe Garamond Pro", Times, serif;
   font-weight: normal;
 }
-
-/*
-.nko {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-*/
 
 .lobby {
   background-color: #556;
@@ -252,7 +244,16 @@ video {
     width: 100%;
     height: auto;
   }
+  .dead.card {
+    .pic {
+      .grayscale(80%);
+    }
+    color: #999;
+    cursor: default;
+    text-decoration: line-through;
+  }
 }
+
 
 .sidebar .player {
   .card {
@@ -528,10 +529,15 @@ strong {
 
 
 @baseColor: #c00;
+.spin-color(@n) {
+  @spun: spin(@baseColor, @n * 110);
+}
+
 .loop-through(@n) when (@n > 0) {
   .color-@{n} {
-     background-color: spin(@baseColor, @n * 110);
-     color: contrast(spin(@baseColor, @n * 110));
+    .spin-color(@n);
+    background-color: @spun;
+    color: contrast(@spun);
   }
   .loop-through(@n - 1);
 }
