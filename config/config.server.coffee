@@ -6,7 +6,7 @@ module.exports =
   production:
     host: "werewolves.io"
     port: 8000
-    socketUrl: 'https//werewolves.io'
+    socketUrl: 'https://werewolves.io'
   development:
     host: "localhost"
   staging:
