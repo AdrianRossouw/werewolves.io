@@ -93,13 +93,13 @@ class Models.Round extends Models.BaseModel
       # there is a death
       died: state 'final',
         admit:
-          'votes.all': -> !!@owner.getDeath()
+          'votes.*': -> !!@owner.getDeath()
           'complete.*': false
 
       # there wasn't one
       survived: state 'final',
         admit:
-          'votes.all': -> !@owner.getDeath()
+          'votes.*': -> !@owner.getDeath()
           'complete.*': false
 
   # transform an array of actions into a single
