@@ -121,6 +121,15 @@ class Models.Round extends Models.BaseModel
       .sortBy(sortByLength)
       .value()
 
+  # All active players who have not voted vote for themselves.
+  #
+  # In effect this is to help with people timing out.
+  #
+  # If the wolf doesn't pick someone to vote for they will
+  # vote themselves out of the game.
+  padVotes: (votes) ->
+
+
   # Do a simple transform on the votes to give us
   # the vote count instead of a list of people who
   # voted for them.
@@ -135,6 +144,8 @@ class Models.Round extends Models.BaseModel
   # otherwise returns false for draws.
   getDeath: ->
     votes    = @countVotes()
+    return false if !votes.length
+
     victim   =  _(votes).first()
     top      = _(votes).where votes: victim.votes
     return if top.length == 1 then victim.id else false
