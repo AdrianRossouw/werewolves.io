@@ -21,8 +21,7 @@ Marionette    = require("backbone.marionette")
 Backbone.$    = Marionette.$ = require("jquery")
 {Filtered}    = require("backbone.projections")
 
-alert env
-if env != 'development'
+if window.NODE_ENV != 'development'
   require('../voice')
 
 # Load up the state instances
