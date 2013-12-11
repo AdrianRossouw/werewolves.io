@@ -1,0 +1,68 @@
+html, body {
+  height: 100%;
+}
+
+html {
+  background-color: #fff;
+  color: #333;
+  font-family: "Helvetica Neue", helvetica, arial, sans-serif;
+}
+
+body {
+  font-size: 16px;
+  line-height: 22px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: Georgia, "Adobe Garamond Pro", Times, serif;
+  font-weight: normal;
+}
+
+.row {
+  overflow: hidden;
+}
+
+.row + .row {
+  margin-top: 40px;
+}
+
+.cell {
+  width: 33.3333333%;
+  float: left;
+  .box-sizing(border-box);
+  padding-right: 40px;
+
+  &.span2 {
+    width: 66.6666666%;
+  }
+}
+
+.logos {
+  overflow: hidden;
+}
+.logo {
+  float: left;
+  img {
+    display: block;
+    margin-right: 5px;
+  }
+}
+.logo + .logo {
+  margin-left: 10px;
+}
+
+video {
+  display: none
+}
+
+strong {
+  font-weight: bold;
+}
+
+.demo {
+  position: absolute;
+  padding: 20px;
+  button {
+    margin: 0;
+  }
+}

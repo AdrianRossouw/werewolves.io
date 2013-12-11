@@ -1,0 +1,68 @@
+.intro-wrap {
+  .flex(1);
+  .flex-display(flex);
+  .flex-direction(column);
+  .justify-content(center);
+  .align-items(center);
+
+  max-width: @maxWidth;
+  margin: 40px auto;
+  .box-sizing(border-box);
+  padding: @maxWidthPadding;
+}
+
+.header {
+  max-width: @maxWidth;
+  width: 100%;
+  margin: 0 auto;
+  .box-sizing(border-box);
+  padding: @maxWidthPadding;
+
+  img {
+    max-width: 600px;
+    height: auto;
+    float: left;
+  }
+}
+
+.game {
+  .flex-display(flex);
+  .align-items(stretch);
+  max-width: @maxWidth;
+  margin: 0 auto;
+  .box-sizing(border-box);
+  padding: @maxWidthPadding;
+  padding-bottom: 20px;
+  .box-sizing(border-box);
+
+  min-height: 100vh;
+  .align-content(stretch);
+}
+
+.main {
+  .flex(1);
+}
+
+.sidebar {
+  width: 260px;
+  background-color: #eee;
+  .box-sizing(border-box);
+  padding: 20px;
+}
+
+.opponents {
+  overflow: hidden;
+}
+
+.in-lobby {
+  .status, .game, .footer {
+    display: none;
+  }
+}
+.in-game .lobby {
+  min-height: 0;
+  height: auto;
+}
+.in-game .intro-wrap {
+  display: none;
+}

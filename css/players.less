@@ -1,0 +1,146 @@
+//.keyframes(~'breathe-head, 0% { transform: rotate(1deg) translate(0px, 0px)} 40% { transform: rotate(-3deg) translate(-2px, -1px)} 100% { transform: rotate(1deg) translate(0px, 0px)}');
+
+.player {
+  img {
+    //.animation(breathe-head 3000ms infinite both ease-in-out);
+    width: 100%;
+    height: auto;
+  }
+  .dead.card {
+    .pic {
+      .grayscale(80%);
+    }
+    color: #999;
+    cursor: default;
+    text-decoration: line-through;
+  }
+}
+
+.sidebar .player {
+  .card {
+    background-color: #fff;
+    border: 2px solid #aaa;
+    border-radius: 4px;
+    padding: 10px;
+
+    .pic {
+      margin-bottom: 10px;
+    }
+    .info {
+      background-color: #e6e6e6;
+      padding: 5px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .occupation {
+      font-size: 11px;
+    }
+  }
+}
+
+
+.opponents .player {
+  float: left;
+  width: 20%;
+  .box-sizing(border-box);
+  padding-right: 20px;
+  padding-top: 20px;
+
+  &.selected .card .pic {
+    // background-color: #fc0;
+    background-image: url("/assets/selected.svg");
+    background-position: top right;
+    background-repeat: no-repeat;
+  }
+  &.selected .card .info {
+    color: #fff;
+    background-color: #000;
+  }
+
+  .alive.card {
+    cursor: pointer;
+  }
+
+  .card {
+    background-color: #fff;
+    padding: 10px;
+    overflow: hidden;
+    box-shadow: 0px 3px 8px #efefef;
+    border: 1px solid #ccc;
+
+    .pic {
+      background-image: none;
+      
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    .info {
+      background-color: #e6e6e6;
+      padding: 5px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .name,
+    .occupation {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
+    }
+    .name {
+      font-size: 14px;
+    }
+
+    .occupation {
+      font-size: 11px;
+    }
+  }
+}
+
+.contestant {
+  .flex-display(flex);
+  margin-top: 20px;
+  .pic {
+    width: 75px;
+    height: 80px;
+    img {
+      width: 100%;
+    }
+  }
+}
+.votes {
+  .flex(1);
+  overflow: hidden;
+}
+
+.vote {
+  background-color: #fff;
+  width: 20px;
+  height: 20px;
+  float: left;
+  margin-left: 5px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+}
+
+@baseColor: #c00;
+.spin-color(@n) {
+  @spun: spin(@baseColor, @n * 110);
+}
+
+.loop-through(@n) when (@n > 0) {
+  .color-@{n} {
+    .spin-color(@n);
+    background-color: @spun;
+    color: contrast(@spun);
+  }
+  .loop-through(@n - 1);
+}
+.loop-through(16);
+
