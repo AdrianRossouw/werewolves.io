@@ -46,5 +46,6 @@ class Views.Game extends Backbone.Marionette.Layout
       model: @gameState.currentRound()
       players: @gameState.players
     
+    @gameState.players.deselect()
     @round.show new Views.Round(opts) if opts.model
 
