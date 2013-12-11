@@ -90,23 +90,23 @@ class Models.Round extends Models.BaseModel
 
     complete: state 'conclusive',
       enter: ->
-        @death = @getDeath()
+        @death = @getDeath(true)
       # there is a death
       died: state 'final',
         admit:
-          'votes.*': -> !!@owner.getDeath()
+          'votes.*': -> !!@owner.getDeath(true)
           'complete.*': false
 
       # there wasn't one
       survived: state 'final',
         admit:
-          'votes.*': -> !@owner.getDeath()
+          'votes.*': -> !@owner.getDeath(true)
           'complete.*': false
 
   # transform an array of actions into a single
   # array of votes (player id only), indexed
   # by who they voted for
-  getVotes: ->
+  getVotes: (padded = false) ->
     action = if @phase is 'day' then 'lynch' else 'eat'
     byTarget      = (a)    -> a.target
     sortByLength  = (a)    -> -a.votes?.length
@@ -114,7 +114,10 @@ class Models.Round extends Models.BaseModel
       id: k,
       votes: _(v).pluck('id')
 
-    @actions.chain()
+    actions = @padVotes() if padded
+    actions ?= @actions.models
+
+    _(actions).chain()
       .where(action: action)
       .groupBy(byTarget)
       .map(makeArray)
@@ -127,14 +130,29 @@ class Models.Round extends Models.BaseModel
   #
   # If the wolf doesn't pick someone to vote for they will
   # vote themselves out of the game.
-  padVotes: (votes) ->
+  padVotes: ->
+    filterFn = (p) -> p.voteAction()
+    mapFn = (p) =>
+      existing = @actions.get(p.id)
+      return existing if existing
+
+      result =
+        id: p.id
+        action: p.voteAction()
+        target: p.id
+
+    @players.chain()
+      .filter(filterFn)
+      .map(mapFn)
+      .value()
+    
 
 
   # Do a simple transform on the votes to give us
   # the vote count instead of a list of people who
   # voted for them.
-  countVotes: ->
-    _(@getVotes()).map (v) ->
+  countVotes: (padded = false) ->
+    _(@getVotes(padded)).map (v) ->
       _.extend {}, v, votes: v.votes.length
 
   # make sure there is only a single victim of the
@@ -142,8 +160,8 @@ class Models.Round extends Models.BaseModel
   #
   # returns the player id meant to die,
   # otherwise returns false for draws.
-  getDeath: ->
-    votes    = @countVotes()
+  getDeath: (padded = false) ->
+    votes    = @countVotes(padded)
     return false if !votes.length
 
     victim   =  _(votes).first()
