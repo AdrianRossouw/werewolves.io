@@ -141,12 +141,21 @@ class Models.Round extends Models.BaseModel
 
   # Pick a victim to kill.
   choose: (me, target, opts = {}) ->
-    player = State.getPlayer me
-    actionName = player.voteAction()
 
-    if !actionName
-      debug 'player cant do this'
-      return false
+    # has to have a valid player
+    player = State.getPlayer me
+    return false if !player
+
+    # has to have a valid action
+    actionName = player.voteAction()
+    return false if !actionName
+
+    # has to be a valid victim
+    victim = State.getPlayer target
+    return false if !victim
+
+    # no voting for the dead
+    return false if !victim.state().isIn('alive')
 
     debug 'choose', me, target, actionName
 

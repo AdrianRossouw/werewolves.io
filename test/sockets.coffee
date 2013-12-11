@@ -86,11 +86,18 @@ it 'should have started the state module', ->
 describe 'socket can connect', ->
 
   before (done) ->
+    next = _.after(2, done)
+
     setupSpies()
-    $io.wolfSocket = socketio.connect(Socket.formatUrl(App.config()))
-    $io.wolfSocket.on 'connect', -> done()
+    url = Socket.formatUrl(App.config())
+    $io.wolfSocket = socketio.connect(url)
     $io.wolfSocket.on 'data', $spy.wolfIoData
     $io.wolfSocket.on 'state', $spy.wolfIoState
+    $io.wolfSocket.on 'connect', -> next()
+
+    $io.spectateSocket = socketio.connect url,
+      'force new connection': true
+    $io.spectateSocket.on 'connect', -> next()
 
 
   it 'should have set up the environment', ->
@@ -468,6 +475,11 @@ describe 'socket can connect', ->
         $spy.wolfIoState.calledWith(@round.getUrl(), 'votes.some').should.be.ok
         $spy.seerIoState.calledWith(@round.getUrl(), 'votes.some').should.be.ok
         $spy.villagerIoState.calledWith(@round.getUrl(), 'votes.all').should.be.ok
+
+      it 'should not allow the spectator to vote', (done) ->
+        $io.spectateSocket.emit 'round:action', $state.wolf.id, (err, response) ->
+          err.should.equal 403
+          done()
 
 
     describe 'next day', ->
