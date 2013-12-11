@@ -35,6 +35,7 @@ class Models.Round extends Models.BaseModel
     super
     @state().change(data._state or 'votes.none')
     @publish()
+    @trigger('state', @state().path())
 
     @listenTo @timer, 'end', @endPhase
 

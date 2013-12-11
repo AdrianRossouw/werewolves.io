@@ -34,6 +34,7 @@ class Models.Timer extends Models.BaseModel
     @_remaining ?= data._remaining
     super
     @state().change(data._state or 'stopped')
+    @trigger('state', @state().path())
     @publish()
 
   toJSON: ->

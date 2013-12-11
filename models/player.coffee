@@ -43,6 +43,7 @@ class Models.Player extends Models.BaseModel
     @set('role', 'villager') unless @role
     @state().change(data._state or 'alive')
     @publish()
+    @trigger('state', @state().path())
 
   initState: ->
     state @,

@@ -34,7 +34,16 @@ class Views.Game extends Backbone.Marionette.Layout
       player: @playerState
 
     @showCurrentRound()
+    @makeActive()
     @listenTo @gameState.rounds, 'add', @showCurrentRound
+    @listenTo @playerState, 'state', @makeActive
+
+  makeActive: ->
+    isAsleep = @playerState.state().isIn 'asleep'
+    isDead = @playerState.state().is 'dead'
+    isSpectator = @worldState.session.id != @playerState.id
+
+    @$el.toggleClass('active', !isAsleep and !isDead and !isSpectator)
 
 
   # this is a no-op if there are no rounds yet.

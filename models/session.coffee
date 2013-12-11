@@ -27,6 +27,7 @@ class Models.Session extends Models.BaseModel
 
     @state().change(data._state or 'offline')
     @publish()
+    @trigger('state', @state().path())
     @listenTo @, 'change', @upgrade
 
     Object.defineProperty @, 'player',

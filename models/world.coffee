@@ -19,6 +19,7 @@ class Models.World extends Models.BaseModel
     super
     @state().change(data._state or 'attract')
     @publish()
+    @trigger('state', @state().path())
 
   destroy: ->
     @sessions.invoke 'destroy'
