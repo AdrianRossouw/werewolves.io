@@ -19,6 +19,7 @@ class Models.Game extends Models.BaseModel
     super
     @state().change(data._state or 'recruit')
     @publish()
+    @trigger('state', @state().path())
 
   destroy: ->
     @players.invoke('destroy')
