@@ -84,7 +84,7 @@ class Models.World extends Models.BaseModel
     cleanup:
       arrive: ->
         @listenTo @timer, 'end', => @go 'attract'
-        @timer.limit 30000
+        @timer.limit = 30000
         @timer.start()
 
       exit: ->
