@@ -162,7 +162,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
       callState = req.body.session.parameters.callState
 
       if callState is 'init'
-        tropo.call session.sip
+        tropo.call session?.sip
 
     # gather env variables to handle the call correctly
     playerId = session?.id
