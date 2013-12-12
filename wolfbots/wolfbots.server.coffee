@@ -1,8 +1,8 @@
-phantom = require("node-phantom")
 Debug = require('debug')
 debug = Debug('werewolves:wolfbots:server')
 _ = require('underscore')
 Backbone = require('backbone')
+socketio = require("socket.io-client")
 
 App = require('../app')
 State = App.module "State"
@@ -11,123 +11,91 @@ Socket = App.module "Socket"
 Wolfbots = App.module "Wolfbots",
   startWithParent: false
 
-#require('./bots.client.coffee')
 class Models.Bot extends Models.BaseModel
   urlRoot: 'wolfbot'
-  @attribute 'stateId'
 
   initialize: (data, options = {}) ->
-    @id = data.id if data.id
-    @publish()
     @options ?= options
-
-    @debug = Debug("werewolves:wolfbots:#{@id}")
-
-    @phantom = @start()
-    this
+    @socket = @start()
+    @
   
   stop: ->
-    debug 'phantom', 'stopping'
-    _.when(@phantom)
-      .done( (ph) -> ph.exit() )
-      .fail( (err, ph, msg) =>
-        debug("#{@id}:phantom:error", msg)
-        ph.exit() )
+    @io.disconnect()
  
   destroy: ->
     @stop()
     super
 
-  _start: (id) ->
-    Socket = App.Socket
-    
-    App.Socket.io.emit('wolfbot:debug', "hello, #{id} here.")
-    App.Wolfbots.start
-      id: id
-      mode: 'slave'
-
-
-
   start: (cb = ->) ->
-    debug "starting #{@id}"
-    url = Socket.formatUrl(App.config())
     dfr = new _.Deferred()
-
     dfr.then(cb.bind(null, null), cb)
 
-    id = @id
-    _start = @options.start or @_start
-    phantom.create (err, ph) ->
-      ph.createPage (err, page) ->
-        page.onError = (msg, trace) ->
-          msgStack = [msg]
-          if trace and trace.length
-            msgStack.push "TRACE:"
-            c.forEach (t) ->
-              msg = " -> #{t.file}: #{t.line} "
-              msg += " (in function \"#{t.function}\")" if t.function
-              msgStack.push msg
+    @io = socketio.connect Wolfbots.socketUrl, 'force new connection': true
+    @io.on 'connection', dfr.resolve.bind(dfr)
 
-          dfr.reject('error', ph, msgStack.join("\n"))
+    dfr.promise()
 
-        page.onCallback = (args) ->
-          [err, msg] = args
-          dfr.reject(err, ph, msg) if err
-          dfr.resolve(ph, msg) unless err
+  command: (command, args..., cb) ->
+    dfr = new _.Deferred()
+    dfr.then(cb.bind(null, null), cb)
 
-        page.onLoadFinished = (status) ->
-          err = status != 'success'
-          error = (err, result) ->
-          page.evaluateAsync _start, error, 0, id
+    emitFn = (err, result) ->
+      return dfr.reject(err) if err
+      return dfr.resolve(result)
 
-        page.open url, (err, status) ->
+    _.when(@socket).then =>
+      @io.emit(command, args..., emitFn)
 
-
-
-
-    return dfr.promise()
+    dfr.promise()
 
 class Models.Bots extends Models.BaseCollection
   url: 'wolfbot'
   model: Models.Bot
 
-Wolfbots.addInitializer (bots) ->
-  debug 'starting up'
-  State.bots ?= new Models.Bots []
+Wolfbots.addInitializer (config) ->
+  @bots = new Models.Bots []
+
+  @socketUrl = Socket.formatUrl(config)
 
   @listenTo Socket, 'connection', (socket, state) ->
-
-    # re-emit debug messages
-    socket.on 'wolfbot:debug', (args...) ->
-      debug args...
-      socket.volatile.emit('wolfbot:debug', args...)
-
-
-    socket.on 'wolfbot:command', (id, args..., cb = ->) ->
-      debug "wolfbot:command:#{id}", args
-      socket.broadcast.emit('wolfbot:command', id, args..., cb)
-
-    socket.on 'wolfbot:add', (id, cb = ->) ->
-      debug 'wolfbot:add', id
-
-      bot = State.bots.add
-        id: id
-
+    socket.on 'wolfbot:add', (id, cb = ->) =>
+      debug('add', id)
+      bot = @bots.add id: id
       cb(null, bot.id)
 
-    socket.on 'wolfbot:remove', (id, cb = ->) ->
-      debug 'wolfbot:remove', id
-      bot = State.bots.get(id)
+    socket.on 'wolfbot:remove', (id, cb = ->) =>
+      debug('remove', id)
+      bot = @bots.get(id)
+      @bots.remove(bot) if bot
+      cb(null)
 
-      bot.stop().then ->
-        State.bots.remove(bot)
-        cb(null)
+    socket.on 'wolfbot:command', (id, args..., cb = ->) =>
+      debug('command', id, args...)
+      bot = @bots.get(id)
+      return cb(403, {message: 'no such bot'}) if !bot
+      #bot.command(args..., cb)
+      cb(null)
+
+    socket.on 'wolfbot:command:all', (id, args..., cb = ->) =>
+      debug('command:all', id, args...)
+      bot = @bots.get(id)
+      return cb(403, {message: 'no such bot'}) if !bot
+      #bot.command(args..., cb)
+      cb(null)
+
+
 
     socket.on 'disconnect', ->
       socket.removeAllListeners('wolfbot:add')
       socket.removeAllListeners('wolfbot:remove')
-      socket.removeAllListeners('wolfbot:debug')
       socket.removeAllListeners('wolfbot:command')
 
+Wolfbots.addFinalizer ->
+  debug('finalizer')
+  @bots.destroy()
+  delete @bots
+  @stopListening()
+  @off()
 
 module.exports = Wolfbots
+

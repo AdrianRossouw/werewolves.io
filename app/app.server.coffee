@@ -24,14 +24,18 @@ App.addInitializer (opts) ->
   State.start(opts)
   @trigger 'state', opts
 
+# figure out config for the current environment
+App.config = ->
+  _.defaults({}, conf[env], conf.defaults)
+
 # Load up the web sockets
 Socket = require('../socket')
 Voice = require('../voice')
 
 #if env is 'development'
 Wolfbots = require('../wolfbots')
-Wolfbots.start()
-
+App.addInitializer (opts) ->
+  Wolfbots.start(opts)
 
 # Set up express with some default things.
 App.addInitializer (opts) ->
@@ -93,10 +97,5 @@ App.addInitializer (opts) ->
     server.close() if @_running
     @_running = false
     @trigger 'close'
-
-
-# figure out config for the current environment
-App.config = ->
-  _.defaults({}, conf[env], conf.defaults)
 
 module.exports = App
