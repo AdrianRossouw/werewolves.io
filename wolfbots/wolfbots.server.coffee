@@ -31,17 +31,17 @@ class Models.Bot extends Models.BaseModel
     dfr.then(cb.bind(null, null), cb)
 
     @io = socketio.connect Wolfbots.socketUrl, 'force new connection': true
-    @io.on 'connection', dfr.resolve.bind(dfr)
+    @io.on 'connect', dfr.resolve
 
     dfr.promise()
 
-  command: (command, args..., cb) ->
+  command: (command, args..., cb = ->) ->
     dfr = new _.Deferred()
     dfr.then(cb.bind(null, null), cb)
 
     emitFn = (err, result) ->
       return dfr.reject(err) if err
-      return dfr.resolve(result)
+      dfr.resolve(result)
 
     _.when(@socket).then =>
       @io.emit(command, args..., emitFn)
@@ -73,12 +73,11 @@ Wolfbots.addInitializer (config) ->
       debug('command', id, args...)
       bot = @bots.get(id)
       return cb(403, {message: 'no such bot'}) if !bot
-      #bot.command(args..., cb)
-      cb(null)
+      bot.command(args..., cb)
 
     socket.on 'wolfbot:command:all', (args..., cb = ->) =>
       debug('command:all', args...)
-      #bot.command(args..., cb)
+      _.when(@bots.invoke('command', args...)).then(cb.bind(null, null), cb)
       cb(null)
 
     socket.on 'disconnect', ->

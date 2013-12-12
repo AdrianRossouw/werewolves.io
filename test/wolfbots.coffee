@@ -49,18 +49,27 @@ before (done) ->
   App.Voice.startWithParent= false
 
   Socket.on 'connection', (socket, state) ->
-    $state.session = state
+    testHandler = (args..., cb = ->) -> cb(null)
 
     socket.on 'wolfbot:add', $spy.add
     socket.on 'wolfbot:remove', $spy.remove
     socket.on 'wolfbot:command', $spy.command
     socket.on 'wolfbot:command:all', $spy.commandAll
 
+    socket.on 'test:solo1', testHandler
+    socket.on 'test:solo2', testHandler
+    socket.on 'test:group1', testHandler
+    socket.on 'test:all', testHandler
+
     socket.on 'disconnect', ->
       socket.removeAllListeners 'wolfbot:add'
       socket.removeAllListeners 'wolfbot:remove'
       socket.removeAllListeners 'wolfbot:command'
       socket.removeAllListeners 'wolfbot:command:all'
+      socket.removeAllListeners 'test:solo1'
+      socket.removeAllListeners 'test:solo2'
+      socket.removeAllListeners 'test:group1'
+      socket.removeAllListeners 'test:all'
 
   App.once 'listen', ->
     $io.socket = socketio.connect socketUrl,'force new connection': true
@@ -114,7 +123,6 @@ describe 'cleanup', ->
     Socket.stop()
     App.stop()
     App.Voice.startWithParent= true
-
 
   it 'should have stopped the modules', ->
     State.should.have.property '_isInitialized', false
