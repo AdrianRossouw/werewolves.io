@@ -165,7 +165,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
         tropo.call session.sip
 
     # gather env variables to handle the call correctly
-    playerId = session.id
+    playerId = session?.id
     env =
       session: session
       world: State.world
@@ -174,6 +174,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
       player: State.getPlayer(playerId)
 
 
+    ###
     # play the right files for each phase
     if not env.world.state().isIn('gameplay')
       @intro tropo, env
@@ -190,7 +191,9 @@ Voice.listenTo App, 'before:routes', (opts) ->
     else if env.game.state().isIn('victory.villagers')
       @debug tropo, env
     else
-      @debug tropo, env
+    ###
+    Voice.intro tropo, env
+    @debug tropo, env
 
 
     res.send TropoJSON(tropo)
