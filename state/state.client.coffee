@@ -10,14 +10,11 @@ Backbone = require('backbone')
 Picky = require('backbone.picky')
 
 
-Models.Player::initialize = (data={}, opts={}) ->
-  @initState()
-  @publish()
+Models.Player::initClient = (data={}, opts={}) ->
   selectable = new Backbone.Picky.Selectable @
   _.extend @, selectable
 
-Models.Players::initialize = (data={}, opts={}) ->
-  @publish()
+Models.Players::initClient = (data={}, opts={}) ->
   selectOne = new Backbone.Picky.SingleSelect @
   _.extend @, selectOne
 

@@ -45,6 +45,7 @@ class Models.Player extends Models.BaseModel
     @state().change(data._state or 'alive')
     @trigger('state', @state().path())
     @publish()
+    @initClient(data, opts)
 
   toJSON: (session) ->
     result = super

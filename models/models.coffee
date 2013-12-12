@@ -23,6 +23,7 @@ class Models.BaseModel extends Backbone.Model
     @state().go(to) if App.server
 
   initState: ->
+  initClient: ->
   mask: (session) -> @toJSON(session)
   publish:  -> @
   getUrl: -> _.result @, 'url'
@@ -48,11 +49,13 @@ class Models.BaseCollection extends Backbone.Collection
   initialize: (records = {}, options = {}) ->
     super
     @publish()
+    @initClient()
 
   destroy: ->
     @unpublish()
 
   initState: ->
+  initClient: ->
   mask: (session) -> @toJSON(session)
   publish:  -> @
   unpublish:  -> @
