@@ -76,19 +76,16 @@ Wolfbots.addInitializer (config) ->
       #bot.command(args..., cb)
       cb(null)
 
-    socket.on 'wolfbot:command:all', (id, args..., cb = ->) =>
-      debug('command:all', id, args...)
-      bot = @bots.get(id)
-      return cb(403, {message: 'no such bot'}) if !bot
+    socket.on 'wolfbot:command:all', (args..., cb = ->) =>
+      debug('command:all', args...)
       #bot.command(args..., cb)
       cb(null)
-
-
 
     socket.on 'disconnect', ->
       socket.removeAllListeners('wolfbot:add')
       socket.removeAllListeners('wolfbot:remove')
       socket.removeAllListeners('wolfbot:command')
+      socket.removeAllListeners('wolfbot:command:all')
 
 Wolfbots.addFinalizer ->
   debug('finalizer')

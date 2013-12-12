@@ -33,6 +33,7 @@ setupSpies = ->
   $spy.remove = sinon.spy()
   $spy.add = sinon.spy()
   $spy.command = sinon.spy()
+  $spy.commandAll = sinon.spy()
 
 resetSpies = ->
   _($spy).invoke 'reset'
@@ -53,11 +54,13 @@ before (done) ->
     socket.on 'wolfbot:add', $spy.add
     socket.on 'wolfbot:remove', $spy.remove
     socket.on 'wolfbot:command', $spy.command
+    socket.on 'wolfbot:command:all', $spy.commandAll
 
     socket.on 'disconnect', ->
       socket.removeAllListeners 'wolfbot:add'
       socket.removeAllListeners 'wolfbot:remove'
       socket.removeAllListeners 'wolfbot:command'
+      socket.removeAllListeners 'wolfbot:command:all'
 
   App.once 'listen', ->
     $io.socket = socketio.connect socketUrl,'force new connection': true
@@ -80,7 +83,7 @@ describe 'spawning a master bot', ->
       .then(-> Client.command 'clyde', 'test:solo1', 'A', 'B')
       .then(-> Client.command ['clyde'], 'test:solo2', 'C', 'D')
       .then(-> Client.command ['blinky', 'sid'], 'test:group1', 'E')
-      #.then(-> Client.commandAll 'test:all')
+      .then(-> Client.commandAll 'test:all')
       .then(-> Client.remove 'blinky')
       .then(-> done())
 
@@ -99,11 +102,8 @@ describe 'spawning a master bot', ->
     $spy.command.withArgs('blinky', 'test:group1', 'E').called.should.be.ok
     $spy.command.withArgs('sid', 'test:group1', 'E').called.should.be.ok
 
-  it.skip 'should have triggered all commands', ->
-    $spy.command.withArgs('blinky', 'test:all').called.should.be.ok
-    $spy.command.withArgs('clyde', 'test:all').called.should.be.ok
-    $spy.command.withArgs('sid', 'test:all').called.should.be.ok
-    $spy.command.withArgs('gaylord', 'test:all').called.should.be.ok
+  it 'should have triggered all commands', ->
+    $spy.commandAll.withArgs('test:all').called.should.be.ok
 
 
 describe 'cleanup', ->
