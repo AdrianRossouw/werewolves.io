@@ -68,8 +68,8 @@ express              = require('express')
 
 MemoryStore = express.session.MemoryStore
 
-State.addInitializer (opts) ->
-  State.sessionStore = new MemoryStore(secret: opts.secret)
+State.addInitializer (opts = {}) ->
+  State.sessionStore = new MemoryStore(secret: opts.secret or 'secret')
 
   @world ?= new Models.World()
 

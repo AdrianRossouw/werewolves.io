@@ -93,6 +93,7 @@ describe 'spawning a master bot', ->
       .then(-> Client.command ['clyde'], 'test:solo2', 'C', 'D')
       .then(-> Client.command ['blinky', 'sid'], 'test:group1', 'E')
       .then(-> Client.commandAll 'test:all')
+      .then(-> Client.commandAll 'test:all', 'argument')
       .then(-> Client.remove 'blinky')
       .then(-> done())
 
@@ -113,6 +114,7 @@ describe 'spawning a master bot', ->
 
   it 'should have triggered all commands', ->
     $spy.commandAll.withArgs('test:all').called.should.be.ok
+    $spy.commandAll.withArgs('test:all', 'argument').called.should.be.ok
 
 
 describe 'cleanup', ->

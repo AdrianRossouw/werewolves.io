@@ -81,8 +81,7 @@ Wolfbots.addInitializer (config) ->
 
     socket.on 'wolfbot:command:all', (args..., cb = ->) =>
       debug('command:all', args...)
-      _.when(@bots.invoke('command', args...)).then(cb.bind(null, null), cb)
-      cb(null)
+      _.when(@bots.invoke('command', args..., ->)).then(cb.bind(null, null), cb)
 
     socket.on 'disconnect', ->
       socket.removeAllListeners('wolfbot:add')
