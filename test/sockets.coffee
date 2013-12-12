@@ -423,12 +423,9 @@ describe 'socket can connect', ->
         $state.seer.get('role').should.equal 'seer'
         $state.villager.get('role').should.equal 'villager'
 
-      it 'triggered all the data events for role changes', ->
+      it 'triggered all the data events for phase start', ->
         $state.players.each (p) ->
-          if p.role != 'villager'
-            $spy.state.calledWith('data', 'change', p.getUrl()).should.be.ok
-          else
-            $spy.state.calledWith('data', 'change', p.getUrl()).should.not.be.ok
+          $spy.state.calledWith('data', 'change', p.getUrl()).should.be.ok
 
       it 'have sent the wolf his role', ->
         $spy.wolfIoData.calledWith('change', $state.wolf.getUrl()).should.be.ok
@@ -488,6 +485,10 @@ describe 'socket can connect', ->
         @lastRound = $state.game.currentRound()
         $clock.tick(30100)
         @round = $state.game.currentRound()
+
+      it 'triggered all the data events for phase start', ->
+        $state.players.each (p) ->
+          $spy.state.calledWith('data', 'change', p.getUrl()).should.be.ok
 
       it 'should have signaled the night end', ->
         $spy.wolfIoState.calledWith(@lastRound.getUrl(), 'complete.died').should.be.ok

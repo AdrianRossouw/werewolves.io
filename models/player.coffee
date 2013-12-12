@@ -77,6 +77,7 @@ class Models.Player extends Models.BaseModel
       # player is dead, they don't get to take part in anything
       dead: state 'final',
         startPhase: ->
+          State.trigger('data', 'change', @getUrl(), @)
       alive:
         kill: ->
           @go('dead')
@@ -89,6 +90,10 @@ class Models.Player extends Models.BaseModel
             @go('seeing')
             @go('asleep')
             @go('eating')
+
+          # trigger a data event here, to sync with
+          # client.
+          State.trigger('data', 'change', @getUrl(), @)
 
         night: state 'abstract',
           # guards set on the states based on roles
