@@ -90,39 +90,19 @@ class Models.Round extends Models.BaseModel
 
     complete: state 'conclusive',
       enter: ->
-        @death = @getDeath(true)
+        @death = @getDeath()
       # there is a death
       died: state 'final',
         admit:
-          'votes.*': -> !!@owner.getDeath(true)
+          'votes.*': -> !!@owner.getDeath()
           'complete.*': false
 
       # there wasn't one
       survived: state 'final',
         admit:
-          'votes.*': -> !@owner.getDeath(true)
+          'votes.*': -> !@owner.getDeath()
           'complete.*': false
 
-  # transform an array of actions into a single
-  # array of votes (player id only), indexed
-  # by who they voted for
-  getVotes: (padded = false) ->
-    action = if @phase is 'day' then 'lynch' else 'eat'
-    byTarget      = (a)    -> a.target
-    sortByLength  = (a)    -> -a.votes?.length
-    makeArray     = (v, k) ->
-      id: k,
-      votes: _(v).pluck('id')
-
-    actions = @padVotes() if padded
-    actions ?= @actions.models
-
-    _(actions).chain()
-      .where(action: action)
-      .groupBy(byTarget)
-      .map(makeArray)
-      .sortBy(sortByLength)
-      .value()
 
   # All active players who have not voted vote for themselves.
   #
@@ -145,14 +125,36 @@ class Models.Round extends Models.BaseModel
       .filter(filterFn)
       .map(mapFn)
       .value()
-    
 
+  # transform an array of actions into a single
+  # array of votes (player id only), indexed
+  # by who they voted for
+  getVotes: ->
+    action = if @phase is 'day' then 'lynch' else 'eat'
+    byTarget      = (a)    -> a.target
+    sortByLength  = (a)    -> -a.votes?.length
+    makeArray     = (v, k) ->
+      id: k,
+      votes: _(v).pluck('id')
+
+    _(@_getActions()).chain()
+      .where(action: action)
+      .groupBy(byTarget)
+      .map(makeArray)
+      .sortBy(sortByLength)
+      .value()
+
+  # separate function to override on server
+  #
+  # allows us to pad the votes only on the server
+  _getActions: ->
+    @actions.models
 
   # Do a simple transform on the votes to give us
   # the vote count instead of a list of people who
   # voted for them.
-  countVotes: (padded = false) ->
-    _(@getVotes(padded)).map (v) ->
+  countVotes: ->
+    _(@getVotes()).map (v) ->
       _.extend {}, v, votes: v.votes.length
 
   # make sure there is only a single victim of the
@@ -160,8 +162,8 @@ class Models.Round extends Models.BaseModel
   #
   # returns the player id meant to die,
   # otherwise returns false for draws.
-  getDeath: (padded = false) ->
-    votes    = @countVotes(padded)
+  getDeath: () ->
+    votes    = @countVotes()
     return false if !votes.length
 
     victim   =  _(votes).first()

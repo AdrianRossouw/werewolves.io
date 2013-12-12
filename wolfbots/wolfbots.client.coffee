@@ -44,7 +44,6 @@ Client.addInitializer (conf = {}) ->
       dfr.promise()
 
   @commandAll = (args...) ->
-    console.log(args)
     dfr = new _.Deferred()
     @io 'wolfbot:command:all', args..., promiseFn(dfr)
     dfr.promise()

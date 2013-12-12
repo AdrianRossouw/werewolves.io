@@ -1,5 +1,6 @@
 App = require('../app')
 State = require('../state')
+Models = require('../models')
 should = require('should')
 sinon   = require('sinon')
 
@@ -16,6 +17,7 @@ describe 'init state', ->
     @clock = sinon.useFakeTimers()
     @data = fixture
     @nextRound = @data.game.rounds.pop()
+    @voteStub = sinon.stub Models.Round::, "_getActions", -> @actions.models
     App.server = true
     State.start()
     State.load(@data)
@@ -109,5 +111,6 @@ describe 'init state', ->
       
   after () ->
     @clock.restore()
+    @voteStub.restore()
     State.stop()
 

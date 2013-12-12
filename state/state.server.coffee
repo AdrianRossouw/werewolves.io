@@ -49,7 +49,7 @@ Models.Player::mask = (session) ->
   result.role = 'villager'
   return result
 
-
+Models.Round::_getActions = -> @padVotes()
 
 Models.Sessions::mask = (session) ->
   _(@toJSON()).where id: session.id
