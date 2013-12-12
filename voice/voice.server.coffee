@@ -192,8 +192,9 @@ Voice.listenTo App, 'before:routes', (opts) ->
       @debug tropo, env
     else
     ###
-    Voice.intro tropo, env
+    @intro tropo, env
     @debug tropo, env
+    @awake(tropo)
 
 
     res.send TropoJSON(tropo)
