@@ -22,11 +22,11 @@ class Models.World extends Models.BaseModel
     @trigger('state', @state().path())
 
   destroy: ->
-    @sessions.invoke 'destroy'
+    @off()
+    @sessions.destroy()
     @game.destroy()
     @timer.destroy()
     super
-    @stopListening()
 
   toJSON: ->
     obj = super

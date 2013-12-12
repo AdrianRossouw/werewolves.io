@@ -104,9 +104,9 @@ class Models.Players extends Models.BaseCollection
 
   activeTotal: ->
     isActive = (p) ->
-      state = p.state()
-      debug 'active state', p.id, state.isIn('alive'), state.isIn('asleep'), state.path()
-      state.isIn('alive') and not state.isIn('asleep')
+      _state = p.state()
+      debug 'active _state', p.id, _state.isIn('alive'), _state.isIn('asleep'), _state.path()
+      _state.isIn('alive') and not _state.isIn('asleep')
     @filter(isActive).length
 
   startPhase: (phase) ->

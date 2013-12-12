@@ -406,6 +406,17 @@ describe 'start application', ->
       it 'should be recruit.waiting state', ->
         @newGame.state().path().should.equal 'recruit.waiting'
 
+    describe 'join the next game', ->
+      before ->
+        @world.game.addPlayer id: 'Narrator'
+      
+      it 'should have added the playert', ->
+        @newGame.players.length.should.equal 1
+
+      it 'should be recruit.waiting state', ->
+        @newGame.state().path().should.equal 'recruit.waiting'
+
+
 describe 'cleanup test', ->
   before ->
     App.stop()
