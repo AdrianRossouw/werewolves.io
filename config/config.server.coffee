@@ -1,7 +1,7 @@
 module.exports =
   defaults:
     secret: 'sasquatch'
-    token: "22656a3121261b4db6509f369c89e7067a36eff14b6a1fd5f0438699b894211590fdca2edd37de9fd1fdd7e2"
+    token: "24622b46a3c1f64c80645d07062768367fed91bcdb53eaaa2fdfd03494d6fde2204b7d471db81435b209af71"
     port: 8000
   production:
     host: "werewolves.io"
