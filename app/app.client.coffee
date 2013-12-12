@@ -76,14 +76,17 @@ App.addInitializer ->
         @game.close()
         @$body.removeClass('in-game')
 
-      admit: ->
-        worldState = State.world?.state()?.path()?
-        myPlayer = State.world?.session?.player?
+      admit:
+        '*': ->
+          worldState = State.world?.state()?.path()?
+          myPlayer = State.world?.session?.player?
 
-        true if myPlayer or (worldState is 'gameplay')
+          true if myPlayer or (worldState is 'gameplay')
 
   @listenTo State, "state", (url, state) ->
-    @state().change 'game' if State.isWorld(url)
+    if State.isWorld(url)
+      return @state().change 'lobby' if state == 'attract'
+      @state().change 'game'
 
   # what happens when we join
   @listenTo State, "data", (event, coll, url, state) ->

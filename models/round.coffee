@@ -41,12 +41,12 @@ class Models.Round extends Models.BaseModel
 
   destroy: ->
     @stopListening @timer
+    @off()
 
     super
     delete @players
 
     @actions.destroy()
-    delete @actions
 
   voteState: ->
     @go('votes.none')

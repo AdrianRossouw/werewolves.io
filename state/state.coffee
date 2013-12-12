@@ -54,7 +54,7 @@ Models.BaseCollection::publish = ->
 
   State.models[url] = @
   debug "collection",  url
-  State.trigger('data', 'collection', url, @toJSON())
+  State.trigger('data', 'collection', url, @)
 
   addListener = (model) ->
     mUrl = _.result model, 'url'

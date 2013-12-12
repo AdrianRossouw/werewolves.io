@@ -43,13 +43,11 @@ class Models.Player extends Models.BaseModel
     @set('occupation', App.ns.jobTitle()) unless @occupation
     @set('role', 'villager') unless @role
     @state().change(data._state or 'alive')
-    @publish()
     @trigger('state', @state().path())
+    @publish()
 
   toJSON: (session) ->
     result = super
-    result._state = @state().path()
-
     return result unless session
 
     # dead players roles are known

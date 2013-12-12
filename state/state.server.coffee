@@ -18,8 +18,6 @@ Models.Sessions::touchSession = (sess) ->
   session.session = sess.id
   session
 
-
-
 Models.Round::_getActions = -> @padVotes()
 
 # Session middleware
