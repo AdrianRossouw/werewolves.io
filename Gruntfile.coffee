@@ -4,7 +4,7 @@ module.exports = (grunt) ->
   vPkg = [
     "jquery", "underscore", "state", "buzz", "phono", "backbone.projections",
     "backbone", "backbone.marionette", "url", "backbone.picky"
-    "socket.io-client", "underscore.deferred", "debug"
+    "socket.io-client", "underscore.deferred", "debug", "Nonsense"
   ]
 
   shim = ["jquery", "buzz", "phono", "backbone.picky"]

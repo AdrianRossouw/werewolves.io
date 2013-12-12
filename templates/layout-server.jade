@@ -18,6 +18,10 @@ html
     #game-area
 
     include footer-server
+  script.
+    window.NODE_ENV = '#{env}';
+    window.PLAYER_ID = '#{playerId}';
+    window.SOCKET_URL = '#{socketUrl}';
 
   if env === 'production'
     script(src='/js/app.min.js')
@@ -28,7 +32,4 @@ html
     script(src="//#{host}:35729/livereload.js")
 
   script.
-    window.NODE_ENV = '#{env}';
-    window.PLAYER_ID = '#{playerId}';
-    window.SOCKET_URL = '#{socketUrl}';
     App.bootstrap(!{world});

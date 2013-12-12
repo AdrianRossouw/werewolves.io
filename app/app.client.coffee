@@ -59,10 +59,8 @@ App.addInitializer ->
         players = State.world.game.players
         opponents = new Filtered(players, filter: (p) -> p.id != player.id)
        
-        # TODO: unbind when the player isnt active
         # TODO: dont send things when you are observing
         @listenTo players, 'select:one', (model) ->
-          console.log model
           State.choose(player.id, model.id)
 
         @game.show new Views.Game

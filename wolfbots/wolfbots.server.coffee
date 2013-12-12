@@ -30,12 +30,15 @@ class Models.Bot extends Models.BaseModel
     dfr = new _.Deferred()
     dfr.then(cb.bind(null, null), cb)
 
+
     @io = socketio.connect Wolfbots.socketUrl, 'force new connection': true
-    @io.on 'connect', dfr.resolve
+    @io.on 'connect', ->
+      dfr.resolve()
 
     dfr.promise()
 
   command: (command, args..., cb = ->) ->
+    debug "bot #{@id} command", command
     dfr = new _.Deferred()
     dfr.then(cb.bind(null, null), cb)
 
@@ -51,6 +54,7 @@ class Models.Bot extends Models.BaseModel
 class Models.Bots extends Models.BaseCollection
   url: 'wolfbot'
   model: Models.Bot
+  publish: ->
 
 Wolfbots.addInitializer (config) ->
   @bots = new Models.Bots []

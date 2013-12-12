@@ -59,16 +59,17 @@ Models.Session::mask = (session) ->
 
 # Session middleware
 express              = require('express')
-CouchStore           = require('connect-couchdb')(express)
-State.sessionStore   = new CouchStore
-  name: "werewolves-sessions"
-  reapInterval: 600000
-  compactInterval: 300000
-  setThrottle: 60000
+#CouchStore           = require('connect-couchdb')(express)
+#State.sessionStore   = new CouchStore
+#  name: "werewolves-sessions"
+#  reapInterval: 600000
+#  compactInterval: 300000
+#  setThrottle: 60000
 
-
+MemoryStore = express.session.MemoryStore
 
 State.addInitializer (opts) ->
+  State.sessionStore = new MemoryStore(secret: opts.secret)
 
   @world ?= new Models.World()
 
