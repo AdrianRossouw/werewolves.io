@@ -91,8 +91,8 @@ App.addInitializer ->
 
   $('.play-now').click -> App.State.joinGame()
 
-if env is 'development'
-  require('../wolfbots')
+#if env is 'development'
+require('../wolfbots')
 
 
 App.bootstrap = (world) ->
