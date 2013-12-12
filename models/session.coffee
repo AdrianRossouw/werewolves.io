@@ -37,6 +37,10 @@ class Models.Session extends Models.BaseModel
         player = value
         player
 
+  toJSON: (session) ->
+    json = super
+    return json if @id is session.id
+
   destroy: ->
     @stopListening @
 
@@ -74,4 +78,11 @@ class Models.Session extends Models.BaseModel
 class Models.Sessions extends Models.BaseCollection
   url: 'session'
   model: Models.Session
+  toJSON: (session) ->
+    json = super
+    return json unless session
 
+    _(json).chain()
+        .compact()
+        .where(id: session.id)
+        .value()

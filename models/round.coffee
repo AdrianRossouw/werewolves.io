@@ -53,9 +53,9 @@ class Models.Round extends Models.BaseModel
     @go('votes.some')
     @go('votes.all')
 
-  toJSON: ->
+  toJSON: (session) ->
     obj = super
-    obj.actions = @actions.toJSON()
+    obj.actions = @actions.toJSON(session)
     obj
 
   endPhase: ->

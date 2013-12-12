@@ -37,7 +37,7 @@ class Models.Timer extends Models.BaseModel
     @trigger('state', @state().path())
     @publish()
 
-  toJSON: ->
+  toJSON: (session) ->
     json = super
     json._state = @state().path()
     json

@@ -23,10 +23,10 @@ class Models.BaseModel extends Backbone.Model
     @state().go(to) if App.server
 
   initState: ->
-  mask: (session) -> @toJSON()
+  mask: (session) -> @toJSON(session)
   publish:  -> @
   getUrl: -> _.result @, 'url'
-  toJSON: ->
+  toJSON: (session) ->
     obj = super
     obj.id = @id if @id
     obj._state = @state().path() if @state
@@ -53,7 +53,7 @@ class Models.BaseCollection extends Backbone.Collection
     @unpublish()
 
   initState: ->
-  mask: (session) -> @toJSON()
+  mask: (session) -> @toJSON(session)
   publish:  -> @
   unpublish:  -> @
 

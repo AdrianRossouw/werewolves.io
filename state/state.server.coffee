@@ -18,13 +18,6 @@ Models.Sessions::touchSession = (sess) ->
   session.session = sess.id
   session
 
-
-# hide sensitive information from client
-Models.World::mask = (session) ->
-  world = _.pick(@toJSON(), 'id', 'game', '_state', 'sessions', 'timer')
-  world.sessions = _(world.sessions).where id: session.id
-  world
-
 # hide roles from players, unless they were seen
 Models.Player::mask = (session) ->
   result = @toJSON()
@@ -50,12 +43,6 @@ Models.Player::mask = (session) ->
   return result
 
 Models.Round::_getActions = -> @padVotes()
-
-Models.Sessions::mask = (session) ->
-  _(@toJSON()).where id: session.id
-
-Models.Session::mask = (session) ->
-  @toJSON() if @id is session.id
 
 # Session middleware
 express              = require('express')

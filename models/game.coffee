@@ -26,10 +26,10 @@ class Models.Game extends Models.BaseModel
     @rounds.invoke('destroy')
     super
 
-  toJSON: ->
+  toJSON: (session) ->
     obj = super
-    obj.players = @players.toJSON()
-    obj.rounds = @rounds.toJSON()
+    obj.players = @players.toJSON(session)
+    obj.rounds = @rounds.toJSON(session)
     obj
 
   # try to go to the next phase

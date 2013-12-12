@@ -28,13 +28,16 @@ class Models.World extends Models.BaseModel
     @timer.destroy()
     super
 
-  toJSON: ->
-    obj = super
-    obj._state = @state().path()
-    obj.sessions = @sessions.toJSON()
-    obj.timer = @timer.toJSON()
-    obj.game = @game.toJSON()
-    obj
+  toJSON: (session) ->
+    json = super
+    json._state = @state().path()
+    json.sessions = @sessions.toJSON(session)
+    json.timer = @timer.toJSON(session)
+    json.game = @game.toJSON(session)
+    return json unless session
+
+    _.pick json, 'id', 'game', '_state', 'sessions', 'timer'
+
   startGame: =>
     @timer.stop()
     @go('gameplay')
