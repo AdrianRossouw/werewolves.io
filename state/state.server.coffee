@@ -18,29 +18,7 @@ Models.Sessions::touchSession = (sess) ->
   session.session = sess.id
   session
 
-# hide roles from players, unless they were seen
-Models.Player::mask = (session) ->
-  result = @toJSON()
 
-  # dead players roles are known
-  return result if @state().is('dead')
-
-  # your own role is known
-  player = State.getPlayer(session.id)
-  return result if player?.id == @id
-
-  # werewolves get other wolves
-  if player?.role == 'werewolf'
-    return result if @role == 'werewolf'
-
-  # seers get anyone they have seen before.
-  if (player?.role == 'seer')
-    seen = player?.seen or []
-    return result if @id in seen
-
-  # villagers get nothing else.
-  result.role = 'villager'
-  return result
 
 Models.Round::_getActions = -> @padVotes()
 

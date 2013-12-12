@@ -4,6 +4,7 @@ _        = require('underscore')
 debug    = require('debug')('werewolves:model:player')
 Backbone = require('backbone')
 Models   = App.module "Models"
+State    = App.module "State"
 
 Models._getRoles = (numPlayers) ->
   #werewolf, seer, villager
@@ -44,6 +45,30 @@ class Models.Player extends Models.BaseModel
     @state().change(data._state or 'alive')
     @publish()
     @trigger('state', @state().path())
+
+  toJSON: (session) ->
+    result = super
+    return result unless session
+
+    # dead players roles are known
+    return result if @state().is('dead')
+
+    # your own role is known
+    player = State.getPlayer(session.id)
+    return result if player?.id == @id
+
+    # werewolves get other wolves
+    if player?.role == 'werewolf'
+      return result if @role == 'werewolf'
+
+    # seers get anyone they have seen before.
+    if (player?.role == 'seer')
+      seen = player?.seen or []
+      return result if @id in seen
+
+    # villagers get nothing else.
+    result.role = 'villager'
+    return result
 
   initState: ->
     state @,
