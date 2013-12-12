@@ -39,6 +39,8 @@ class Models.Session extends Models.BaseModel
 
   toJSON: (session) ->
     json = super
+    return json unless session
+
     return json if @id is session.id
 
   destroy: ->
