@@ -74,6 +74,7 @@ class Models.Player extends Models.BaseModel
   initState: ->
     state @,
       voteAction: -> false
+      initial: state 'initial'
       # player is dead, they don't get to take part in anything
       dead: state 'final',
         startPhase: ->
@@ -99,18 +100,18 @@ class Models.Player extends Models.BaseModel
           # guards set on the states based on roles
           asleep:
             admit:
-              'alive,alive.day.*': ->
+              'initial,alive,alive.day.*': ->
                 return true if !App.server
                 @owner.role is 'villager'
           seeing:
             admit:
-              'alive,alive.day.*': ->
+              'initial,alive,alive.day.*': ->
                 return true if !App.server
                 @owner.role is 'seer'
             voteAction: -> 'see'
           eating:
             admit:
-              'alive,alive.day.*': ->
+              'initial,alive,alive.day.*': ->
                 return true if !App.server
                 @owner.role is 'werewolf'
             voteAction: -> 'eat'

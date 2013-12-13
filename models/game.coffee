@@ -41,6 +41,7 @@ class Models.Game extends Models.BaseModel
       @state().emit 'next' if before is @state().path()
 
   initState: -> state @,
+    initial: state 'initial'
     # This game hasn't started yet
     recruit: state 'abstract',
       
@@ -50,7 +51,7 @@ class Models.Game extends Models.BaseModel
         next: 'round.firstNight'
         admit:
           # only admit state changes from .waiting when ...
-          waiting: ->
+          'initial, waiting': ->
             return true if !App.server
             @owner.players.length >= 7
 
@@ -118,13 +119,13 @@ class Models.Game extends Models.BaseModel
       enter: -> @trigger 'game:end'
       werewolves:
         admit:
-          'round.*': ->
+          'initial, round.*': ->
             return true if !App.server
             aliveCount = @owner.players.aliveByRole()
             aliveCount.werewolf >= aliveCount.villager
       villagers:
         admit:
-          'round.*': ->
+          'initial, round.*': ->
             return true if !App.server
             !@owner.players.aliveByRole().werewolf
 

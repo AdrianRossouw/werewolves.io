@@ -93,4 +93,5 @@ class Models.World extends Models.BaseModel
       exit: ->
         @stopListening @timer, 'end'
         @game.destroy()
+        @game.clear()
         @game = new Models.Game()
