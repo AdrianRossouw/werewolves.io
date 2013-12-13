@@ -23,6 +23,13 @@ class Backbone.Marionette.ItemView extends Backbone.Marionette.ItemView
     json.options    ?= @options
     json
 
+class Backbone.Marionette.Layout extends Backbone.Marionette.Layout
+  serializeData: ->
+    json = super
+    json.model      ?= @model
+    json.collection ?= @collection
+    json.options    ?= @options
+    json
 
 require('./status.coffee')
 require('./timer.coffee')
