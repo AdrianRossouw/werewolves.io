@@ -34,14 +34,14 @@ Socket.addInitializer (opts) ->
 
     @sio = new SessionIo @io, State.sessionStore, cookieParser
     @sio.on 'connection', (err, socket, sess) =>
-      state = State.world.sessions.touchSocket socket, sess
-      @trigger 'connection', socket, state
+      _state = State.world.sessions.touchSocket socket, sess
+      @trigger 'connection', socket, _state
 
       socket.on 'disconnect', =>
-        if state.socket is socket.id
-          state.voice = false
-          state.sip = false
-          state.socket = false
+        if _state.socket is socket.id
+          _state.voice = false
+          _state.sip = false
+          _state.socket = false
 
 Socket.formatUrl = (opts) ->
   return opts.socketUrl if opts.socketUrl

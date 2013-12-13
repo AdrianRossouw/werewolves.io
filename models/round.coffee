@@ -96,6 +96,7 @@ class Models.Round extends Models.BaseModel
 
     complete: state 'conclusive',
       enter: ->
+        return true if !App.server
         @getDream()
         @death = @getDeath()
 
