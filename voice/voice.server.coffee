@@ -67,7 +67,7 @@ Voice.asleep = (tropo) ->
   tropo.conference("asleep", true, "asleep", false, null, '#', 'exit')
 
 Voice.awake = (tropo) ->
-  tropo.conference("awake", null, "awake", false, null, '#', 'exit')
+  tropo.conference "awake", null, "awake", false, null, '#'#, 'exit'
 
 Voice.spectate = (tropo) ->
   tropo.conference("awake", true, "awake", false, null, '#', 'exit')
@@ -153,11 +153,8 @@ Voice.listenTo App, 'before:routes', (opts) ->
     tropo = new TropoWebAPI()
 
     # when the session get the exit signal, it will call back
-    tropo.on 'exit', null, 'voice'
-    env = {}
-    @intro tropo, env
+    #tropo.on 'exit', null, 'voice'
 
-    return res.send TropoJSON(tropo)
 
     # session.voice maps to this body property from tropo's backend
     session = State.world.sessions.findVoice(req.body?.session?.id)
@@ -197,7 +194,9 @@ Voice.listenTo App, 'before:routes', (opts) ->
       @debug tropo, env
     else
     ###
+    @intro tropo
 
+    return res.send TropoJSON(tropo)
 
 Voice.addFinalizer (opts) ->
   @stopListening()
