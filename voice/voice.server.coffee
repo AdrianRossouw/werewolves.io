@@ -81,38 +81,41 @@ Voice.intro = (tropo, env) ->
 # To be played on the first night
 Voice.firstNight = (tropo, env) ->
   # per role
-  if (env.player.role is 'villager')
-    @audio tropo 'VillagerTutorial'
-  else if (env.player.role is 'werewolf')
-    @audio tropo 'VillagerTutorial'
-  else if (env.player.role is 'seer')
-    @audio tropo 'SeerTutorial'
+  switch env?.player?.role
+    when 'villager'
+      @audio tropo, 'VillagerTutorial'
+    when 'werewolf'
+      @audio tropo, 'VillagerTutorial'
+    when 'seer'
+      @audio tropo, 'SeerTutorial'
 
   # for everyone
-  @audio tropo 'FirstNight'
+  @audio tropo, 'FirstNight'
 
   # for specific roles again
-  if env.player.role is 'werewolf'
-    @audio tropo 'FirstNightWerewolves'
-  else if env.player.role is 'seer'
-    @audio tropo 'FirstNightSeer'
+  switch env?.player?.role
+    when 'villager'
+      @audio tropo, 'FirstNightWerewolves'
+    when 'seer'
+      @audio tropo, 'FirstNightSeer'
+
   @awakeByRole tropo, env.player
 
 # first day
 Voice.firstDay = (tropo, env) ->
-  @audio tropo 'FirstDay'
+  @audio tropo, 'FirstDay'
   @awake(tropo)
 
 # each subsequent night
 
 Voice.night = (tropo, env) ->
-  @audio tropo 'NextNight1'
+  @audio tropo, 'NextNight1'
   @awakeByRole(tropo, env.player)
 
 # each subsequent day
 # TODO: add files for who died.
 Voice.day = (tropo, env) ->
-  @audio tropo 'NextDay1'
+  @audio tropo, 'NextDay1'
   @awake tropo
 
 # for specific roles
@@ -153,7 +156,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
     tropo = new TropoWebAPI()
 
     # when the session get the exit signal, it will call back
-    #tropo.on 'exit', null, 'voice'
+    tropo.on 'exit', null, 'voice'
 
 
     # session.voice maps to this body property from tropo's backend
@@ -176,7 +179,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
       player: State.getPlayer(playerId)
 
 
-    ###
+    
     # play the right files for each phase
     if not env.world.state().isIn('gameplay')
       @intro tropo, env
@@ -193,8 +196,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
     else if env.game.state().isIn('victory.villagers')
       @debug tropo, env
     else
-    ###
-    @intro tropo
+      @debug tropo
 
     return res.send TropoJSON(tropo)
 
