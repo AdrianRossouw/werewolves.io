@@ -29,32 +29,34 @@
   }
 }
 
-.game {
-  .flex-display(flex);
-  .align-items(stretch);
-  max-width: @maxWidth;
-  margin: 0 auto;
-  .box-sizing(border-box);
-  padding: @maxWidthPadding;
-  padding-bottom: 20px;
+#game-area {
+  .game {
+    .flex-display(flex);
+    .align-items(stretch);
+    max-width: @maxWidth;
+    margin: 0 auto;
+    .box-sizing(border-box);
+    padding: @maxWidthPadding;
+    padding-bottom: 20px;
 
-  min-height: 100vh;
-  .align-content(stretch);
-}
+    min-height: 100vh;
+    .align-content(stretch);
+  }
 
-.main {
-  .flex(1);
-}
+  .main {
+    .flex(1);
+  }
 
-.sidebar {
-  width: 260px;
-  background-color: #eee;
-  .box-sizing(border-box);
-  padding: 20px;
-}
+  .sidebar {
+    width: 260px;
+    background-color: #eee;
+    .box-sizing(border-box);
+    padding: 20px;
+  }
 
-.opponents {
-  overflow: hidden;
+  .opponents {
+    overflow: hidden;
+  }
 }
 
 .in-lobby {
