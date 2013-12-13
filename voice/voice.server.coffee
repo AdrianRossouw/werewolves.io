@@ -155,9 +155,8 @@ Voice.listenTo App, 'before:routes', (opts) ->
     # when the session get the exit signal, it will call back
     tropo.on 'exit', null, 'voice'
     env = {}
-    @intro tropo, env
     @debug tropo, env
-    @awake(tropo)
+    @intro tropo, env
 
     return res.send TropoJSON(tropo)
 
