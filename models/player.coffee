@@ -35,6 +35,7 @@ class Models.Player extends Models.BaseModel
   @attribute 'role'
   @attribute 'occupation'
   @attribute 'seqId'
+  @attribute 'seen'
 
   initialize: (data={}, opts={}) ->
     @id = @id or App.ns.uuid()
@@ -42,6 +43,7 @@ class Models.Player extends Models.BaseModel
     @set('name', App.ns.name()) unless @name
     @set('occupation', App.ns.jobTitle()) unless @occupation
     @set('role', 'villager') unless @role
+    @seen = data.seen or []
     @state().change(data._state or 'alive')
     @trigger('state', @state().path())
     @publish()

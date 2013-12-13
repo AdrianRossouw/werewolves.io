@@ -99,6 +99,7 @@ describe 'start application', ->
       counts.werewolf.should.equal 1
       counts.villager.should.equal 7
 
+
     it 'should have moved to the firstNight round', ->
       @game.state().path().should.equal 'round.firstNight'
 
@@ -150,6 +151,10 @@ describe 'start application', ->
       it 'should only have 2 active players', ->
         @game.players.activeTotal().should.equal 2
         @round.activeTotal.should.equal 2
+
+      it 'should have given the seer a seen array', ->
+        should.exist @seer.seen
+        @seer.seen.length.should.equal 0
 
       it 'should have put the seer in seeing state', ->
         @seer.state().path().should.equal 'alive.night.seeing'

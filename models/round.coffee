@@ -96,7 +96,9 @@ class Models.Round extends Models.BaseModel
 
     complete: state 'conclusive',
       enter: ->
+        @getDream()
         @death = @getDeath()
+
       # there is a death
       died: state 'final',
         admit:
@@ -179,6 +181,17 @@ class Models.Round extends Models.BaseModel
     victim   =  _(votes).first()
     top      = _(votes).where votes: victim.votes
     return if top.length == 1 then victim.id else false
+
+  getDream: () ->
+    seer = @players.findWhere(role: 'seer')
+    return false if seer.state().is('dead')
+
+    action = @actions.findWhere(action: 'see')
+    return false if !action
+
+    seen = seer.seen or []
+    seen.push action.target
+    seer.seen = seen
 
 
   # Pick a victim to kill.

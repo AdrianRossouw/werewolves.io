@@ -459,7 +459,7 @@ describe 'socket can connect', ->
         $state.victim1 = $state.players.at(5)
 
         $io.wolfSocket.emit('round:action', $state.victim1.id, next)
-        $io.seerSocket.emit('round:action', $state.wolf2.id, next)
+        $io.seerSocket.emit('round:action', $state.wolf.id, next)
         @round = $state.game.currentRound()
         @round.choose($state.wolf2.id, $state.victim1.id)
 
@@ -489,6 +489,18 @@ describe 'socket can connect', ->
       it 'triggered all the data events for phase start', ->
         $state.players.each (p) ->
           $spy.state.calledWith('data', 'change', p.getUrl()).should.be.ok
+
+      it 'should have revealed the wolf on death', ->
+        withArgs = $spy.villagerIoData.withArgs('change', $state.wolf2.getUrl())
+        withArgs.args[0][2].role.should.equal 'werewolf'
+
+      it 'should have added to the seers seen array', ->
+        withArgs = $spy.seerIoData.withArgs('change', $state.seer.getUrl())
+        withArgs.args[0][2].seen.length.should.equal 1
+
+      it 'should have shown the wolf to the seer', ->
+        withArgs = $spy.seerIoData.withArgs('change', $state.wolf.getUrl())
+        withArgs.args[0][2].role.should.equal 'werewolf'
 
       it 'should have signaled the night end', ->
         $spy.wolfIoState.calledWith(@lastRound.getUrl(), 'complete.died').should.be.ok
