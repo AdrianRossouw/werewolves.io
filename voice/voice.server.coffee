@@ -216,12 +216,16 @@ Voice.listenTo App, 'before:routes', (opts) ->
             @night tropo, env
           when 'day'
             @day tropo, env
+          else @awake tropo
+
       when 'cleanup'
         switch env.game.state().path()
           when 'victory.werewolves'
             @wolvesWin tropo, env
           when 'victory.villagers'
             @villagersWin tropo, env
+          else @awake tropo
+      else @awake tropo
 
     return res.send TropoJSON(tropo)
 
