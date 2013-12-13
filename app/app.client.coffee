@@ -2,8 +2,8 @@
 # This gets processed with browserify to find straggling dependencies.
 App = require('./app.coffee')
 Models = require('../models')
-
 Views = require('../views')
+debug = require('debug')('werewolves:client')
 _ = require('underscore')
 state = require('state')
 
@@ -101,7 +101,9 @@ App.bootstrap = (world) ->
   config = App.config()
 
   App.start config
+  debug 'loading', JSON.stringify(world, null, 2)
   State.load world
+  debug 'loaded', JSON.stringify(State.world.toJSON(), null, 2)
   Socket.start config
 
   @status.show new Views.Status

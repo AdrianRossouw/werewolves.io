@@ -8,7 +8,7 @@ Models   = App.module "Models"
 
 # A game that is running or will be starting.
 class Models.Game extends Models.BaseModel
-  urlRoot: 'game'
+  url: 'game'
   @attribute 'phaseTime'
   initialize: (data = {}, opts={}) ->
     @id = App.ns.uuid()
@@ -51,6 +51,7 @@ class Models.Game extends Models.BaseModel
         admit:
           # only admit state changes from .waiting when ...
           waiting: ->
+            return true if !App.server
             @owner.players.length >= 7
 
       # startgame method.
@@ -78,10 +79,6 @@ class Models.Game extends Models.BaseModel
 
       depart: ->
         @stopListening @rounds, 'change:death'
-
-      # won't come back here from victory state
-      admit:
-        'victory.*': false
 
       firstNight: state
         arrive: -> @addRound 'night'
@@ -122,11 +119,13 @@ class Models.Game extends Models.BaseModel
       werewolves:
         admit:
           'round.*': ->
+            return true if !App.server
             aliveCount = @owner.players.aliveByRole()
             aliveCount.werewolf >= aliveCount.villager
       villagers:
         admit:
           'round.*': ->
+            return true if !App.server
             !@owner.players.aliveByRole().werewolf
 
     cleanup: state 'final'

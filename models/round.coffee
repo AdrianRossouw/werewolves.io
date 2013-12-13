@@ -70,14 +70,18 @@ class Models.Round extends Models.BaseModel
       # waiting for the first vote to be cast
       none: state 'default',
         admit:
-          '*': -> !@owner.actions.length
+          '*': ->
+            return true if !App.server
+            !@owner.actions.length
         arrive: ->
           @timer.start()
 
       # we have  votes
       some:
         admit:
-          'none': -> (1 <= @owner.actions.length <= @owner.activeTotal)
+          'none': ->
+            return true if !App.server
+            (1 <= @owner.actions.length <= @owner.activeTotal)
 
       # we have all the votes
       all:
@@ -86,7 +90,9 @@ class Models.Round extends Models.BaseModel
             @timer.limit = 30000
             @timer.reset()
         admit:
-          'some': -> @owner.actions.length == @owner.activeTotal
+          'some': ->
+            return true if !App.server
+            @owner.actions.length == @owner.activeTotal
 
     complete: state 'conclusive',
       enter: ->
@@ -94,13 +100,17 @@ class Models.Round extends Models.BaseModel
       # there is a death
       died: state 'final',
         admit:
-          'votes.*': -> !!@owner.getDeath()
+          'votes.*': ->
+            return true if !App.server
+            !!@owner.getDeath()
           'complete.*': false
 
       # there wasn't one
       survived: state 'final',
         admit:
-          'votes.*': -> !@owner.getDeath()
+          'votes.*': ->
+            return true if !App.server
+            !@owner.getDeath()
           'complete.*': false
 
 

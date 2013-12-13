@@ -99,14 +99,20 @@ class Models.Player extends Models.BaseModel
           # guards set on the states based on roles
           asleep:
             admit:
-              'alive,alive.day.*': -> @owner.role is 'villager'
+              'alive,alive.day.*': ->
+                return true if !App.server
+                @owner.role is 'villager'
           seeing:
             admit:
-              'alive,alive.day.*': -> @owner.role is 'seer'
+              'alive,alive.day.*': ->
+                return true if !App.server
+                @owner.role is 'seer'
             voteAction: -> 'see'
           eating:
             admit:
-              'alive,alive.day.*': -> @owner.role is 'werewolf'
+              'alive,alive.day.*': ->
+                return true if !App.server
+                @owner.role is 'werewolf'
             voteAction: -> 'eat'
         day: state 'abstract',
           # every living player lynches
