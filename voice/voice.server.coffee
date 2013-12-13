@@ -177,7 +177,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
     tropo = new TropoWebAPI()
 
     # when the session get the exit signal, it will call back
-    tropo.on 'exit', null, '/voice', true
+    tropo.on 'exit', null, '/voice'
     #tropo.on "hangup", null, "/voice/hangup"
     #tropo.on "error", null, "/voice/error"
 
