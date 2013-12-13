@@ -1,8 +1,30 @@
 #status-area {
-  text-align: center;
-  background-color: rgba(0, 0, 0, 0.2);
-  color: #333;
-  width: @maxWidth;
+  width: 100%;
+  max-width: @maxWidth;
   margin: 0 auto;
-  padding: 0;
+  .box-sizing(border-box);
+  padding: @maxWidthPadding;
+  .flex-display(flex);
+  .align-items(stretch);
+
+}
+
+#status {
+  .flex(1);
+  height: 24px;
+  color: #eee;
+
+  margin: 5px auto;
+}
+
+#timer {
+  width: 260px;
+  height: 24px;
+  color: #eee;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid #333;
+  border-radius: 4px;
+  .box-sizing(border-box);
+  margin: 5px auto;
+  text-align: center;
 }

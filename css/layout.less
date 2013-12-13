@@ -1,3 +1,10 @@
+.full-width {
+  max-width: @maxWidth;
+  margin: 40px auto;
+  .box-sizing(border-box);
+  padding: @maxWidthPadding;
+}
+
 .intro-wrap {
   .flex(1);
   .flex-display(flex);
@@ -5,10 +12,7 @@
   .justify-content(center);
   .align-items(center);
 
-  max-width: @maxWidth;
-  margin: 40px auto;
-  .box-sizing(border-box);
-  padding: @maxWidthPadding;
+  .full-width;
 }
 
 .header {
@@ -33,7 +37,6 @@
   .box-sizing(border-box);
   padding: @maxWidthPadding;
   padding-bottom: 20px;
-  .box-sizing(border-box);
 
   min-height: 100vh;
   .align-content(stretch);
