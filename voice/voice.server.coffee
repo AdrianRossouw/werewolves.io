@@ -153,6 +153,12 @@ Voice.listenTo App, 'before:routes', (opts) ->
 
     # when the session get the exit signal, it will call back
     tropo.on 'exit', null, 'voice'
+    env = {}
+    @intro tropo, env
+    @debug tropo, env
+    @awake(tropo)
+
+    return res.send TropoJSON(tropo)
 
     # session.voice maps to this body property from tropo's backend
     session = State.world.sessions.findVoice(req.body?.session?.id)
@@ -192,12 +198,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
       @debug tropo, env
     else
     ###
-    @intro tropo, env
-    @debug tropo, env
-    @awake(tropo)
 
-
-    res.send TropoJSON(tropo)
 
 Voice.addFinalizer (opts) ->
   @stopListening()
