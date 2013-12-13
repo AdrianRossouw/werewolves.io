@@ -2,7 +2,7 @@ App           = require('../app')
 Socket        = App.module "Socket",
   startWithParent: false
 State         = require('../state')
-debug         = require('debug')('werewolves:state:client')
+debug         = require('debug')('werewolves:socket:client')
 _             = require('underscore')
 url           = require('url')
 
@@ -38,26 +38,39 @@ Socket.addInitializer (opts) ->
     if event is 'add'
       [mUrl, data] = args
       coll = State.models[url]
-      if coll
-        record = coll.add data
-        record.state().change(data._state) if data._state
-        record.trigger('state', data._state)
+      return debug 'collection not found', url if !coll
 
-        debug "added #{mUrl} to #{url}"
+      debug "adding #{mUrl} to #{url}"
+      record = coll.add data
+      record.state().change(data._state) if data._state
+      record.trigger('state', data._state)
+
 
     if event is 'remove'
-      [mUrl, data] = args
+      [mUrl] = args
       coll = State.models[url]
-      if coll
-        coll.remove coll.get url
-        debug "removes #{mUrl} from #{url}"
+      return debug 'collection not found', url if !coll
+
+      debug "data:remove", url, mUrl
+      coll.remove coll.get url
 
     if event is 'change'
       [data] = args
       model = State.models[url]
-      if model
-        model.set data if model
-        debug "received new data for #{url}"
+      return debug 'model not found', url if !model
+
+      debug "data:change", url, data
+      model.set data if model
+
+    if event is 'reset'
+      [data] = args
+      coll = State.models[url]
+      debug "data:reset", url, data
+      return debug 'collection not found', url if !coll
+
+      debug "removes #{mUrl} from #{url}"
+      coll.reset data
+
 
   @io.on 'state', (url, state) ->
     debug "received new state #{state} for #{url}"

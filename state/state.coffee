@@ -54,7 +54,7 @@ Models.BaseCollection::publish = ->
 
   State.models[url] = @
   debug "collection",  url
-  State.trigger('data', 'collection', url, @)
+  State.trigger('data', 'reset', url, @)
 
   addListener = (model) ->
     mUrl = _.result model, 'url'
@@ -79,12 +79,12 @@ Models.BaseCollection::publish = ->
 
 Models.BaseModel::unpublish = ->
   State.stopListening @
-  url = _.result @, 'url'
 
   states = @state('**')
   #_(states).each (s) -> s.off 'arrive'
 
-  delete State.models[url]
+  debug('unpublish', @getUrl())
+  delete State.models[@getUrl()]
 
 
 State.getPlayer = (player) ->

@@ -3,7 +3,7 @@ State     = require('../state')
 express   = require('express')
 socketio  = require("socket.io")
 SessionIo = require("session.socket.io")
-debug     = require('debug')('werewolves:state:server')
+debug     = require('debug')('werewolves:socket:server')
 _         = require('underscore')
 Models    = App.module "Models"
 
@@ -108,25 +108,35 @@ Socket.addInitializer (opts) ->
     true unless State.isSession(url) and (session.getUrl() != url)
 
   # when a new socket connection is made
-  @listenTo @, 'connection', (socket, state) ->
+  @listenTo @, 'connection', (socket, session) ->
 
     @listenTo State, 'data', (event, args...) =>
       if event is 'change'
         [url, model] = args
-        mask = model.mask(state)
+        mask = model.mask(session)
+        debug('data:change', url, mask)
         socket.emit 'data', 'change', url, mask if mask
 
       else if event is 'add'
         [cUrl, url, model] = args
-        mask = model.mask(state)
+        mask = model.mask(session)
+        debug('data:add', cUrl, url, mask)
         socket.emit 'data', 'add', cUrl, url, mask if mask
 
-      else
-        socket.emit 'data', args...
+      else if event is 'reset'
+        [url, collection] = args
+        mask = collection.mask(session)
+        debug('data:reset', url, mask)
+        socket.emit 'data', 'reset', url, mask if mask
 
+      else if event is 'remove'
+        [cUrl, url, model] = args
+        mask = model.mask(session)
+        debug('data:remove', cUrl, url, mask)
+        socket.emit 'data', 'remove', cUrl, url if mask
 
     @listenTo State, 'state', (url, newState) ->
-      allow = @stateMask url, newState, state
+      allow = @stateMask url, newState, session
 
       socket.emit 'state', url, newState if allow
 
