@@ -84,25 +84,30 @@ Voice.intro = (tropo, env) ->
 
 # To be played on the first night
 Voice.firstNight = (tropo, env) ->
-  tropo.say 'first night'
   # per role
   switch env?.player?.role
     when 'villager'
-      @audio tropo, 'VillagerTutorial'
+      #@audio tropo, 'VillagerTutorial'
+      tropo.say 'you are a villager'
     when 'werewolf'
-      @audio tropo, 'VillagerTutorial'
+      #@audio tropo, 'VillagerTutorial'
+      tropo.say 'you are a werewolf'
     when 'seer'
-      @audio tropo, 'SeerTutorial'
+      #@audio tropo, 'SeerTutorial'
+      tropo.say 'you are the seer'
 
   # for everyone
-  @audio tropo, 'FirstNight'
+  #@audio tropo, 'FirstNight'
+  tropo.say 'the first night'
 
   # for specific roles again
   switch env?.player?.role
     when 'villager'
-      @audio tropo, 'FirstNightWerewolves'
+      #@audio tropo, 'FirstNightWerewolves'
+      tropo.say 'kill somebody'
     when 'seer'
-      @audio tropo, 'FirstNightSeer'
+      #@audio tropo, 'FirstNightSeer'
+      tropo.say 'dream about somebody'
 
   @awakeByRole tropo, env.player
 
@@ -198,25 +203,35 @@ Voice.listenTo App, 'before:routes', (opts) ->
 
 
     # play the right files for each phase
-    if not env.world.state().isIn('gameplay')
-      @intro tropo, env
-    else if env.game.state().isIn('firstNight')
-      @firstNight tropo, env
-    else if env.game.state().isIn('firstDay')
-      @firstDay tropo, env
-    else if env.game.state().isIn('night')
-      @night tropo, env
-    else if env.game.state().isIn('day')
-      @day tropo, env
-    else if env.game.state().isIn('victory.werewolves')
-      @wolvesWin tropo, env
-    else if env.game.state().isIn('victory.villagers')
-      @villagersWin tropo, env
+    switch env.world.state().path()
+      when 'attract' or 'startup'
+        @intro tropo, env
+      when 'gameplay'
+        switch env.game.state().name
+          when 'firstNight'
+            @firstNight tropo, env
+          when 'firstDay'
+            @firstDay tropo, env
+          when 'night'
+            @night tropo, env
+          when 'day'
+            @day tropo, env
+      when 'cleanup'
+        switch env.game.state().path()
+          when 'victory.werewolves'
+            @wolvesWin tropo, env
+          when 'victory.villagers'
+            @villagersWin tropo, env
 
     return res.send TropoJSON(tropo)
 
   App.post '/voice/hangup', (req, res, next) ->
-    console.log(req.body)
+    sessionId = req.body?.result?.sessionId
+
+    # session.voice maps to this body property from tropo's backend
+    session = State.world.sessions.findVoice(sessionId)
+    session.unset('voice') if session
+
     res.send(500)
 
   App.post '/voice/error', (req, res, next) ->
