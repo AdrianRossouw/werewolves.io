@@ -183,6 +183,11 @@ Voice.listenTo App, 'before:routes', (opts) ->
     # play the right files for each phase
     if not env.world.state().isIn('gameplay')
       @intro tropo, env
+    else
+      @debug tropo
+      @awake tropo
+
+    ###
     else if env.game.state().isIn('firstNight')
       @firstNight tropo, env
     else if env.game.state().isIn('firstDay')
@@ -195,8 +200,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
       @debug tropo, env
     else if env.game.state().isIn('victory.villagers')
       @debug tropo, env
-    else
-      @debug tropo
+    ###
 
     return res.send TropoJSON(tropo)
 
