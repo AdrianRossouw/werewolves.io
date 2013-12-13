@@ -46,6 +46,7 @@ Models.Sessions::findSip = (sip) ->
 tropo  = require('tropo-webapi')
 
 middleware = (opts) ->
+  @use '/voice', new express.logger()
   @use new express.json()
   @use new express.urlencoded()
   @use new express.static(__dirname + "/../bower_components/phono/deps/flensed/1.0")
@@ -140,11 +141,9 @@ Voice.listenTo State, 'state', (url, state) ->
     session = State.models[url]
     session.initVoice()
 
-
   # end of a round, interrupt everyone.
   # tropo will call back to get the script
-  if state in ['completed.survived', 'completed.died']
-    State.sessions.invoke 'signal', 'exit'
+  State.world.sessions.invoke 'signal', 'exit' if url == 'game'
 
 
 # this is the url that tropo will hit when it calls
@@ -156,7 +155,9 @@ Voice.listenTo App, 'before:routes', (opts) ->
     tropo = new TropoWebAPI()
 
     # when the session get the exit signal, it will call back
-    tropo.on 'exit', null, 'voice'
+    tropo.on 'exit', null, '/voice', true
+    tropo.on "hangup", null, "/voice/hangup"
+    tropo.on "error", null, "/voice/error"
 
 
     # session.voice maps to this body property from tropo's backend
@@ -179,7 +180,6 @@ Voice.listenTo App, 'before:routes', (opts) ->
       player: State.getPlayer(playerId)
 
 
-    
     # play the right files for each phase
     if not env.world.state().isIn('gameplay')
       @intro tropo, env
@@ -199,6 +199,14 @@ Voice.listenTo App, 'before:routes', (opts) ->
       @debug tropo
 
     return res.send TropoJSON(tropo)
+
+  App.post '/voice/hangup', (req, res, next) ->
+    console.log(req.body)
+    res.send(500)
+
+  App.post '/voice/error', (req, res, next) ->
+    console.log(req.body)
+    res.send 500
 
 Voice.addFinalizer (opts) ->
   @stopListening()
