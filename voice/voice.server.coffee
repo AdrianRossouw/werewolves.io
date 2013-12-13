@@ -184,7 +184,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
     if not env.world.state().isIn('gameplay')
       @intro tropo, env
     else
-      @debug tropo
+      @debug tropo, env
       @awake tropo
 
     ###
