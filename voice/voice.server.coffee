@@ -65,12 +65,15 @@ Voice.audio = (tropo, name) ->
   tropo.say "http://hosting.tropo.com/5010929/www/audio/#{name}.mp3"
 
 Voice.asleep = (tropo) ->
+  tropo.say 'you go to sleep'
   tropo.conference("asleep", true, "asleep", false, null, '#', 'exit')
 
 Voice.awake = (tropo) ->
-  tropo.conference "awake", null, "awake", false, null, '#'#, 'exit'
+  tropo.say 'you wake up'
+  tropo.conference "awake", null, "awake", false, null, '#', 'exit'
 
 Voice.spectate = (tropo) ->
+  tropo.say 'you are spectating'
   tropo.conference("awake", true, "awake", false, null, '#', 'exit')
 
 
@@ -81,6 +84,7 @@ Voice.intro = (tropo, env) ->
 
 # To be played on the first night
 Voice.firstNight = (tropo, env) ->
+  tropo.say 'first night'
   # per role
   switch env?.player?.role
     when 'villager'
@@ -104,20 +108,33 @@ Voice.firstNight = (tropo, env) ->
 
 # first day
 Voice.firstDay = (tropo, env) ->
-  @audio tropo, 'FirstDay'
+  #@audio tropo, 'FirstDay'
+  tropo.say 'first day'
   @awake(tropo)
 
 # each subsequent night
 
 Voice.night = (tropo, env) ->
-  @audio tropo, 'NextNight1'
+  #@audio tropo, 'NextNight1'
+  tropo.say 'next night'
   @awakeByRole(tropo, env.player)
 
 # each subsequent day
 # TODO: add files for who died.
 Voice.day = (tropo, env) ->
-  @audio tropo, 'NextDay1'
+  #@audio tropo, 'NextDay1'
+  tropo.say 'next day'
   @awake tropo
+
+Voice.wolvesWin = (tropo, env) ->
+  tropo.say 'wolves win'
+  @awake tropo
+
+Voice.villagersWin = (tropo, env) ->
+  tropo.say 'villagers win'
+  @awake tropo
+
+
 
 # for specific roles
 # leave them muted/unmuted in the 
@@ -183,11 +200,6 @@ Voice.listenTo App, 'before:routes', (opts) ->
     # play the right files for each phase
     if not env.world.state().isIn('gameplay')
       @intro tropo, env
-    else
-      @debug tropo, env
-      @awake tropo
-
-    ###
     else if env.game.state().isIn('firstNight')
       @firstNight tropo, env
     else if env.game.state().isIn('firstDay')
@@ -197,10 +209,9 @@ Voice.listenTo App, 'before:routes', (opts) ->
     else if env.game.state().isIn('day')
       @day tropo, env
     else if env.game.state().isIn('victory.werewolves')
-      @debug tropo, env
+      @wolvesWin tropo, env
     else if env.game.state().isIn('victory.villagers')
-      @debug tropo, env
-    ###
+      @villagersWin tropo, env
 
     return res.send TropoJSON(tropo)
 
