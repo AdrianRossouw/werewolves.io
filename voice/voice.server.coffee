@@ -64,13 +64,13 @@ Voice.audio = (tropo, name) ->
   tropo.say "http://hosting.tropo.com/5010929/www/audio/#{name}.mp3"
 
 Voice.asleep = (tropo) ->
-  tropo.conference("asleep", true, "asleep", false, true, null, '#', 'exit')
+  tropo.conference("asleep", true, "asleep", false, null, '#', 'exit')
 
 Voice.awake = (tropo) ->
-  tropo.conference("awake", null, "awake", false, true, null, '#', 'exit')
+  tropo.conference("awake", null, "awake", false, null, '#', 'exit')
 
 Voice.spectate = (tropo) ->
-  tropo.conference("awake", true, "awake", false, true, null, '#', 'exit')
+  tropo.conference("awake", true, "awake", false, null, '#', 'exit')
 
 
 # introductory, to be played in attract mode
@@ -153,7 +153,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
     tropo = new TropoWebAPI()
 
     # when the session get the exit signal, it will call back
-    #tropo.on 'exit', null, 'voice'
+    tropo.on 'exit', null, 'voice'
     env = {}
     @intro tropo, env
 
