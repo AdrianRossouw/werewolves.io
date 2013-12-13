@@ -179,6 +179,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
     # when the session get the exit signal, it will call back
     tropo.on 'exit', null, '/voice'
     tropo.on "hangup", null, "/voice/hangup"
+    tropo.on "incomplete", null, "/voice/incomplete"
     #tropo.on "error", null, "/voice/error"
 
 
@@ -229,7 +230,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
 
     return res.send TropoJSON(tropo)
 
-  App.post '/voice/hangup', (req, res, next) ->
+  downgrade = (req, res, next) ->
     console.log(req.body)
     sessionId = req.body?.result?.sessionId
 
@@ -240,9 +241,9 @@ Voice.listenTo App, 'before:routes', (opts) ->
 
     res.send(500)
 
-  App.post '/voice/error', (req, res, next) ->
-    console.log(req.body)
-    res.send 500
+  App.post '/voice/hangup', downgrade
+  App.post '/voice/incomplete', downgrade
+  App.post '/voice/error', downgrade
 
 Voice.addFinalizer (opts) ->
   @stopListening()
