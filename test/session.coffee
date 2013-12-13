@@ -186,7 +186,7 @@ describe 'upgrading connections', ->
   describe 'out of order credentials', ->
     beforeEach -> @m = cleanInstances().offline
     
-    it.skip 'voice, sip, socket', ->
+    it 'voice, sip, session, socket', ->
       @m.voice = 'voice.id'
       @m.state().path().should.equal 'offline'
 
@@ -194,6 +194,7 @@ describe 'upgrading connections', ->
       @m.state().path().should.equal 'offline'
 
       @m.socket = 'socket.id'
+      @m.session = 'session.id'
 
       @m.state().path().should.equal 'online.voice'
 
@@ -213,7 +214,7 @@ describe 'upgrading connections', ->
 
 
 
-describe.skip 'downgrading connections', ->
+describe 'downgrading connections', ->
  
   describe 'from online.voice state', ->
     beforeEach -> @m = cleanInstances().voice

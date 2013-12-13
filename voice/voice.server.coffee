@@ -233,8 +233,8 @@ Voice.listenTo App, 'before:routes', (opts) ->
     sessionId = req.body?.result?.sessionId
 
     # session.voice maps to this body property from tropo's backend
-    #session = State.world.sessions.findVoice(sessionId)
-    #session.unset('voice') if session
+    session = State.world.sessions.findVoice(sessionId)
+    session.unset('voice') if session
 
     res.send(500)
 

@@ -49,7 +49,13 @@ class Models.Session extends Models.BaseModel
   upgrade: ->
     before = @state().path()
     @state().emit 'upgrade'
-    @upgrade() if before != @state().path()
+    return @upgrade() if before != @state().path()
+    @downgrade()
+
+  downgrade: ->
+    before = @state().path()
+    @state().emit 'downgrade'
+    @downgrade() if before != @state().path()
 
   initState: ->
     state @,
@@ -62,18 +68,30 @@ class Models.Session extends Models.BaseModel
 
       online: state 'abstract',
         session: state
+          downgrade: 'offline'
           upgrade: 'socket'
           admit:
             offline: -> true if @owner.session
         socket:
+          downgrade: 'session'
           upgrade: 'sip'
+          release:
+            'sip': -> true if @owner.socket
+            'session': -> true if !@owner.socket
           admit:
-            'offline,session': -> true if @owner.socket
+            'sip,offline,session': -> true if @owner.socket
         sip:
+          downgrade: 'socket'
           upgrade: 'voice'
+          release:
+            'voice': -> true if @owner.sip
+            'socket': -> true if !@owner.sip
           admit:
-            'socket,offline': -> true if (@owner.sip && @owner.socket)
+            'socket,offline,voice': -> true if (@owner.sip && @owner.socket)
         voice:
+          downgrade: 'sip'
+          release:
+            'sip': -> true if !@owner.voice
           admit:
             'sip,offline': -> true if (@owner.voice && @owner.sip && @owner.socket)
 
