@@ -9,11 +9,15 @@ html
       link(rel='stylesheet', href='/css/style.css')
   body.in-lobby
 
-    include intro-server
+    .lobby
+      include intro-server
 
-    #status-area
-      #status
-      #timer
+      .header
+        img(src='/assets/logo_night.svg')
+
+      #status-area
+        #status
+        #timer
 
     #game-area
 
