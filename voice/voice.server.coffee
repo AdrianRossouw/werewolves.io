@@ -179,7 +179,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
     # when the session get the exit signal, it will call back
     tropo.on 'exit', null, '/voice'
     tropo.on "hangup", null, "/voice/hangup"
-    tropo.on "error", null, "/voice/error"
+    #tropo.on "error", null, "/voice/error"
 
 
     # session.voice maps to this body property from tropo's backend
@@ -230,11 +230,13 @@ Voice.listenTo App, 'before:routes', (opts) ->
     return res.send TropoJSON(tropo)
 
   App.post '/voice/hangup', (req, res, next) ->
+    console.log(req.body)
     sessionId = req.body?.result?.sessionId
 
     # session.voice maps to this body property from tropo's backend
     session = State.world.sessions.findVoice(sessionId)
     session.unset('voice') if session
+    console.log(session)
 
     res.send(500)
 
