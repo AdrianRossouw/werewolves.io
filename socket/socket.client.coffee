@@ -28,8 +28,7 @@ Socket.addInitializer (opts) ->
   
   State.on 'data', (event, url, model) =>
     debug 'update session'
-
-    @io.emit 'update', url, model if @isSession(url)
+    @io.emit 'update', url, model.toJSON() if @isSession(url)
 
   State.on 'choose', (id, target) =>
     @io.emit 'round:action', target

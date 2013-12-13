@@ -3,6 +3,7 @@ State = require('../state')
 Models = App.module "Models"
 express = require('express')
 request = require('request')
+debug = require('debug')('werewolves:voice:server')
 Voice = App.module "Voice"
 
 Models.Session::signal = (signal) ->
