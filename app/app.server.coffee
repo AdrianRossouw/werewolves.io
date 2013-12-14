@@ -68,7 +68,7 @@ App.addInitializer (opts) ->
       env: env
       playerId: req.state.session.id
       socketUrl: App.Socket.formatUrl(opts)
-      world: JSON.stringify(State.world.mask(req.state.session))
+      world: JSON.stringify(State.world.maskJSON(req.state.session))
 
   @trigger 'before:routes', opts
   @get "/", defaultRoute
