@@ -127,6 +127,9 @@ Socket.addInitializer (opts) ->
       model = applyArgs.pop()
       return null unless model
 
+      # conditionally filter out data events
+      return null if model.filterData(session, event)
+
       # mask the JSON being sent to the client
       maskJSON = model.maskJSON(session)
       return null unless maskJSON

@@ -15,6 +15,20 @@ class Models.Action extends Models.BaseModel
     super
     @publish()
 
+  # only sync actions to the same roles
+  filterData: (session, event) ->
+    # always see lynchings, even for observers
+    return null if @action == 'lynch'
+
+    # always block other events, so you cant just
+    # open a spare tab to see the killings.
+    player = State.getPlayer(session.id)
+    return true unless player
+
+    # only pass the event back when it is the same
+    # role.
+    @action != player.voteAction()
+
 class Models.Actions extends Models.BaseCollection
   url: 'action'
   model: Models.Action

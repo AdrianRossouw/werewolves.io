@@ -436,7 +436,6 @@ describe 'socket can connect', ->
         withArgs.called.should.be.ok
         withArgs.args[0][2].role.should.equal 'villager'
 
-
       it 'should have sent the wolf the other wolf', ->
         $spy.wolfIoData.calledWith('change', $state.wolf2.getUrl()).should.be.ok
 
@@ -472,6 +471,11 @@ describe 'socket can connect', ->
         $spy.wolfIoState.calledWith(@round.getUrl(), 'votes.some').should.be.ok
         $spy.seerIoState.calledWith(@round.getUrl(), 'votes.some').should.be.ok
         $spy.villagerIoState.calledWith(@round.getUrl(), 'votes.all').should.be.ok
+
+      it 'should only have sent the see action to own roles', ->
+        $spy.wolfIoData.withArgs('add', 'action').callCount.should.equal(2)
+        $spy.villagerIoData.withArgs('add', 'action').callCount.should.equal(0)
+        $spy.seerIoData.withArgs('add', 'action').callCount.should.equal(1)
 
       it 'should not allow the spectator to vote', (done) ->
         $io.spectateSocket.emit 'round:action', $state.wolf.id, (err, response) ->
