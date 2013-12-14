@@ -75,7 +75,7 @@ class Models.Player extends Models.BaseModel
 
   # conditionally filter out what events
   # get sent to the clients.
-  blockData: (session, event) -> event is 'change'
+  filterData: (session, event) -> event is 'change'
 
   initState: ->
     state @,

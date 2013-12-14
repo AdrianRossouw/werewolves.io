@@ -25,7 +25,7 @@ class Models.BaseModel extends Backbone.Model
   initState: ->
   initClient: ->
   maskJSON: (session) -> @toJSON(session)
-  blockData: ->
+  filterData: ->
   maskState: -> @state().path()
 
   publish:  -> @
@@ -60,7 +60,7 @@ class Models.BaseCollection extends Backbone.Collection
   initState: ->
   initClient: ->
   maskJSON: (session) -> @toJSON(session)
-  blockData: ->
+  filterData: ->
   maskState: ->
   publish:  -> @
   unpublish:  -> @
