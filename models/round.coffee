@@ -40,6 +40,11 @@ class Models.Action extends Models.BaseModel
 class Models.Actions extends Models.BaseCollection
   url: 'action'
   model: Models.Action
+  toJSON: (session) ->
+    json = super
+    return json unless session
+
+    _(json).compact()
 
 class Models.Round extends Models.BaseModel
   urlRoot: 'round'

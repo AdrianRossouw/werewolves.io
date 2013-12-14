@@ -116,7 +116,7 @@ Socket.addInitializer (opts) ->
 
       applyArgs = switch event
         when 'add' then _(args).first(3)
-        when 'remove' then _(args).first(3)
+        when 'remove' then _(args).first(2)
         when 'reset' then _(args).first(2)
         when 'merge' then _(args).first(2)
         when 'change' then _(args).first(2)
