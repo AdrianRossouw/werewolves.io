@@ -139,10 +139,15 @@ Socket.addInitializer (opts) ->
       socket.emit 'data', event, applyArgs...
       debug "data:#{event}", applyArgs...
 
-    @listenTo State, 'state', (url, newState) ->
-      allow = @stateMask url, newState, session
+    @listenTo State, 'state', (url, _state) ->
+      model = State.models[url]
+      return null unless model
 
-      socket.emit 'state', url, newState if allow
+      return null unless model.maskState(session, _state)
+
+      allow = @stateMask url, _state, session
+
+      socket.emit 'state', url, _state if allow
 
 
 Socket.addFinalizer (opts) ->
