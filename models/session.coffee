@@ -28,7 +28,7 @@ class Models.Session extends Models.BaseModel
     @state().change(data._state or 'offline')
     @publish()
     @trigger('state', @state().path())
-    @listenTo @, 'change', @upgrade
+    @listenTo @, 'change', @updateState
 
     Object.defineProperty @, 'player',
       get: -> State.getPlayer(@id)
@@ -45,50 +45,37 @@ class Models.Session extends Models.BaseModel
 
   destroy: ->
     @stopListening @
+  go: (to) ->
+    @state().go(to) if App.server
 
-  upgrade: ->
-    before = @state().path()
-    @state().emit 'upgrade'
-    return @upgrade() if before != @state().path()
-    @downgrade()
-
-  downgrade: ->
-    before = @state().path()
-    @state().emit 'downgrade'
-    @downgrade() if before != @state().path()
-
+  updateState: -> @upgrade() or @downgrade()
   initState: ->
     state @,
+      downgrade: ->
+      upgrade: ->
       offline: state 'initial',
-        upgrade: state.bind ->
-          if @owner.session
-            @be 'session'
-          else if @owner.socket
-            @be 'socket'
+        upgrade: ->
+          if @socket
+            @go 'socket'
+          else if @session
+            @go 'session'
 
       online: state 'abstract',
         session: state
-          upgrade: 'socket'
+          arrive: -> @upgrade() or @downgrade()
+          upgrade: -> @go 'socket' if @socket
           downgrade: -> @go 'offline' if !@session
-          admit:
-            offline: -> true if @owner.session
         socket:
-          arrive: -> @downgrade()
-          upgrade: 'sip'
+          arrive: -> @upgrade() or @downgrade()
+          upgrade: -> @go 'sip' if @sip
           downgrade: -> @go 'session' if !@socket
-          admit:
-            'sip,offline,session': -> true if @owner.socket
         sip:
-          arrive: -> @downgrade()
-          upgrade: 'voice'
+          arrive: -> @upgrade() or @downgrade()
+          upgrade: -> @go 'voice' if @voice
           downgrade: -> @go 'socket' if !@sip
-          admit:
-            'socket,offline,voice': -> true if (@owner.sip && @owner.socket)
         voice:
-          arrive: -> @downgrade()
+          arrive: -> @upgrade() or @downgrade()
           downgrade: -> @go 'sip' if !@voice
-          admit:
-            'sip,offline': -> true if (@owner.voice && @owner.sip && @owner.socket)
 
 class Models.Sessions extends Models.BaseCollection
   url: 'session'

@@ -247,7 +247,7 @@ describe 'downgrading connections', ->
 
       @m.state().path().should.equal 'offline'
 
-  describe.skip 'from online.sip state', ->
+  describe 'from online.sip state', ->
     beforeEach -> @m = cleanInstances().sip
 
     it 'should downgrade to socket', ->
@@ -267,7 +267,7 @@ describe 'downgrading connections', ->
 
       @m.state().path().should.equal 'offline'
 
-  describe.skip 'from online.socket state', ->
+  describe 'from online.socket state', ->
     beforeEach -> @m = cleanInstances().socket
 
     it 'should downgrade to session', ->
