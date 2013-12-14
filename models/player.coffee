@@ -73,6 +73,10 @@ class Models.Player extends Models.BaseModel
     result.role = 'villager'
     return result
 
+  # conditionally filter out what events
+  # get sent to the clients.
+  maskData: (event, session) -> event is 'change'
+
   initState: ->
     state @,
       voteAction: -> false

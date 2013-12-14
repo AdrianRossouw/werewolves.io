@@ -24,7 +24,9 @@ class Models.BaseModel extends Backbone.Model
 
   initState: ->
   initClient: ->
-  mask: (session) -> @toJSON(session)
+  maskJSON: (session) -> @toJSON(session)
+  maskData: ->
+  maskState: ->
   publish:  -> @
   getUrl: -> _.result @, 'url'
   toJSON: (session) ->
@@ -56,7 +58,9 @@ class Models.BaseCollection extends Backbone.Collection
 
   initState: ->
   initClient: ->
-  mask: (session) -> @toJSON(session)
+  maskJSON: (session) -> @toJSON(session)
+  maskData: ->
+  maskState: ->
   publish:  -> @
   unpublish:  -> @
 
