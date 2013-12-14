@@ -534,6 +534,16 @@ describe 'socket can connect', ->
           should.exist where
           where.role.should.equal 'werewolf'
 
+      describe 'revealed to everyone', ->
+        before ->
+          withArgs = $spy.villagerIoData.withArgs('merge', 'player')
+          @data = withArgs.args[0][2]
+
+        it 'should not have added to the seers seen array', ->
+          where = _(@data).findWhere(id: $state.seer.id)
+          should.exist where.seen
+          where.seen.length.should.equal 0
+
       it 'should have signaled the night end', ->
         $spy.wolfIoState.calledWith(@lastRound.getUrl(), 'complete.died').should.be.ok
 

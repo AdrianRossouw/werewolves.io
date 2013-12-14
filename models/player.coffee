@@ -53,12 +53,18 @@ class Models.Player extends Models.BaseModel
     result = super
     return result unless session
 
+    # never reveal who the seer has seen
+    result.seen = []
+
     # dead players roles are known
     return result if @state().is('dead')
 
     # your own role is known
+    # and the seer can see his own seen
     player = State.getPlayer(session.id)
-    return result if player?.id == @id
+    if @id == player?.id
+      result.seen = @seen
+      return result
 
     # werewolves get other wolves
     if player?.role == 'werewolf'
@@ -66,6 +72,7 @@ class Models.Player extends Models.BaseModel
 
     # seers get anyone they have seen before.
     if (player?.role == 'seer')
+
       seen = player?.seen or []
       return result if @id in seen
 
@@ -150,7 +157,6 @@ class Models.Players extends Models.BaseCollection
 
   startPhase: (phase) ->
     @invoke 'startPhase', phase
-  
 
   aliveByRole: ->
     isAlive = (p) -> p.state().isIn('alive')
