@@ -19,7 +19,7 @@ Models.Session::signal = (signal) ->
   request.post reqOpts, ->
 
 Models.Session::initVoice = ->
-  return false if !@sip
+  return false unless @sip and @socket
 
   debug 'initvoice', @id, @sip
   body = JSON.stringify
@@ -203,7 +203,6 @@ Voice.listenTo App, 'before:routes', (opts) ->
       game: State.world.game
       round: State.world.game.currentRound()
       player: State.getPlayer(playerId)
-
 
     # play the right files for each phase
     switch env.world.state().path()
