@@ -227,15 +227,12 @@ describe 'downgrading connections', ->
 
 
     it 'should downgrade to socket', ->
-      @m.voice = false
-      @m.sip = false
+      @m.set voice: false, sip: false
 
       @m.state().path().should.equal 'online.socket'
 
     it 'should downgrade to session', ->
-      @m.voice = false
-      @m.sip = false
-      @m.socket = false
+      @m.set voice: false, sip: false, socket: false
 
       @m.state().path().should.equal 'online.session'
 

@@ -40,10 +40,8 @@ Socket.addInitializer (opts) ->
       socket.on 'disconnect', =>
         if _state.socket is socket.id
           debug 'socket disconnect', socket.id
+          _state.set voice: false, sip: false, socket: false
 
-          _state.voice = false
-          _state.sip = false
-          _state.socket = false
 
 Socket.formatUrl = (opts) ->
   return opts.socketUrl if opts.socketUrl
@@ -71,7 +69,6 @@ Socket.addInitializer (opts) ->
       model = State.models[url]
       return cb(404, {message: 'not found'}) unless model
       cb(null, model.maskJSON(state))
-   
 
     # a modification of data from the client.
     socket.on 'update', (url, data, cb = ->) ->
@@ -80,7 +77,6 @@ Socket.addInitializer (opts) ->
       return cb(404, {message: 'not found'}) unless model
       model.set data
       cb(null, data)
-
 
     # allow players to join
     socket.on 'game:join', (cb=->) ->
