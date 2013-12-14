@@ -45,8 +45,6 @@ class Models.Session extends Models.BaseModel
 
   destroy: ->
     @stopListening @
-  go: (to) ->
-    @state().go(to) if App.server
 
   updateState: -> @upgrade() or @downgrade()
   initState: ->
@@ -62,19 +60,19 @@ class Models.Session extends Models.BaseModel
 
       online: state 'abstract',
         session: state
-          arrive: -> @upgrade() or @downgrade()
+          arrive: -> @updateState()
           upgrade: -> @go 'socket' if @socket
           downgrade: -> @go 'offline' if !@session
         socket:
-          arrive: -> @upgrade() or @downgrade()
+          arrive: -> @updateState()
           upgrade: -> @go 'sip' if @sip
           downgrade: -> @go 'session' if !@socket
         sip:
-          arrive: -> @upgrade() or @downgrade()
+          arrive: -> @updateState()
           upgrade: -> @go 'voice' if @voice
           downgrade: -> @go 'socket' if !@sip
         voice:
-          arrive: -> @upgrade() or @downgrade()
+          arrive: -> @updateState()
           downgrade: -> @go 'sip' if !@voice
 
 class Models.Sessions extends Models.BaseCollection
