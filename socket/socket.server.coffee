@@ -70,7 +70,7 @@ Socket.addInitializer (opts) ->
       debug "request #{url}"
       model = State.models[url]
       return cb(404, {message: 'not found'}) unless model
-      cb(null, model.mask(state))
+      cb(null, model.maskJSON(state))
    
 
     # a modification of data from the client.
@@ -113,36 +113,45 @@ Socket.addInitializer (opts) ->
   @listenTo @, 'connection', (socket, session) ->
 
     @listenTo State, 'data', (event, args...) =>
-      if event is 'change'
-        [url, model] = args
-        mask = model.mask(session)
-        return false if !mask
 
-        socket.emit 'data', 'change', url, mask
-        debug('data:change', url, mask)
+      switch event
+        when 'change'
+          [url, model] = args
+        when 'add'
+          [cUrl, url, model] = args
+        when 'reset'
+          [url, collection] = args
+        when 'remove'
+          [cUrl, url, model] = args
+        else
+          return null
+
+      if event is 'change'
+        maskJSON = model.maskJSON(session)
+        return false if !maskJSON
+
+        socket.emit 'data', 'change', url, maskJSON
+        debug('data:change', url, maskJSON)
 
       else if event is 'add'
-        [cUrl, url, model] = args
-        mask = model.mask(session)
-        return false if !mask
+        maskJSON = model.maskJSON(session)
+        return false if !maskJSON
 
-        debug('data:add', cUrl, url, mask)
-        socket.emit 'data', 'add', cUrl, url, mask
+        debug('data:add', cUrl, url, maskJSON)
+        socket.emit 'data', 'add', cUrl, url, maskJSON
 
       else if event is 'reset'
-        [url, collection] = args
-        mask = collection.mask(session)
-        return false if !mask
+        maskJSON = collection.maskJSON(session)
+        return false if !maskJSON
 
-        debug('data:reset', url, mask)
-        socket.emit 'data', 'reset', url, mask
+        debug('data:reset', url, maskJSON)
+        socket.emit 'data', 'reset', url, maskJSON
 
       else if event is 'remove'
-        [cUrl, url, model] = args
-        mask = model.mask(session)
-        return false if !mask
+        maskJSON = model.maskJSON(session)
+        return false if !maskJSON
 
-        debug('data:remove', cUrl, url, mask)
+        debug('data:remove', cUrl, url, maskJSON)
         socket.emit 'data', 'remove', cUrl, url
 
     @listenTo State, 'state', (url, newState) ->
