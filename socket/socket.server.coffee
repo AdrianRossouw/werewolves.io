@@ -114,45 +114,26 @@ Socket.addInitializer (opts) ->
 
     @listenTo State, 'data', (event, args...) =>
 
-      switch event
-        when 'change'
-          [url, model] = args
-        when 'add'
-          [cUrl, url, model] = args
-        when 'reset'
-          [url, collection] = args
-        when 'remove'
-          [cUrl, url, model] = args
-        else
-          return null
+      applyArgs = switch event
+        when 'add' then _(args).first(3)
+        when 'remove' then _(args).first(3)
+        when 'reset' then _(args).first(2)
+        when 'change' then _(args).first(2)
+        else null
 
-      if event is 'change'
-        maskJSON = model.maskJSON(session)
-        return false if !maskJSON
+      return null unless applyArgs
 
-        socket.emit 'data', 'change', url, maskJSON
-        debug('data:change', url, maskJSON)
+      # model is always the last argument
+      model = applyArgs.pop()
+      return null unless model
 
-      else if event is 'add'
-        maskJSON = model.maskJSON(session)
-        return false if !maskJSON
+      # mask the JSON being sent to the client
+      maskJSON = model.maskJSON(session)
+      return null unless maskJSON
+      applyArgs.push(maskJSON)
 
-        debug('data:add', cUrl, url, maskJSON)
-        socket.emit 'data', 'add', cUrl, url, maskJSON
-
-      else if event is 'reset'
-        maskJSON = collection.maskJSON(session)
-        return false if !maskJSON
-
-        debug('data:reset', url, maskJSON)
-        socket.emit 'data', 'reset', url, maskJSON
-
-      else if event is 'remove'
-        maskJSON = model.maskJSON(session)
-        return false if !maskJSON
-
-        debug('data:remove', cUrl, url, maskJSON)
-        socket.emit 'data', 'remove', cUrl, url
+      socket.emit 'data', event, applyArgs...
+      debug "data:#{event}", applyArgs...
 
     @listenTo State, 'state', (url, newState) ->
       allow = @stateMask url, newState, session
