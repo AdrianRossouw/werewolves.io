@@ -30,7 +30,7 @@ class Models.Action extends Models.BaseModel
 
     # always block other events, so you cant just
     # open a spare tab to see the killings.
-    player = State.getPlayer(session.id)
+    player = session.player
     return true unless player
 
     # only pass the event back when it is the same

@@ -61,7 +61,7 @@ class Models.Player extends Models.BaseModel
 
     # your own role is known
     # and the seer can see his own seen
-    player = State.getPlayer(session.id)
+    player = session.player
     if @id == player?.id
       result.seen = @seen
       return result
