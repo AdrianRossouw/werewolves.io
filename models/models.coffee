@@ -26,13 +26,14 @@ class Models.BaseModel extends Backbone.Model
   initClient: ->
   maskJSON: (session) -> @toJSON(session)
   maskData: ->
-  maskState: ->
+  maskState: -> @state().path()
+
   publish:  -> @
   getUrl: -> _.result @, 'url'
   toJSON: (session) ->
     obj = super
     obj.id = @id if @id
-    obj._state = @state().path() if @state
+    obj._state = @maskState(session) if @state
     obj
 
 
