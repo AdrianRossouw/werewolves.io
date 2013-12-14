@@ -150,7 +150,7 @@ class Models.Players extends Models.BaseCollection
 
   startPhase: (phase) ->
     @invoke 'startPhase', phase
-    State.trigger('data', 'merge', 'player', @)
+  
 
   aliveByRole: ->
     isAlive = (p) -> p.state().isIn('alive')

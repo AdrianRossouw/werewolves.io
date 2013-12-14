@@ -519,19 +519,9 @@ describe 'socket can connect', ->
       it 'triggered all the data events for phase start', ->
         $spy.state.calledWith('data', 'merge', 'player').should.be.ok
 
-      describe 'revealed to villagers', ->
-        before ->
-          withArgs = $spy.villagerIoData.withArgs('merge', 'player')
-          @data = withArgs.args[0][2]
-
-        it 'should have revealed the wolf on death', ->
-          where = _(@data).findWhere(id: $state.wolf2.id)
-          should.exist where
-          where.role.should.equal 'werewolf'
-
       describe 'revealed to seer', ->
         before ->
-          withArgs = $spy.villagerIoData.withArgs('merge', 'player')
+          withArgs = $spy.seerIoData.withArgs('merge', 'player')
           @data = withArgs.args[0][2]
 
         it 'should have added to the seers seen array', ->
@@ -539,9 +529,8 @@ describe 'socket can connect', ->
           should.exist where.seen
           where.seen.length.should.equal 1
 
-
         it 'should have shown the wolf to the seer', ->
-          where = _(@data).findWhere(id: $state.wolf2.id)
+          where = _(@data).findWhere(id: $state.wolf.id)
           should.exist where
           where.role.should.equal 'werewolf'
 
@@ -582,9 +571,18 @@ describe 'socket can connect', ->
       it 'should have signaled the day end', ->
         $spy.wolfIoState.calledWith(@round.getUrl(), 'complete.died').should.be.ok
 
-
       it 'should have killed the second wolf', ->
         $spy.villagerIoState.calledWith($state.wolf2.getUrl(), 'dead').should.be.ok
+
+      describe 'revealed to villagers', ->
+        before ->
+          withArgs = $spy.villagerIoData.withArgs('merge', 'player')
+          @data = withArgs.args[0][2]
+
+        it 'should have revealed the wolf on death', ->
+          where = _(@data).findWhere(id: $state.wolf2.id)
+          should.exist where
+          where.role.should.equal 'werewolf'
 
     describe 'next night', ->
       before (done) ->

@@ -4,6 +4,7 @@ _        = require('underscore')
 Backbone = require('backbone')
 debug    = require('debug')('werewolves:model:game')
 Models   = App.module "Models"
+State    = App.module "State"
 {Capped} = require('backbone.projections')
 
 # A game that is running or will be starting.
@@ -35,6 +36,7 @@ class Models.Game extends Models.BaseModel
   # try to go to the next phase
   next: ->
     before = @state().path()
+
     @go('victory.werewolves')
     @go('victory.villagers')
     if App.server
@@ -44,7 +46,6 @@ class Models.Game extends Models.BaseModel
     initial: state 'initial'
     # This game hasn't started yet
     recruit: state 'abstract',
-      
       # we are still waiting for enough players to join
       waiting: {}
       ready:
@@ -69,6 +70,7 @@ class Models.Game extends Models.BaseModel
       # assign the roles when we leave the recruit state
       exit: ->
         @players.assignRoles() if App.server
+        State.trigger('data', 'merge', 'player', @players)
 
     round: state 'abstract',
       enter: ->
@@ -76,10 +78,12 @@ class Models.Game extends Models.BaseModel
         # this should only happen when the round reaches complete.died stage
         @listenTo @rounds, 'change:death', (model, death) ->
           @players.kill death if death
+          State.trigger('data', 'merge', 'player', @players)
           @next()
 
       depart: ->
         @stopListening @rounds, 'change:death'
+        State.trigger('data', 'merge', 'player', @players)
 
       firstNight: state
         arrive: -> @addRound 'night'
