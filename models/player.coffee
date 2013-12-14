@@ -85,6 +85,19 @@ class Models.Player extends Models.BaseModel
   filterData: (session, event) ->
     event is 'change'
 
+  # never let other players know whether we
+  # are alive.eating or alive.seeing
+  maskState: (session, _state) ->
+    return _state unless session
+
+    # you can see your own true state
+    return _state if session.id is @id
+
+    # always return .asleep otherwise
+    regex = /alive.night.*/
+    return 'alive.night.asleep' if regex.test(_state)
+    _state
+
   initState: ->
     state @,
       voteAction: -> false

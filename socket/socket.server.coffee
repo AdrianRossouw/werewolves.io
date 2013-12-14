@@ -106,8 +106,6 @@ Socket.addInitializer (opts) ->
 
 # outgoing broadcasts from the server to the client
 Socket.addInitializer (opts) ->
-  @stateMask = (url, state, session) ->
-    true unless State.isSession(url) and (session.getUrl() != url)
 
   # when a new socket connection is made
   @listenTo @, 'connection', (socket, session) ->
@@ -143,11 +141,10 @@ Socket.addInitializer (opts) ->
       model = State.models[url]
       return null unless model
 
-      return null unless model.maskState(session, _state)
+      mask = model.maskState(session, _state)
+      return null unless mask
 
-      allow = @stateMask url, _state, session
-
-      socket.emit 'state', url, _state if allow
+      socket.emit 'state', url, mask
 
 
 Socket.addFinalizer (opts) ->

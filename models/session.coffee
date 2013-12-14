@@ -41,7 +41,12 @@ class Models.Session extends Models.BaseModel
     json = super
     return json unless session
 
-    return json if @id is session.id
+    json if @id is session.id
+
+  maskState: (session, _state) ->
+    return _state unless session
+
+    _state if @id is session.id
 
   destroy: ->
     @stopListening @
