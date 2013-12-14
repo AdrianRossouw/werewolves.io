@@ -109,9 +109,7 @@ Socket.addInitializer (opts) ->
 
   # when a new socket connection is made
   @listenTo @, 'connection', (socket, session) ->
-
-    @listenTo State, 'data', (event, args...) =>
-
+    dataHandler = (event, args...) =>
       applyArgs = switch event
         when 'add' then _(args).first(3)
         when 'remove' then _(args).first(2)
@@ -120,6 +118,7 @@ Socket.addInitializer (opts) ->
         when 'change' then _(args).first(2)
         else null
 
+      # not a handled event
       return null unless applyArgs
 
       # model is always the last argument
@@ -137,7 +136,9 @@ Socket.addInitializer (opts) ->
       socket.emit 'data', event, applyArgs...
       debug "data:#{event}", applyArgs...
 
-    @listenTo State, 'state', (url, _state) ->
+    @listenTo State, 'data', dataHandler
+
+    stateHandler = (url, _state) ->
       model = State.models[url]
       return null unless model
 
@@ -145,6 +146,8 @@ Socket.addInitializer (opts) ->
       return null unless mask
 
       socket.emit 'state', url, mask
+
+    @listenTo State, 'state', stateHandler
 
 
 Socket.addFinalizer (opts) ->
