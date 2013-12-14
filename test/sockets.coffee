@@ -424,32 +424,57 @@ describe 'socket can connect', ->
         $state.villager.get('role').should.equal 'villager'
 
       it 'triggered all the data events for phase start', ->
-        $state.players.each (p) ->
-          $spy.state.calledWith('data', 'change', p.getUrl()).should.be.ok
+        $spy.state.calledWith('data', 'merge', 'player').should.be.ok
 
-      it 'have sent the wolf his role', ->
-        $spy.wolfIoData.calledWith('change', $state.wolf.getUrl()).should.be.ok
+      describe 'roles passed to the wolf', ->
+        before ->
+          withArgs = $spy.wolfIoData.withArgs('merge', 'player')
+          @data = withArgs.args[0][2]
 
-      it 'should not have sent the wolf the seer', ->
-        withArgs = $spy.wolfIoData.withArgs('change', $state.seer.getUrl())
-        # TODO: fix this so it doesnt send any messages, or sends for everyone
-        withArgs.called.should.be.ok
-        withArgs.args[0][2].role.should.equal 'villager'
+        it 'have sent the wolf his role', ->
+          where = _(@data).where
+            id: $state.wolf.id
+            role: 'werewolf'
+          where.length.should.equal 1
 
-      it 'should have sent the wolf the other wolf', ->
-        $spy.wolfIoData.calledWith('change', $state.wolf2.getUrl()).should.be.ok
+        it 'should have sent the wolf the other wolf', ->
+          where = _(@data).where
+            id: $state.wolf2.id
+            role: 'werewolf'
+          where.length.should.equal 1
 
-      it 'have sent the seer his role', ->
-        $spy.seerIoData.calledWith('change', $state.seer.getUrl()).should.be.ok
+        it 'should not have sent the wolf the seer', ->
+          where = _(@data).where role: 'seer'
+          where.length.should.equal 0
 
-      it 'should not have sent the seer the wolves yet', ->
-        wolf1 = $spy.seerIoData.withArgs('change', $state.wolf.getUrl())
-        wolf1.called.should.be.ok
-        wolf1.args[0][2].role.should.equal 'villager'
+      describe 'roles passed to the seer', ->
+        before ->
+          withArgs = $spy.seerIoData.withArgs('merge', 'player')
+          @data = withArgs.args[0][2]
 
-        wolf2 = $spy.seerIoData.withArgs('change', $state.wolf2.getUrl())
-        wolf2.called.should.be.ok
-        wolf2.args[0][2].role.should.equal 'villager'
+        it 'have sent the seer his role', ->
+          where = _(@data).where
+            id: $state.seer.id
+            role: 'seer'
+          where.length.should.equal 1
+
+        it 'should not have sent the seer any wolves', ->
+          where = _(@data).where role: 'werewolf'
+          where.length.should.equal 0
+
+      describe 'roles passed to the villager', ->
+        before ->
+          withArgs = $spy.villagerIoData.withArgs('merge', 'player')
+          @data = withArgs.args[0][2]
+
+        it 'should not have sent the villager the seer', ->
+          where = _(@data).where role: 'seer'
+          where.length.should.equal 0
+
+        it 'should not have sent the villager any wolves', ->
+          where = _(@data).where role: 'werewolf'
+          where.length.should.equal 0
+
 
     describe 'first night', ->
       before (done) ->
@@ -490,21 +515,35 @@ describe 'socket can connect', ->
         $clock.tick(30100)
         @round = $state.game.currentRound()
 
+
       it 'triggered all the data events for phase start', ->
-        $state.players.each (p) ->
-          $spy.state.calledWith('data', 'change', p.getUrl()).should.be.ok
+        $spy.state.calledWith('data', 'merge', 'player').should.be.ok
 
-      it.skip 'should have revealed the wolf on death', ->
-        withArgs = $spy.villagerIoData.withArgs('change', $state.wolf2.getUrl())
-        withArgs.args[0][2].role.should.equal 'werewolf'
+      describe 'revealed to villagers', ->
+        before ->
+          withArgs = $spy.villagerIoData.withArgs('merge', 'player')
+          @data = withArgs.args[0][2]
 
-      it 'should have added to the seers seen array', ->
-        withArgs = $spy.seerIoData.withArgs('change', $state.seer.getUrl())
-        withArgs.args[0][2].seen.length.should.equal 1
+        it 'should have revealed the wolf on death', ->
+          where = _(@data).findWhere(id: $state.wolf2.id)
+          should.exist where
+          where.role.should.equal 'werewolf'
 
-      it 'should have shown the wolf to the seer', ->
-        withArgs = $spy.seerIoData.withArgs('change', $state.wolf.getUrl())
-        withArgs.args[0][2].role.should.equal 'werewolf'
+      describe 'revealed to seer', ->
+        before ->
+          withArgs = $spy.villagerIoData.withArgs('merge', 'player')
+          @data = withArgs.args[0][2]
+
+        it 'should have added to the seers seen array', ->
+          where = _(@data).findWhere(id: $state.seer.id)
+          should.exist where.seen
+          where.seen.length.should.equal 1
+
+
+        it 'should have shown the wolf to the seer', ->
+          where = _(@data).findWhere(id: $state.wolf2.id)
+          should.exist where
+          where.role.should.equal 'werewolf'
 
       it 'should have signaled the night end', ->
         $spy.wolfIoState.calledWith(@lastRound.getUrl(), 'complete.died').should.be.ok

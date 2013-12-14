@@ -76,7 +76,7 @@ class Models.Player extends Models.BaseModel
   # conditionally filter out what events
   # get sent to the clients.
   filterData: (session, event) ->
-    #  event is 'change'
+    event is 'change'
 
   initState: ->
     state @,
@@ -85,7 +85,6 @@ class Models.Player extends Models.BaseModel
       # player is dead, they don't get to take part in anything
       dead: state 'final',
         startPhase: ->
-          State.trigger('data', 'change', @getUrl(), @)
       alive:
         kill: ->
           @go('dead')
@@ -98,10 +97,6 @@ class Models.Player extends Models.BaseModel
             @go('seeing')
             @go('asleep')
             @go('eating')
-
-          # trigger a data event here, to sync with
-          # client.
-          State.trigger('data', 'change', @getUrl(), @)
 
         night: state 'abstract',
           # guards set on the states based on roles
@@ -150,12 +145,12 @@ class Models.Players extends Models.BaseCollection
   activeTotal: ->
     isActive = (p) ->
       _state = p.state()
-      debug 'active _state', p.id, _state.isIn('alive'), _state.isIn('asleep'), _state.path()
       _state.isIn('alive') and not _state.isIn('asleep')
     @filter(isActive).length
 
   startPhase: (phase) ->
     @invoke 'startPhase', phase
+    State.trigger('data', 'merge', 'player', @)
 
   aliveByRole: ->
     isAlive = (p) -> p.state().isIn('alive')
