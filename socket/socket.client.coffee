@@ -34,42 +34,34 @@ Socket.addInitializer (opts) ->
     @io.emit 'round:action', target
 
   @io.on 'data', (event, url, args...) ->
-    debug 'data', arguments
-    if event is 'add'
-      [mUrl, data] = args
-      coll = State.models[url]
-      return debug 'collection not found', url if !coll
 
-      debug "adding #{mUrl} to #{url}"
-      record = coll.add data
-      record.state().change(data._state) if data._state
-      record.trigger('state', data._state)
+    data = switch event
+      when 'add' then _(args).first(2)
+      when 'remove' then _(args).first()
+      when 'reset' then _(args).first()
+      when 'merge' then _(args).first()
+      when 'change' then _(args).first()
+      else null
 
+    return null unless data
 
-    if event is 'remove'
-      [mUrl] = args
-      coll = State.models[url]
-      return debug 'collection not found', url if !coll
+    # model is always the last argument
+    model = State.models[url]
+    return null unless model
 
-      debug "data:remove", url, mUrl
-      coll.remove coll.get url
+    switch event
+      when 'add'
+        model.add _(data).last()
+      when 'remove'
+        model.remove model.get data
+      when 'reset'
+        model.reset data
+      when 'merge'
+        model.set data, merge: true
+      when 'change'
+        model.set data
 
-    if event is 'change'
-      [data] = args
-      model = State.models[url]
-      return debug 'model not found', url if !model
-
-      debug "data:change", url, data
-      model.set data if model
-
-    if event is 'reset'
-      [data] = args
-      coll = State.models[url]
-      debug "data:reset", url, data
-      return debug 'collection not found', url if !coll
-
-      debug "removes #{mUrl} from #{url}"
-      coll.reset data
+    debug "data:#{url}", data...
 
 
   @io.on 'state', (url, state) ->
