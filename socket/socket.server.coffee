@@ -39,6 +39,8 @@ Socket.addInitializer (opts) ->
 
       socket.on 'disconnect', =>
         if _state.socket is socket.id
+          debug 'socket disconnect', socket.id
+
           _state.voice = false
           _state.sip = false
           _state.socket = false
@@ -114,26 +116,34 @@ Socket.addInitializer (opts) ->
       if event is 'change'
         [url, model] = args
         mask = model.mask(session)
+        return false if !mask
+
+        socket.emit 'data', 'change', url, mask
         debug('data:change', url, mask)
-        socket.emit 'data', 'change', url, mask if mask
 
       else if event is 'add'
         [cUrl, url, model] = args
         mask = model.mask(session)
+        return false if !mask
+
         debug('data:add', cUrl, url, mask)
-        socket.emit 'data', 'add', cUrl, url, mask if mask
+        socket.emit 'data', 'add', cUrl, url, mask
 
       else if event is 'reset'
         [url, collection] = args
         mask = collection.mask(session)
+        return false if !mask
+
         debug('data:reset', url, mask)
-        socket.emit 'data', 'reset', url, mask if mask
+        socket.emit 'data', 'reset', url, mask
 
       else if event is 'remove'
         [cUrl, url, model] = args
         mask = model.mask(session)
+        return false if !mask
+
         debug('data:remove', cUrl, url, mask)
-        socket.emit 'data', 'remove', cUrl, url if mask
+        socket.emit 'data', 'remove', cUrl, url
 
     @listenTo State, 'state', (url, newState) ->
       allow = @stateMask url, newState, session

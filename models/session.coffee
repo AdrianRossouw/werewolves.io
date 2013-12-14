@@ -68,30 +68,25 @@ class Models.Session extends Models.BaseModel
 
       online: state 'abstract',
         session: state
-          downgrade: 'offline'
           upgrade: 'socket'
+          downgrade: -> @go 'offline' if !@session
           admit:
             offline: -> true if @owner.session
         socket:
-          downgrade: 'session'
+          arrive: -> @downgrade()
           upgrade: 'sip'
-          release:
-            'sip': -> true if @owner.socket
-            'session': -> true if !@owner.socket
+          downgrade: -> @go 'session' if !@socket
           admit:
             'sip,offline,session': -> true if @owner.socket
         sip:
-          downgrade: 'socket'
+          arrive: -> @downgrade()
           upgrade: 'voice'
-          release:
-            'voice': -> true if @owner.sip
-            'socket': -> true if !@owner.sip
+          downgrade: -> @go 'socket' if !@sip
           admit:
             'socket,offline,voice': -> true if (@owner.sip && @owner.socket)
         voice:
-          downgrade: 'sip'
-          release:
-            'sip': -> true if !@owner.voice
+          arrive: -> @downgrade()
+          downgrade: -> @go 'sip' if !@voice
           admit:
             'sip,offline': -> true if (@owner.voice && @owner.sip && @owner.socket)
 

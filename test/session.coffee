@@ -1,6 +1,6 @@
 # This test is built to confirm that the session
 # state machine behaves as expected.
-
+App      = require('../app')
 Models   = require('../models')
 should   = require('should')
 sinon    = require('sinon')
@@ -53,6 +53,7 @@ cleanInstances = ->
 
 describe 'initializing sessions', ->
   before ->
+    App.server = true
     @m = cleanInstances()
 
   testInitialized = (instances, key) ->
@@ -220,7 +221,62 @@ describe 'downgrading connections', ->
     beforeEach -> @m = cleanInstances().voice
 
     it 'should downgrade to sip', ->
-      @m.unset('voice')
-      should.not.exist(@m.voice)
+      @m.voice = false
+      @m.voice.should.equal false
       @m.state().path().should.equal 'online.sip'
 
+
+    it 'should downgrade to socket', ->
+      @m.voice = false
+      @m.sip = false
+
+      @m.state().path().should.equal 'online.socket'
+
+    it 'should downgrade to session', ->
+      @m.voice = false
+      @m.sip = false
+      @m.socket = false
+
+      @m.state().path().should.equal 'online.session'
+
+    it 'should downgrade to offline', ->
+      @m.voice = false
+      @m.sip = false
+      @m.socket = false
+      @m.session = false
+
+      @m.state().path().should.equal 'offline'
+
+  describe.skip 'from online.sip state', ->
+    beforeEach -> @m = cleanInstances().sip
+
+    it 'should downgrade to socket', ->
+      @m.sip = false
+      @m.state().path().should.equal 'online.socket'
+
+    it 'should downgrade to session', ->
+      @m.sip = false
+      @m.socket = false
+
+      @m.state().path().should.equal 'online.session'
+
+    it 'should downgrade to offline', ->
+      @m.sip = false
+      @m.socket = false
+      @m.session = false
+
+      @m.state().path().should.equal 'offline'
+
+  describe.skip 'from online.socket state', ->
+    beforeEach -> @m = cleanInstances().socket
+
+    it 'should downgrade to session', ->
+      @m.socket = false
+
+      @m.state().path().should.equal 'online.session'
+
+    it 'should downgrade to offline', ->
+      @m.socket = false
+      @m.session = false
+
+      @m.state().path().should.equal 'offline'

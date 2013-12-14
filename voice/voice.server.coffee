@@ -19,7 +19,9 @@ Models.Session::signal = (signal) ->
   request.post reqOpts, ->
 
 Models.Session::initVoice = ->
+  return false if !@sip
 
+  debug 'initvoice', @id, @sip
   body = JSON.stringify
     token: Voice.token,
     playerId: @id
@@ -66,15 +68,15 @@ Voice.audio = (tropo, name) ->
 
 Voice.asleep = (tropo) ->
   tropo.say 'you go to sleep'
-  tropo.conference("asleep", true, "asleep", false, null, '#', 'exit')
+  tropo.conference "asleep", true, "asleep", false, null, '#'
 
 Voice.awake = (tropo) ->
   tropo.say 'you wake up'
-  tropo.conference "awake", null, "awake", false, null, '#', 'exit'
+  tropo.conference "awake", null, "awake", false, null, '#'
 
 Voice.spectate = (tropo) ->
   tropo.say 'you are spectating'
-  tropo.conference("awake", true, "awake", false, null, '#', 'exit')
+  tropo.conference "awake", true, "awake", false, null, '#'
 
 
 # introductory, to be played in attract mode
@@ -180,7 +182,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
     tropo.on 'exit', null, '/voice'
     tropo.on "hangup", null, "/voice/hangup"
     tropo.on "incomplete", null, "/voice/incomplete"
-    #tropo.on "error", null, "/voice/error"
+    tropo.on "error", null, "/voice/error"
 
 
     # session.voice maps to this body property from tropo's backend
@@ -231,18 +233,17 @@ Voice.listenTo App, 'before:routes', (opts) ->
     return res.send TropoJSON(tropo)
 
   downgrade = (req, res, next) ->
-    console.log(req.body)
     sessionId = req.body?.result?.sessionId
 
     # session.voice maps to this body property from tropo's backend
     session = State.world.sessions.findVoice(sessionId)
     session.unset('voice') if session
-    console.log(session)
 
     res.send(500)
 
   App.post '/voice/hangup', downgrade
   App.post '/voice/incomplete', downgrade
+  App.post '/voice/error', downgrade
   App.post '/voice/error', downgrade
 
 Voice.addFinalizer (opts) ->
