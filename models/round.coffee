@@ -15,6 +15,14 @@ class Models.Action extends Models.BaseModel
     super
     @publish()
 
+  toJSON: (session) ->
+    json = super
+    return json unless session
+
+    # don't pass filtered actions through in the
+    # first data dump, leaking roles...
+    json unless @filterData(session, 'add')
+
   # only sync actions to the same roles
   filterData: (session, event) ->
     # always see lynchings, even for observers
