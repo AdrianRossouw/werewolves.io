@@ -47,6 +47,12 @@ class Models.Session extends Models.BaseModel
   removeSession: (id) ->
     @session = false if @session is id
 
+  addVoice: (id) ->
+    @voice ?= id
+
+  removeVoice: (id) ->
+    @voice = false if @voice is id
+
   toJSON: (session) ->
     json = super
     return json unless session
