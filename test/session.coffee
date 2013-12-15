@@ -20,28 +20,28 @@ $data =
   socket:
     id: 'socket'
     session: 'session.id'
-    socket: 'socket.id'
+    socket: ['socket.id']
     _state: 'online.socket'
 
   sip:
     id: 'sip'
     session: 'session.id'
-    socket: 'socket.id'
-    sip: 'sip.id'
+    socket: ['socket.id']
+    sip: ['sip.id']
     _state: 'online.sip'
 
   voice:
     id: 'voice'
     session: 'session.id'
-    socket: 'socket.id'
-    sip: 'sip.id'
+    socket: ['socket.id']
+    sip: ['sip.id']
     voice: 'voice.id'
     _state: 'online.voice'
 
   # edge case: used during testing a lot
   socketOnly:
     id: 'socket-only'
-    socket: 'socket.id'
+    socket: ['socket.id']
     _state: 'online.socket'
 
 # get a clean instance
@@ -101,21 +101,21 @@ describe 'upgrading connections', ->
 
     it 'should upgrade to socket', ->
       @m.session = 'session.id'
-      @m.socket = 'socket.id'
-      @m.socket.should.equal 'socket.id'
+      @m.socket = ['socket.id']
+      @m.socket.should.include 'socket.id'
       @m.state().path().should.equal 'online.socket'
 
     it 'should upgrade to sip', ->
       @m.session = 'session.id'
-      @m.socket = 'socket.id'
-      @m.sip = 'sip.id'
-      @m.sip.should.equal 'sip.id'
+      @m.socket = ['socket.id']
+      @m.sip = ['sip.id']
+      @m.sip.should.include 'sip.id'
       @m.state().path().should.equal 'online.sip'
 
     it 'should upgrade to voice', ->
       @m.session = 'session.id'
-      @m.socket = 'socket.id'
-      @m.sip = 'sip.id'
+      @m.socket = ['socket.id']
+      @m.sip = ['sip.id']
       @m.voice = 'voice.id'
       @m.voice.should.equal 'voice.id'
       @m.state().path().should.equal 'online.voice'
@@ -125,19 +125,19 @@ describe 'upgrading connections', ->
     beforeEach -> @m = cleanInstances().session
 
     it 'should upgrade to socket', ->
-      @m.socket = 'socket.id'
-      @m.socket.should.equal 'socket.id'
+      @m.socket = ['socket.id']
+      @m.socket.should.include 'socket.id'
       @m.state().path().should.equal 'online.socket'
 
     it 'should upgrade to sip', ->
-      @m.socket = 'socket.id'
-      @m.sip = 'sip.id'
-      @m.sip.should.equal 'sip.id'
+      @m.socket = ['socket.id']
+      @m.sip = ['sip.id']
+      @m.sip.should.include 'sip.id'
       @m.state().path().should.equal 'online.sip'
 
     it 'should upgrade to voice', ->
-      @m.socket = 'socket.id'
-      @m.sip = 'sip.id'
+      @m.socket = ['socket.id']
+      @m.sip = ['sip.id']
       @m.voice = 'voice.id'
       @m.voice.should.equal 'voice.id'
       @m.state().path().should.equal 'online.voice'
@@ -146,12 +146,12 @@ describe 'upgrading connections', ->
     beforeEach -> @m = cleanInstances().socket
 
     it 'should upgrade to sip', ->
-      @m.sip = 'sip.id'
-      @m.sip.should.equal 'sip.id'
+      @m.sip = ['sip.id']
+      @m.sip.should.include 'sip.id'
       @m.state().path().should.equal 'online.sip'
 
     it 'should upgrade to voice', ->
-      @m.sip = 'sip.id'
+      @m.sip = ['sip.id']
       @m.voice = 'voice.id'
       @m.voice.should.equal 'voice.id'
       @m.state().path().should.equal 'online.voice'
@@ -173,12 +173,12 @@ describe 'upgrading connections', ->
       @m.state().path().should.not.equal 'online.session'
 
     it 'should upgrade to sip', ->
-      @m.sip = 'sip.id'
-      @m.sip.should.equal 'sip.id'
+      @m.sip = ['sip.id']
+      @m.sip.should.include 'sip.id'
       @m.state().path().should.equal 'online.sip'
 
     it 'should upgrade to voice', ->
-      @m.sip = 'sip.id'
+      @m.sip = ['sip.id']
       @m.voice = 'voice.id'
       @m.voice.should.equal 'voice.id'
       @m.state().path().should.equal 'online.voice'
@@ -191,17 +191,17 @@ describe 'upgrading connections', ->
       @m.voice = 'voice.id'
       @m.state().path().should.equal 'offline'
 
-      @m.sip = 'sip.id'
+      @m.sip = ['sip.id']
       @m.state().path().should.equal 'offline'
 
-      @m.socket = 'socket.id'
+      @m.socket = ['socket.id']
       @m.session = 'session.id'
 
       @m.state().path().should.equal 'online.voice'
 
  
     it 'socket, session, voice, sip', ->
-      @m.socket = 'socket.id'
+      @m.socket = ['socket.id']
       @m.state().path().should.equal 'online.socket'
 
       @m.session = 'session.id'
@@ -210,7 +210,7 @@ describe 'upgrading connections', ->
       @m.voice = 'voice.id'
       @m.state().path().should.equal 'online.socket'
 
-      @m.sip = 'sip.id'
+      @m.sip = ['sip.id']
       @m.state().path().should.equal 'online.voice'
 
 

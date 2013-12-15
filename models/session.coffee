@@ -25,6 +25,9 @@ class Models.Session extends Models.BaseModel
     @id = data.id or App.ns.uuid()
     super
 
+    @socket = data.socket or []
+    @sip = data.sip or []
+
     @state().change(data._state or 'offline')
     @publish()
     @trigger('state', @state().path())
@@ -58,7 +61,7 @@ class Models.Session extends Models.BaseModel
       upgrade: ->
       offline: state 'initial',
         upgrade: ->
-          if @socket
+          if @socket.length
             @go 'socket'
           else if @session
             @go 'session'
@@ -66,16 +69,16 @@ class Models.Session extends Models.BaseModel
       online: state 'abstract',
         session: state
           arrive: -> @updateState()
-          upgrade: -> @go 'socket' if @socket
+          upgrade: -> @go 'socket' if @socket.length
           downgrade: -> @go 'offline' if !@session
         socket:
           arrive: -> @updateState()
-          upgrade: -> @go 'sip' if @sip
-          downgrade: -> @go 'session' if !@socket
+          upgrade: -> @go 'sip' if @sip.length
+          downgrade: -> @go 'session' if !@socket.length
         sip:
           arrive: -> @updateState()
           upgrade: -> @go 'voice' if @voice
-          downgrade: -> @go 'socket' if !@sip
+          downgrade: -> @go 'socket' if !@sip.length
         voice:
           arrive: -> @updateState()
           downgrade: -> @go 'sip' if !@voice
