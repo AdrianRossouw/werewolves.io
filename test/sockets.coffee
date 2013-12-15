@@ -53,7 +53,6 @@ setupSpies = ->
   $stub.roles = sinon.stub Models, '_getRoles'
   $stub.roles.returns $roles
 
-
 resetSpies = -> _($spy).invoke 'reset'
 
 restoreSpies = ->
@@ -71,10 +70,9 @@ App.config = ->
       log: false
 
 before ->
-  App.module "Voice",
-    startsWithParent: false
-  
   config = App.config()
+
+  App.module "Voice", startsWithParent: false
   State.sessionStore = new MemoryStore(secret: config.secret)
 
   Socket.start config
@@ -98,7 +96,6 @@ describe 'socket can connect', ->
     $io.spectateSocket = socketio.connect url,
       'force new connection': true
     $io.spectateSocket.on 'connect', -> next()
-
 
   it 'should have set up the environment', ->
     should.exist $io.wolfSocket
@@ -168,7 +165,6 @@ describe 'socket can connect', ->
       should.exist $io.world.timer._state
       $io.world.timer._state.should.equal $state.timer.state().path()
 
-
   describe 'getting session from server', ->
     before (done) ->
       $io.wolfSocket.emit 'data', $state.url, (err, data) =>
@@ -181,7 +177,6 @@ describe 'socket can connect', ->
       should.exist $io.session._state
       $io.session.id.should.equal $server.id
       $io.session._state.should.equal $state.session.state().path()
-
 
   describe 'upgrading session from client', ->
     before (done) ->
@@ -208,7 +203,6 @@ describe 'socket can connect', ->
     it 'IO should have caught a state event', ->
       $spy.wolfIoState.calledWith($state.url, 'online.sip').should.be.ok
 
-
   describe 'upgrading session from server', ->
     before ->
       $state.session.voice = 'voice@test.com'
@@ -230,8 +224,6 @@ describe 'socket can connect', ->
 
     it 'IO should have caught a state event', ->
       $spy.wolfIoState.calledWith($state.url, 'online.sip').should.be.ok
-
-
 
   describe 'it should allow us to join the game', ->
     before (done) ->
@@ -298,8 +290,6 @@ describe 'socket can connect', ->
       $spy.wolfIoState.called.should.not.be.ok
       $spy.wolfIoData.called.should.not.be.ok
 
-
-
   describe 'adding the seer to the game', ->
     before (done) ->
       resetSpies()
@@ -365,7 +355,6 @@ describe 'socket can connect', ->
 
     before ->
       resetSpies()
-
       $clock = sinon.useFakeTimers()
    
     describe 'adding more players, 10 seconds apart', ->

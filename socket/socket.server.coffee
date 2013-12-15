@@ -20,7 +20,6 @@ Models.Sessions::touchSocket = (socket, sess) ->
   session.socket = socket.id
   session
 
-
 # Initialize the socket.io library, with the
 # session handler wrapper.
 Socket.addInitializer (opts) ->
@@ -54,7 +53,6 @@ Socket.formatUrl = (opts) ->
     port: 8000
     
   url.format parts
-
 
 # Incoming requests from the client
 Socket.addInitializer (opts) ->
@@ -98,8 +96,6 @@ Socket.addInitializer (opts) ->
       socket.removeAllListeners 'update'
       socket.removeAllListeners 'game:join'
       socket.removeAllListeners 'round:action'
-
-
 
 # outgoing broadcasts from the server to the client
 Socket.addInitializer (opts) ->
@@ -154,7 +150,6 @@ Socket.addInitializer (opts) ->
 
       socket.emit 'data', event, applyArgs...
       debug "data:#{event}:#{socket.id}", applyArgs...
-
 
 Socket.addFinalizer (opts) ->
   @off()

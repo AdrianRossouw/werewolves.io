@@ -21,8 +21,8 @@ Marionette    = require("backbone.marionette")
 Backbone.$    = Marionette.$ = require("jquery")
 {Filtered}    = require("backbone.projections")
 
-if window.NODE_ENV != 'development'
-  require('../voice')
+#if window.NODE_ENV != 'development'
+require('../voice')
 
 # Load up the state instances
 State = require('../state')
@@ -96,22 +96,16 @@ App.addInitializer ->
 #if env is 'development'
 require('../wolfbots')
 
-
 App.bootstrap = (world) ->
   config = App.config()
 
   App.start config
-  debug 'loading', JSON.stringify(world, null, 2)
   State.load world
-  debug 'loaded', JSON.stringify(State.world.toJSON(), null, 2)
   Socket.start config
 
-  @status.show new Views.Status
-    model: State.world
+  @status.show new Views.Status model: State.world
 
   @trigger 'bootstrap'
-
-  # won't happen if the guards dont admit it
   @state().change('game')
 
 window.App = App

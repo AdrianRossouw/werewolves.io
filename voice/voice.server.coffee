@@ -21,7 +21,6 @@ Models.Session::signal = (signal) ->
 Models.Session::initVoice = ->
   return false unless @sip and @socket
 
-  debug 'initvoice', @id, @sip
   body = JSON.stringify
     token: Voice.token,
     playerId: @id
@@ -35,11 +34,9 @@ Models.Session::initVoice = ->
   request.post reqOpts, (err, resp) =>
     @voice = resp.body.id.replace('\r\n', '')
 
-
 Models.Sessions::findVoice = (voice) ->
   return false if not voice
   @findWhere voice: voice
-
 
 Models.Sessions::findSip = (sip) ->
   return false if not sip
@@ -62,7 +59,6 @@ Voice.debug = (tropo, env) ->
   tropo.say "round is #{env.round.state().name}" if env.round
   tropo.say "player is #{env.player.state().name}" if env.player
 
-
 Voice.audio = (tropo, name) ->
   tropo.say "http://hosting.tropo.com/5010929/www/audio/#{name}.mp3"
 
@@ -77,7 +73,6 @@ Voice.awake = (tropo) ->
 Voice.spectate = (tropo) ->
   tropo.say 'you are spectating'
   tropo.conference "awake", true, "awake", false, null, '#'
-
 
 # introductory, to be played in attract mode
 Voice.intro = (tropo, env) ->
@@ -141,8 +136,6 @@ Voice.villagersWin = (tropo, env) ->
   tropo.say 'villagers win'
   @awake tropo
 
-
-
 # for specific roles
 # leave them muted/unmuted in the 
 # right conference rooms.
@@ -169,11 +162,7 @@ Voice.listenTo State, 'state', (url, state) ->
   # tropo will call back to get the script
   State.world.sessions.invoke 'signal', 'exit' if url == 'game'
 
-
-# this is the url that tropo will hit when it calls
-# us.
-#
-# TODO: handle hangups, so we can remove inactive sessions
+# this is the url that tropo will hit when it calls us.
 Voice.listenTo App, 'before:routes', (opts) ->
   App.post '/voice', (req, res, next) =>
     tropo = new TropoWebAPI()
@@ -247,6 +236,5 @@ Voice.listenTo App, 'before:routes', (opts) ->
 
 Voice.addFinalizer (opts) ->
   @stopListening()
-
 
 module.exports = Voice

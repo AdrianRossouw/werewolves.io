@@ -51,7 +51,6 @@ class Views.Opponents extends Backbone.Marionette.CollectionView
   className: 'opponents'
   itemView: Views.Opponent
 
-
 class Views.PlayerLog extends Backbone.Marionette.ItemView
   className: 'playerlog'
 
@@ -63,5 +62,3 @@ class Views.PlayerLog extends Backbone.Marionette.ItemView
       pages: pages
 
     json
-
-
