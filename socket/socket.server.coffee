@@ -105,6 +105,7 @@ Socket.addInitializer (opts) ->
 Socket.addInitializer (opts) ->
   @listenTo State, 'state', (url, _state) ->
     sessions = State.world.sessions
+    return null unless sessions
 
     _(@io.sockets.clients('game')).each (socket) ->
       session = sessions.findSocket socket.id
@@ -120,11 +121,14 @@ Socket.addInitializer (opts) ->
       debug "state:#{socket.id}", url, mask
 
 Socket.addInitializer (opts) ->
-  dataHandler = (socket, session) ->
-    debug "register:socket", 'data', socket.id
-    id = _.uniqueId('socket')
+  @listenTo State, 'data', (event, args...) ->
+    sessions = State.world?.sessions
+    return null unless sessions
 
-    (event, args...) ->
+    _(@io.sockets.clients('game')).each (socket) ->
+      session = sessions.findSocket socket.id
+      return null unless session
+
       applyArgs = switch event
         when 'add' then _(args).first(3)
         when 'remove' then _(args).first(2)
@@ -149,15 +153,8 @@ Socket.addInitializer (opts) ->
       applyArgs.push(maskJSON)
 
       socket.emit 'data', event, applyArgs...
-      debug "data:#{event}:#{id}", applyArgs...
-  # when a new socket connection is made
-  @listenTo @, 'connection', (socket, session) ->
-    dhInstance = dataHandler(socket, session)
-    @listenTo State, 'data', dhInstance
+      debug "data:#{event}:#{socket.id}", applyArgs...
 
-    # remove all the listeners on this socket
-    socket.on 'disconnect', =>
-      @stopListening State, 'data', dhInstance
 
 Socket.addFinalizer (opts) ->
   @off()
