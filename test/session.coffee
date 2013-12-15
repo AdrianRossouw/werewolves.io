@@ -95,25 +95,25 @@ describe 'upgrading connections', ->
     beforeEach -> @m = cleanInstances().offline
 
     it 'should upgrade to session', ->
-      @m.session = 'session.id'
+      @m.addSession 'session.id'
       @m.session.should.equal 'session.id'
       @m.state().path().should.equal 'online.session'
 
     it 'should upgrade to socket', ->
-      @m.session = 'session.id'
+      @m.addSession 'session.id'
       @m.socket = ['socket.id']
       @m.socket.should.include 'socket.id'
       @m.state().path().should.equal 'online.socket'
 
     it 'should upgrade to sip', ->
-      @m.session = 'session.id'
+      @m.addSession 'session.id'
       @m.socket = ['socket.id']
       @m.sip = ['sip.id']
       @m.sip.should.include 'sip.id'
       @m.state().path().should.equal 'online.sip'
 
     it 'should upgrade to voice', ->
-      @m.session = 'session.id'
+      @m.addSession 'session.id'
       @m.socket = ['socket.id']
       @m.sip = ['sip.id']
       @m.voice = 'voice.id'
@@ -168,7 +168,7 @@ describe 'upgrading connections', ->
     beforeEach -> @m = cleanInstances().socketOnly
     
     it 'should not downgrade to session', ->
-      @m.session = 'session.id'
+      @m.addSession 'session.id'
       @m.session.should.equal 'session.id'
       @m.state().path().should.not.equal 'online.session'
 
@@ -195,7 +195,7 @@ describe 'upgrading connections', ->
       @m.state().path().should.equal 'offline'
 
       @m.socket = ['socket.id']
-      @m.session = 'session.id'
+      @m.addSession 'session.id'
 
       @m.state().path().should.equal 'online.voice'
 
@@ -204,7 +204,7 @@ describe 'upgrading connections', ->
       @m.socket = ['socket.id']
       @m.state().path().should.equal 'online.socket'
 
-      @m.session = 'session.id'
+      @m.addSession 'session.id'
       @m.state().path().should.equal 'online.socket'
 
       @m.voice = 'voice.id'
@@ -227,20 +227,20 @@ describe 'downgrading connections', ->
 
 
     it 'should downgrade to socket', ->
-      @m.set voice: false, sip: false
+      @m.set voice: false, sip: []
 
       @m.state().path().should.equal 'online.socket'
 
     it 'should downgrade to session', ->
-      @m.set voice: false, sip: false, socket: false
+      @m.set voice: false, sip: [], socket: []
 
       @m.state().path().should.equal 'online.session'
 
     it 'should downgrade to offline', ->
       @m.voice = false
-      @m.sip = false
-      @m.socket = false
-      @m.session = false
+      @m.sip = []
+      @m.socket = []
+      @m.removeSession 'session.id'
 
       @m.state().path().should.equal 'offline'
 
@@ -248,19 +248,19 @@ describe 'downgrading connections', ->
     beforeEach -> @m = cleanInstances().sip
 
     it 'should downgrade to socket', ->
-      @m.sip = false
+      @m.sip = []
       @m.state().path().should.equal 'online.socket'
 
     it 'should downgrade to session', ->
-      @m.sip = false
-      @m.socket = false
+      @m.sip = []
+      @m.socket = []
 
       @m.state().path().should.equal 'online.session'
 
     it 'should downgrade to offline', ->
-      @m.sip = false
-      @m.socket = false
-      @m.session = false
+      @m.sip = []
+      @m.socket = []
+      @m.removeSession 'session.id'
 
       @m.state().path().should.equal 'offline'
 
@@ -268,12 +268,12 @@ describe 'downgrading connections', ->
     beforeEach -> @m = cleanInstances().socket
 
     it 'should downgrade to session', ->
-      @m.socket = false
+      @m.socket = []
 
       @m.state().path().should.equal 'online.session'
 
     it 'should downgrade to offline', ->
-      @m.socket = false
-      @m.session = false
+      @m.socket = []
+      @m.removeSession 'session.id'
 
       @m.state().path().should.equal 'offline'

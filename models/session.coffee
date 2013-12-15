@@ -40,6 +40,13 @@ class Models.Session extends Models.BaseModel
         player = value
         player
 
+  # adds a connection to the session object
+  addSession: (id) ->
+    @session ?= id
+
+  removeSession: (id) ->
+    @session = false if @session is id
+
   toJSON: (session) ->
     json = super
     return json unless session
