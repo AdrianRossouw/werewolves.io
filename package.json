@@ -86,7 +86,8 @@
     "jquery": "./bower_components/jquery/jquery.min.js",
     "phono": "./bower_components/phono/releases/1.1/jquery.phono.min.js",
     "buzz": "./bower_components/buzz/dist/buzz.min.js",
-    "backbone.picky": "./bower_components/backbone.picky/lib/backbone.picky.min.js"
+    "backbone.picky": "./bower_components/backbone.picky/lib/backbone.picky.min.js",
+    "./phono.util.js": false
   },
   "author": "Nodesque",
   "license": "BSD-2-Clause"

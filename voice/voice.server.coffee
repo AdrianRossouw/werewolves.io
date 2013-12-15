@@ -216,6 +216,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
     return res.send TropoJSON(tropo)
 
   downgrade = (req, res, next) ->
+    console.log(req.body)
     sessionId = req.body?.result?.sessionId
 
     # session.voice maps to this body property from tropo's backend

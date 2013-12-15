@@ -67,7 +67,7 @@ module.exports = (grunt) ->
               depends:
                 jquery: "$"
             phono:
-              path: "bower_components/phono/releases/1.1/jquery.phono.min.js"
+              path: "bower_components/phono/releases/master/jquery.phono.min.js"
               exports: "phono"
               depends:
                 jquery: "$"

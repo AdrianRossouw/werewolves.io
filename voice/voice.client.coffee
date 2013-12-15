@@ -10,7 +10,7 @@ Voice.addInitializer (opts) ->
   @apiKey = opts.apiKey
 
   @listenTo State, 'load', (world) ->
-    $.phono
+    @phone = $.phono
       apiKey: @apiKey
       onReady: (event) ->
         Voice.phono = @
@@ -25,6 +25,10 @@ Voice.addInitializer (opts) ->
           State.addCall()
           console.log("Auto-answering call with ID " + call.id)
           call.answer()
+        onError: (reason) ->
+          alert "error #{reason}"
+
+    @phone.setLogLevel("WARN")
 
   $(window).on 'unload', ->
     phono.connection.sync = true
