@@ -55,7 +55,7 @@ State.choose = (id, target) ->
 State.addSip = (id) ->
   @trigger 'session:sip', id
 
-State.voiceAnswer = (id) ->
-  @trigger 'voice:answer', id
+State.addCall = (id) ->
+  @trigger 'session:call'
 
 module.exports = State

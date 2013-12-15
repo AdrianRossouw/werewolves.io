@@ -29,6 +29,9 @@ Socket.addInitializer (opts) ->
   State.on 'session:sip', (id) =>
     @io.emit 'session:sip', id
 
+  State.on 'session:call', (id) =>
+    @io.emit 'session:call'
+
   @io.on 'data', (event, url, args...) ->
 
     data = switch event

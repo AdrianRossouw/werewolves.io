@@ -21,6 +21,8 @@ class Models.Session extends Models.BaseModel
   @attribute 'socket'
   @attribute 'sip'
   @attribute 'voice'
+  @attribute 'call'
+
   initialize: (data={}, opts={}) ->
     @id = data.id or App.ns.uuid()
     super
@@ -41,24 +43,21 @@ class Models.Session extends Models.BaseModel
         player
 
   # adds a connection to the session object
-  addSession: (id) ->
-    @session ?= id
-
-  removeSession: (id) ->
-    @session = false if @session is id
+  addSession: (id) -> @session ?= id
+  removeSession: (id) -> @session = false if @session is id
 
   # each session can only have one active voice
-  addVoice: (id) ->
-    @voice ?= id
+  addVoice: (id) -> @voice ?= id
+  removeVoice: (id) -> @voice = false if @voice is id
 
-  removeVoice: (id) ->
-    @voice = false if @voice is id
+  # each session has one of it's open windows being active
+  addCall: (id) -> @call ?= id if id in @socket
+  removeCall: (id) -> @call = false if @call is id
 
   # each session can have multiple sockets
   hasSocket: -> _(@socket).size()
   addSocket: (id) ->
     return null if id in @socket
-
     socket = _(@socket).clone()
     socket.push(id)
     @socket = socket
@@ -94,13 +93,12 @@ class Models.Session extends Models.BaseModel
 
   maskState: (session, _state) ->
     return _state unless session
-
     _state if @id is session.id
 
-  destroy: ->
-    @stopListening @
+  destroy: -> @stopListening @
 
   updateState: -> @upgrade() or @downgrade()
+
   initState: ->
     state @,
       downgrade: ->
@@ -127,7 +125,11 @@ class Models.Session extends Models.BaseModel
           downgrade: -> @go 'socket' if !_(@sip).size()
         voice:
           arrive: -> @updateState()
+          upgrade: -> @go 'call' if @call
           downgrade: -> @go 'sip' if !@voice
+        call:
+          arrive: -> @updateState()
+          downgrade: -> @go 'voice' if !@call
 
 class Models.Sessions extends Models.BaseCollection
   url: 'session'

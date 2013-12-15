@@ -178,20 +178,20 @@ describe 'socket can connect', ->
       $io.session.id.should.equal $server.id
       $io.session._state.should.equal $state.session.state().path()
 
-  describe 'upgrading session from client', ->
+  describe 'upgrading session to sip from client', ->
     before (done) ->
-      $io.session.sip = 'test@test.com'
-      $io.wolfSocket.emit 'update', $state.url, $io.session, done
+      $io.session.sip[$io.session.socket[0]] = 'test@test.com'
+
+      $io.wolfSocket.emit 'session:sip', 'test@test.com', done
 
     it 'should have changed the server records', ->
-      $server.session.sip.should.equal $io.session.sip
-      $state.session.sip.should.equal $io.session.sip
+      $server.session.sip.should.include $io.session.sip
+      $state.session.sip.should.include $io.session.sip
 
     it 'should have changed the state on the server', ->
       $server.session.state().path().should.equal 'online.sip'
 
     it 'State should have fired a data change event', ->
-      console.log $spy.wolfIoData.args
       $spy.state.calledWith('data', 'change', $state.url).should.be.ok
 
     it 'State should have fired a state event', ->
@@ -203,12 +203,9 @@ describe 'socket can connect', ->
     it 'IO should have caught a state event', ->
       $spy.wolfIoState.calledWith($state.url, 'online.sip').should.be.ok
 
-  describe 'upgrading session from server', ->
+  describe 'upgrading session to voice from server', ->
     before ->
       $state.session.voice = 'voice@test.com'
-
-    it 'should have changed the server records', ->
-      $state.session.sip.should.equal $io.session.sip
 
     it 'should have changed the state on the server', ->
       $server.session.state().path().should.equal 'online.voice'
@@ -218,6 +215,29 @@ describe 'socket can connect', ->
 
     it 'State should have fired a state event', ->
       $spy.state.calledWith('state', $state.url, 'online.voice').should.be.ok
+
+    it 'IO should have caught a data change event', ->
+      $spy.wolfIoData.calledWith('change', $state.url).should.be.ok
+
+    it 'IO should have caught a state event', ->
+      $spy.wolfIoState.calledWith($state.url, 'online.sip').should.be.ok
+
+  describe 'upgrading session to call from client', ->
+    before (done) ->
+      $io.wolfSocket.emit 'session:call', done
+
+    it 'should have changed the server records', ->
+      $server.session.sip.should.include $io.session.sip
+      $state.session.sip.should.include $io.session.sip
+
+    it 'should have changed the state on the server', ->
+      $server.session.state().path().should.equal 'online.call'
+
+    it 'State should have fired a data change event', ->
+      $spy.state.calledWith('data', 'change', $state.url).should.be.ok
+
+    it 'State should have fired a state event', ->
+      $spy.state.calledWith('state', $state.url, 'online.sip').should.be.ok
 
     it 'IO should have caught a data change event', ->
       $spy.wolfIoData.calledWith('change', $state.url).should.be.ok

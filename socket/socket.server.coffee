@@ -41,8 +41,10 @@ Socket.addInitializer (opts) ->
 
       socket.on 'disconnect', ->
         # handles downgrading the voice connection
-        isActive = session.activeSip is session.sip[socket.id]
-        session.removeVoice session.voice if isActive
+        if session.call is socket.id
+          console.log 'kill active call'
+          session.removeCall socket.id
+          session.removeVoice session.voice
 
         # remove the sip address registered for this socket
         session.removeSip socket.id
@@ -77,11 +79,6 @@ Socket.addInitializer (opts) ->
       return cb(404, {message: 'not found'}) unless model
       cb(null, model.maskJSON(state))
 
-    socket.on 'voice:answer', (sip, cb =->) ->
-      session.activeSip = sip
-      cb(null)
-
-
     # a modification of data from the client.
     socket.on 'update', (url, data, cb = ->) ->
       debug "update", url, data
@@ -93,6 +90,11 @@ Socket.addInitializer (opts) ->
     # add a sip address registered against this socket
     socket.on 'session:sip', (id, cb = ->) ->
       state.addSip(socket.id, id)
+      cb(null)
+
+    # add a sip address registered against this socket
+    socket.on 'session:call', (cb = ->) ->
+      state.addCall(socket.id)
       cb(null)
 
     # allow players to join
