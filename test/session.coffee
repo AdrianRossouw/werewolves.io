@@ -101,20 +101,20 @@ describe 'upgrading connections', ->
 
     it 'should upgrade to socket', ->
       @m.addSession 'session.id'
-      @m.socket = ['socket.id']
+      @m.addSocket 'socket.id'
       @m.socket.should.include 'socket.id'
       @m.state().path().should.equal 'online.socket'
 
     it 'should upgrade to sip', ->
       @m.addSession 'session.id'
-      @m.socket = ['socket.id']
+      @m.addSocket 'socket.id'
       @m.sip = ['sip.id']
       @m.sip.should.include 'sip.id'
       @m.state().path().should.equal 'online.sip'
 
     it 'should upgrade to voice', ->
       @m.addSession 'session.id'
-      @m.socket = ['socket.id']
+      @m.addSocket 'socket.id'
       @m.sip = ['sip.id']
       @m.addVoice 'voice.id'
       @m.voice.should.equal 'voice.id'
@@ -125,18 +125,18 @@ describe 'upgrading connections', ->
     beforeEach -> @m = cleanInstances().session
 
     it 'should upgrade to socket', ->
-      @m.socket = ['socket.id']
+      @m.addSocket 'socket.id'
       @m.socket.should.include 'socket.id'
       @m.state().path().should.equal 'online.socket'
 
     it 'should upgrade to sip', ->
-      @m.socket = ['socket.id']
+      @m.addSocket 'socket.id'
       @m.sip = ['sip.id']
       @m.sip.should.include 'sip.id'
       @m.state().path().should.equal 'online.sip'
 
     it 'should upgrade to voice', ->
-      @m.socket = ['socket.id']
+      @m.addSocket 'socket.id'
       @m.sip = ['sip.id']
       @m.addVoice 'voice.id'
       @m.voice.should.equal 'voice.id'
@@ -194,14 +194,14 @@ describe 'upgrading connections', ->
       @m.sip = ['sip.id']
       @m.state().path().should.equal 'offline'
 
-      @m.socket = ['socket.id']
+      @m.addSocket 'socket.id'
       @m.addSession 'session.id'
 
       @m.state().path().should.equal 'online.voice'
 
  
     it 'socket, session, voice, sip', ->
-      @m.socket = ['socket.id']
+      @m.addSocket 'socket.id'
       @m.state().path().should.equal 'online.socket'
 
       @m.addSession 'session.id'
@@ -212,8 +212,6 @@ describe 'upgrading connections', ->
 
       @m.sip = ['sip.id']
       @m.state().path().should.equal 'online.voice'
-
-
 
 describe 'downgrading connections', ->
  
@@ -239,7 +237,7 @@ describe 'downgrading connections', ->
     it 'should downgrade to offline', ->
       @m.removeVoice 'voice.id'
       @m.sip = []
-      @m.socket = []
+      @m.removeSocket 'socket.id'
       @m.removeSession 'session.id'
 
       @m.state().path().should.equal 'offline'
@@ -253,13 +251,13 @@ describe 'downgrading connections', ->
 
     it 'should downgrade to session', ->
       @m.sip = []
-      @m.socket = []
+      @m.removeSocket 'socket.id'
 
       @m.state().path().should.equal 'online.session'
 
     it 'should downgrade to offline', ->
       @m.sip = []
-      @m.socket = []
+      @m.removeSocket 'socket.id'
       @m.removeSession 'session.id'
 
       @m.state().path().should.equal 'offline'
@@ -268,12 +266,12 @@ describe 'downgrading connections', ->
     beforeEach -> @m = cleanInstances().socket
 
     it 'should downgrade to session', ->
-      @m.socket = []
+      @m.removeSocket 'socket.id'
 
       @m.state().path().should.equal 'online.session'
 
     it 'should downgrade to offline', ->
-      @m.socket = []
+      @m.removeSocket 'socket.id'
       @m.removeSession 'session.id'
 
       @m.state().path().should.equal 'offline'

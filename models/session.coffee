@@ -47,11 +47,26 @@ class Models.Session extends Models.BaseModel
   removeSession: (id) ->
     @session = false if @session is id
 
+  # each session can only have one active voice
   addVoice: (id) ->
     @voice ?= id
 
   removeVoice: (id) ->
     @voice = false if @voice is id
+
+  # each session can have multiple sockets
+  addSocket: (id) ->
+    return null if id in @socket
+
+    socket = _(@socket).clone()
+    socket.push(id)
+    @socket = socket
+
+  removeSocket: (id) ->
+    return null unless id in @socket
+
+    socket = _(@socket).clone()
+    @socket = _(socket).without id
 
   toJSON: (session) ->
     json = super
