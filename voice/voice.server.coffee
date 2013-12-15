@@ -20,7 +20,7 @@ Models.Session::signal = (signal) ->
   request.post reqOpts, ->
 
 Models.Session::initVoice = ->
-  return false unless @hasSip() and @hasSocket()
+  return false unless @hasSip()
 
   body = JSON.stringify
     token: Voice.token,
@@ -159,7 +159,6 @@ Voice.listenTo State, 'state', (url, state) ->
 # this is the url that tropo will hit when it calls us.
 Voice.listenTo App, 'before:routes', (opts) ->
   App.post '/voice', (req, res, next) =>
-    console.log req.body
     tropo = new TropoWebAPI()
 
     # when the session get the exit signal, it will call back
@@ -177,6 +176,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
 
     if callState is 'init'
       sips = _(session?.sip).values()
+      console.log('sips being called', sips)
       tropo.call sips if sips.length
 
     # gather env variables to handle the call correctly
@@ -221,7 +221,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
     # session.voice maps to this body property from tropo's backend
     sessions = State.world?.sessions
     session = sessions?.findVoice(sessionId)
-    return res.send(500) unless session
+    return res.send(200) unless session
 
     # remove the voice connection
     session.removeVoice(sessionId)

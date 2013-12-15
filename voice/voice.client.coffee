@@ -3,13 +3,13 @@ State = App.module "State"
 Voice = App.module "Voice"
 
 phono = require('phono')
+call = null
 
-Voice.listenTo App, 'state', (opts) ->
+Voice.addInitializer (opts) ->
+  @appId = opts.appId
+  @apiKey = opts.apiKey
 
-  loader = (world) ->
-    @appId = opts.appId
-    @apiKey = opts.apiKey
-
+  @listenTo State, 'load', (world) ->
     $.phono
       apiKey: @apiKey
       onReady: (event) ->
@@ -17,6 +17,7 @@ Voice.listenTo App, 'state', (opts) ->
         @phone.ringTone false
         @phone.wideband true
         State.addSip @sessionId
+      onUnready: (event) ->
 
       phone:
         onIncomingCall: (event) ->
@@ -25,6 +26,11 @@ Voice.listenTo App, 'state', (opts) ->
           console.log("Auto-answering call with ID " + call.id)
           call.answer()
 
-  State.on 'load', loader, Voice
+  $(window).on 'unload', ->
+    phono.connection.sync = true
+    phono.connection.flush()
+    call.hangup() if call
+
+    phono.connection.disconnect()
 
 module.exports = Voice
