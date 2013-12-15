@@ -151,6 +151,10 @@ Socket.addInitializer (opts) ->
     shInstance = stateHandler(socket, session)
     @listenTo State, 'state', shInstance
 
+    # remove all the listeners on this socket
+    socket.on 'disconnect', =>
+      @stopListening State, 'state', shInstance
+      @stopListening State, 'data', dhInstance
 
 Socket.addFinalizer (opts) ->
   @off()
