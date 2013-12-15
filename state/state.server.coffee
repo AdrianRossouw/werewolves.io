@@ -15,7 +15,7 @@ Models.Sessions::findSession = (id) ->
 Models.Sessions::touchSession = (sess) ->
   session = @findSession(sess.id)
   session ?= @add {}
-  session.session = sess.id
+  session.addSession sess.id
   session
 
 Models.Round::_getActions = -> @padVotes()

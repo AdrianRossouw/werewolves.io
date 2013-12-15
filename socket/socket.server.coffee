@@ -11,13 +11,14 @@ Socket    = App.module "Socket",
   startWithParent: false
 
 Models.Sessions::findSocket = (id) ->
-  State.world.sessions.findWhere socket:id
+  State.world.sessions.find (session) ->
+    id in session.socket
 
 Models.Sessions::touchSocket = (socket, sess) ->
   session = @touchSession(sess) if sess
   session ?= @findSocket(socket.id)
   session ?= @add {}
-  session.socket = socket.id
+  session.addSocket socket.id
   session
 
 # Initialize the socket.io library, with the
@@ -32,15 +33,18 @@ Socket.addInitializer (opts) ->
     @io.set("destroy upgrade",false)
 
     @sio = new SessionIo @io, State.sessionStore, cookieParser
-    @sio.on 'connection', (err, socket, sess) =>
-      _state = State.world.sessions.touchSocket socket, sess
+    @sio.on 'connection', (err, socket, _session) =>
+      session = State.world.sessions.touchSocket socket, _session
       socket.join('game')
-      @trigger 'connection', socket, _state
 
-      socket.on 'disconnect', =>
-        if _state.socket is socket.id
-          debug 'socket disconnect', socket.id
-          _state.set voice: false, sip: false, socket: false
+      @trigger 'connection', socket, session
+
+      socket.on 'disconnect', ->
+        # remove the sip address registered for this socket
+        session.removeSip socket.id
+
+        # remove the socket registered for this session
+        session.removeSocket socket.id
 
 
 Socket.formatUrl = (opts) ->

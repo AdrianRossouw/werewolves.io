@@ -1,20 +1,9 @@
 App = require('../app')
 State = App.module "State"
 Voice = App.module "Voice"
+Socket = App.module "Socket"
 
 phono = require('phono')
-PhonoStrophe.LogLevel = {  }
-buzz = require('buzz')
-
-###
-#
-mySound = new buzz.sound( "assets/audio/Introduction", {
-    formats: [ "mp3"]
-})
-
-mySound.play()
-    .unloop()
-###
 
 Voice.listenTo App, 'state', (opts) ->
   loader = (world) ->
@@ -28,7 +17,7 @@ Voice.listenTo App, 'state', (opts) ->
         @phone.ringTone false
         @phone.wideband true
 
-        State.world.session.sip = @sessionId
+        State.world.session.addSip Socket.io.sessionId, @sessionId
       phone:
         onIncomingCall: (event) ->
           call = event.call

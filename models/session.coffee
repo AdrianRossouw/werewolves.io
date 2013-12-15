@@ -76,8 +76,8 @@ class Models.Session extends Models.BaseModel
     _sip[socket] = sip
     @sip = _sip
 
-  removeSip: (socket, sip) ->
-    return null unless @sip[socket] is sip
+  removeSip: (socket) ->
+    return null unless @sip[socket]
 
     _sip = _(@sip).clone()
     delete _sip[socket]

@@ -236,7 +236,7 @@ describe 'downgrading connections', ->
 
     it 'should downgrade to offline', ->
       @m.removeVoice 'voice.id'
-      @m.removeSip 'socket.id', 'sip.id'
+      @m.removeSip 'socket.id'
       @m.removeSocket 'socket.id'
       @m.removeSession 'session.id'
 
@@ -246,17 +246,17 @@ describe 'downgrading connections', ->
     beforeEach -> @m = cleanInstances().sip
 
     it 'should downgrade to socket', ->
-      @m.removeSip 'socket.id', 'sip.id'
+      @m.removeSip 'socket.id'
       @m.state().path().should.equal 'online.socket'
 
     it 'should downgrade to session', ->
-      @m.removeSip 'socket.id', 'sip.id'
+      @m.removeSip 'socket.id'
       @m.removeSocket 'socket.id'
 
       @m.state().path().should.equal 'online.session'
 
     it 'should downgrade to offline', ->
-      @m.removeSip 'socket.id', 'sip.id'
+      @m.removeSip 'socket.id'
       @m.removeSocket 'socket.id'
       @m.removeSession 'session.id'
 
