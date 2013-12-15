@@ -124,18 +124,6 @@ module.exports = (grunt) ->
             'build/js/templates.min.js',
             'build/js/client.min.js']
 
-    mkcouchdb:
-      sessions:
-        db: 'http://localhost:5984/werewolves-sessions'
-        options:
-          okay_if_exists: true
-
-      games:
-        db: 'http://localhost:5984/werewolves-games'
-        options:
-          okay_if_exists: true
-
-
   
   grunt.loadNpmTasks "grunt-browserify"
   grunt.loadNpmTasks "grunt-contrib-uglify"
@@ -143,7 +131,6 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks "grunt-contrib-watch"
   grunt.loadNpmTasks "grunt-contrib-less"
   grunt.loadNpmTasks "grunt-contrib-cssmin"
-  grunt.loadNpmTasks "grunt-couchapp"
   grunt.loadNpmTasks "grunt-nodemon"
   grunt.loadNpmTasks "grunt-concurrent"
  
@@ -163,8 +150,6 @@ module.exports = (grunt) ->
   # Default task(s).
   grunt.registerTask "default", [
     "browserify:all",
-    "mkcouchdb:sessions",
-    "mkcouchdb:games",
     "less",
     "cssmin",
     'uglify:all',

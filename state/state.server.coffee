@@ -22,12 +22,6 @@ Models.Round::_getActions = -> @padVotes()
 
 # Session middleware
 express              = require('express')
-#CouchStore           = require('connect-couchdb')(express)
-#State.sessionStore   = new CouchStore
-#  name: "werewolves-sessions"
-#  reapInterval: 600000
-#  compactInterval: 300000
-#  setThrottle: 60000
 
 MemoryStore = express.session.MemoryStore
 

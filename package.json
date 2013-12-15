@@ -62,9 +62,6 @@
     "session.socket.io": "~0.1.6",
     "tropo-webapi": "git://github.com/tropo/tropo-webapi-node.git",
     "request": "~2.27.0",
-    "connect-couchdb": "~0.4.1",
-    "nano": "~4.2.1",
-    "grunt-couchapp": "~0.2.1",
     "backbone.projections": "~1.0.0"
   },
   "engines": {
