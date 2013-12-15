@@ -27,14 +27,14 @@ $data =
     id: 'sip'
     session: 'session.id'
     socket: ['socket.id']
-    sip: ['sip.id']
+    sip: 'socket.id': 'sip.id'
     _state: 'online.sip'
 
   voice:
     id: 'voice'
     session: 'session.id'
     socket: ['socket.id']
-    sip: ['sip.id']
+    sip: 'socket.id': 'sip.id'
     voice: 'voice.id'
     _state: 'online.voice'
 
@@ -108,14 +108,14 @@ describe 'upgrading connections', ->
     it 'should upgrade to sip', ->
       @m.addSession 'session.id'
       @m.addSocket 'socket.id'
-      @m.sip = ['sip.id']
-      @m.sip.should.include 'sip.id'
+      @m.addSip 'socket.id', 'sip.id'
+      @m.sip.should.include 'socket.id': 'sip.id'
       @m.state().path().should.equal 'online.sip'
 
     it 'should upgrade to voice', ->
       @m.addSession 'session.id'
       @m.addSocket 'socket.id'
-      @m.sip = ['sip.id']
+      @m.addSip 'socket.id', 'sip.id'
       @m.addVoice 'voice.id'
       @m.voice.should.equal 'voice.id'
       @m.state().path().should.equal 'online.voice'
@@ -131,13 +131,13 @@ describe 'upgrading connections', ->
 
     it 'should upgrade to sip', ->
       @m.addSocket 'socket.id'
-      @m.sip = ['sip.id']
-      @m.sip.should.include 'sip.id'
+      @m.addSip 'socket.id', 'sip.id'
+      @m.sip.should.include 'socket.id': 'sip.id'
       @m.state().path().should.equal 'online.sip'
 
     it 'should upgrade to voice', ->
       @m.addSocket 'socket.id'
-      @m.sip = ['sip.id']
+      @m.addSip 'socket.id', 'sip.id'
       @m.addVoice 'voice.id'
       @m.voice.should.equal 'voice.id'
       @m.state().path().should.equal 'online.voice'
@@ -146,12 +146,12 @@ describe 'upgrading connections', ->
     beforeEach -> @m = cleanInstances().socket
 
     it 'should upgrade to sip', ->
-      @m.sip = ['sip.id']
-      @m.sip.should.include 'sip.id'
+      @m.addSip 'socket.id', 'sip.id'
+      @m.sip.should.include 'socket.id': 'sip.id'
       @m.state().path().should.equal 'online.sip'
 
     it 'should upgrade to voice', ->
-      @m.sip = ['sip.id']
+      @m.addSip 'socket.id', 'sip.id'
       @m.addVoice 'voice.id'
       @m.voice.should.equal 'voice.id'
       @m.state().path().should.equal 'online.voice'
@@ -173,12 +173,12 @@ describe 'upgrading connections', ->
       @m.state().path().should.not.equal 'online.session'
 
     it 'should upgrade to sip', ->
-      @m.sip = ['sip.id']
-      @m.sip.should.include 'sip.id'
+      @m.addSip 'socket.id', 'sip.id'
+      @m.sip.should.include 'socket.id': 'sip.id'
       @m.state().path().should.equal 'online.sip'
 
     it 'should upgrade to voice', ->
-      @m.sip = ['sip.id']
+      @m.addSip 'socket.id', 'sip.id'
       @m.addVoice 'voice.id'
       @m.voice.should.equal 'voice.id'
       @m.state().path().should.equal 'online.voice'
@@ -191,7 +191,7 @@ describe 'upgrading connections', ->
       @m.addVoice 'voice.id'
       @m.state().path().should.equal 'offline'
 
-      @m.sip = ['sip.id']
+      @m.addSip 'socket.id', 'sip.id'
       @m.state().path().should.equal 'offline'
 
       @m.addSocket 'socket.id'
@@ -210,7 +210,7 @@ describe 'upgrading connections', ->
       @m.addVoice 'voice.id'
       @m.state().path().should.equal 'online.socket'
 
-      @m.sip = ['sip.id']
+      @m.addSip 'socket.id', 'sip.id'
       @m.state().path().should.equal 'online.voice'
 
 describe 'downgrading connections', ->
@@ -236,7 +236,7 @@ describe 'downgrading connections', ->
 
     it 'should downgrade to offline', ->
       @m.removeVoice 'voice.id'
-      @m.sip = []
+      @m.removeSip 'socket.id', 'sip.id'
       @m.removeSocket 'socket.id'
       @m.removeSession 'session.id'
 
@@ -246,17 +246,17 @@ describe 'downgrading connections', ->
     beforeEach -> @m = cleanInstances().sip
 
     it 'should downgrade to socket', ->
-      @m.sip = []
+      @m.removeSip 'socket.id', 'sip.id'
       @m.state().path().should.equal 'online.socket'
 
     it 'should downgrade to session', ->
-      @m.sip = []
+      @m.removeSip 'socket.id', 'sip.id'
       @m.removeSocket 'socket.id'
 
       @m.state().path().should.equal 'online.session'
 
     it 'should downgrade to offline', ->
-      @m.sip = []
+      @m.removeSip 'socket.id', 'sip.id'
       @m.removeSocket 'socket.id'
       @m.removeSession 'session.id'
 

@@ -26,7 +26,7 @@ class Models.Session extends Models.BaseModel
     super
 
     @socket = data.socket or []
-    @sip = data.sip or []
+    @sip = data.sip or {}
 
     @state().change(data._state or 'offline')
     @publish()
@@ -68,6 +68,21 @@ class Models.Session extends Models.BaseModel
     socket = _(@socket).clone()
     @socket = _(socket).without id
 
+  # each socket can only have one sip id
+  addSip: (socket, sip) ->
+    return null if @sip[socket]
+
+    _sip = _(@sip).clone()
+    _sip[socket] = sip
+    @sip = _sip
+
+  removeSip: (socket, sip) ->
+    return null unless @sip[socket] is sip
+
+    _sip = _(@sip).clone()
+    delete _sip[socket]
+    @sip = _sip
+
   toJSON: (session) ->
     json = super
     return json unless session
@@ -101,12 +116,12 @@ class Models.Session extends Models.BaseModel
           downgrade: -> @go 'offline' if !@session
         socket:
           arrive: -> @updateState()
-          upgrade: -> @go 'sip' if @sip.length
+          upgrade: -> @go 'sip' if _(@sip).size()
           downgrade: -> @go 'session' if !@socket.length
         sip:
           arrive: -> @updateState()
           upgrade: -> @go 'voice' if @voice
-          downgrade: -> @go 'socket' if !@sip.length
+          downgrade: -> @go 'socket' if !_(@sip).size()
         voice:
           arrive: -> @updateState()
           downgrade: -> @go 'sip' if !@voice
