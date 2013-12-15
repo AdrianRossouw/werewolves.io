@@ -11,7 +11,6 @@ registerHandlers = (opts) ->
   State.on 'game:join', =>
     @io.emit 'game:join'
 
-
 State.on 'load', registerHandlers, Socket
 Socket.addInitializer (opts) ->
   socketio.transports = ["websocket"]

@@ -159,6 +159,7 @@ Voice.listenTo State, 'state', (url, state) ->
 # this is the url that tropo will hit when it calls us.
 Voice.listenTo App, 'before:routes', (opts) ->
   App.post '/voice', (req, res, next) =>
+    console.log req.body
     tropo = new TropoWebAPI()
 
     # when the session get the exit signal, it will call back
@@ -167,20 +168,16 @@ Voice.listenTo App, 'before:routes', (opts) ->
     tropo.on "incomplete", null, "/voice/incomplete"
     tropo.on "error", null, "/voice/error"
 
-
     # session.voice maps to this body property from tropo's backend
-    session = State.world.sessions.findVoice(req.body?.session?.id)
+    sessions = State.world.sessions
+    session = sessions.findVoice(req.body?.session?.id)
+    
+    # call all registered sip addresses, hoping one of them picks up.
+    callState = req.body?.session?.parameters?.callState
 
-    # if we just got your sip number, call your browser
-    if req.body?.session?.parameters
-      callState = req.body.session.parameters.callState
-
-      if callState is 'init'
-        # call all registered sip addresses,
-        # hoping one of them picks up.
-        sips = _(session?.sip).values()
-
-        tropo.call sips
+    if callState is 'init'
+      sips = _(session?.sip).values()
+      tropo.call sips if sips.length
 
     # gather env variables to handle the call correctly
     playerId = session?.id
@@ -219,12 +216,12 @@ Voice.listenTo App, 'before:routes', (opts) ->
     return res.send TropoJSON(tropo)
 
   downgrade = (req, res, next) ->
-    console.log req.body
     sessionId = req.body?.result?.sessionId
 
     # session.voice maps to this body property from tropo's backend
-    session = State.world.sessions.findVoice(sessionId)
-    res.set(500) unless session
+    sessions = State.world?.sessions
+    session = sessions?.findVoice(sessionId)
+    return res.send(500) unless session
 
     # remove the voice connection
     session.removeVoice(sessionId)

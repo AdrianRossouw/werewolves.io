@@ -40,6 +40,10 @@ Socket.addInitializer (opts) ->
       @trigger 'connection', socket, session
 
       socket.on 'disconnect', ->
+        # handles downgrading the voice connection
+        isActive = session.activeSip is session.sip[socket.id]
+        session.removeVoice session.voice if isActive
+
         # remove the sip address registered for this socket
         session.removeSip socket.id
 
@@ -72,6 +76,11 @@ Socket.addInitializer (opts) ->
       model = State.models[url]
       return cb(404, {message: 'not found'}) unless model
       cb(null, model.maskJSON(state))
+
+    socket.on 'voice:answer', (sip, cb =->) ->
+      session.activeSip = sip
+      cb(null)
+
 
     # a modification of data from the client.
     socket.on 'update', (url, data, cb = ->) ->

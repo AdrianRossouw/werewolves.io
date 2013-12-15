@@ -21,6 +21,7 @@ Voice.listenTo App, 'state', (opts) ->
       phone:
         onIncomingCall: (event) ->
           call = event.call
+          State.voiceAnswer Voice.phono.sessionId
           console.log("Auto-answering call with ID " + call.id)
           call.answer()
 
