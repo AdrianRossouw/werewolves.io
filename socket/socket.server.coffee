@@ -35,6 +35,7 @@ Socket.addInitializer (opts) ->
     @sio = new SessionIo @io, State.sessionStore, cookieParser
     @sio.on 'connection', (err, socket, sess) =>
       _state = State.world.sessions.touchSocket socket, sess
+      socket.join('game')
       @trigger 'connection', socket, _state
 
       socket.on 'disconnect', =>
@@ -102,6 +103,23 @@ Socket.addInitializer (opts) ->
 
 # outgoing broadcasts from the server to the client
 Socket.addInitializer (opts) ->
+  @listenTo State, 'state', (url, _state) ->
+    sessions = State.world.sessions
+
+    _(@io.sockets.clients('game')).each (socket) ->
+      session = sessions.findSocket socket.id
+      return null unless session
+
+      model = State.models[url]
+      return null unless model
+
+      mask = model.maskState(session, _state)
+      return null unless mask
+
+      socket.emit 'state', url, mask
+      debug "state:#{socket.id}", url, mask
+
+Socket.addInitializer (opts) ->
   dataHandler = (socket, session) ->
     debug "register:socket", 'data', socket.id
     id = _.uniqueId('socket')
@@ -132,28 +150,13 @@ Socket.addInitializer (opts) ->
 
       socket.emit 'data', event, applyArgs...
       debug "data:#{event}:#{id}", applyArgs...
-
-  stateHandler = (socket, session) ->
-    (url, _state) ->
-      model = State.models[url]
-      return null unless model
-
-      mask = model.maskState(session, _state)
-      return null unless mask
-
-      socket.emit 'state', url, mask
-
   # when a new socket connection is made
   @listenTo @, 'connection', (socket, session) ->
     dhInstance = dataHandler(socket, session)
     @listenTo State, 'data', dhInstance
 
-    shInstance = stateHandler(socket, session)
-    @listenTo State, 'state', shInstance
-
     # remove all the listeners on this socket
     socket.on 'disconnect', =>
-      @stopListening State, 'state', shInstance
       @stopListening State, 'data', dhInstance
 
 Socket.addFinalizer (opts) ->
