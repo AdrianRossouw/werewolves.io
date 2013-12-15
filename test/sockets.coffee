@@ -196,6 +196,7 @@ describe 'socket can connect', ->
       $server.session.state().path().should.equal 'online.sip'
 
     it 'State should have fired a data change event', ->
+      console.log $spy.wolfIoData.args
       $spy.state.calledWith('data', 'change', $state.url).should.be.ok
 
     it 'State should have fired a state event', ->

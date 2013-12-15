@@ -102,10 +102,11 @@ Socket.addInitializer (opts) ->
 
 # outgoing broadcasts from the server to the client
 Socket.addInitializer (opts) ->
+  dataHandler = (socket, session) ->
+    debug "register:socket", 'data', socket.id
+    id = _.uniqueId('socket')
 
-  # when a new socket connection is made
-  @listenTo @, 'connection', (socket, session) ->
-    dataHandler = (event, args...) =>
+    (event, args...) ->
       applyArgs = switch event
         when 'add' then _(args).first(3)
         when 'remove' then _(args).first(2)
@@ -130,11 +131,10 @@ Socket.addInitializer (opts) ->
       applyArgs.push(maskJSON)
 
       socket.emit 'data', event, applyArgs...
-      debug "data:#{event}", applyArgs...
+      debug "data:#{event}:#{id}", applyArgs...
 
-    @listenTo State, 'data', dataHandler
-
-    stateHandler = (url, _state) ->
+  stateHandler = (socket, session) ->
+    (url, _state) ->
       model = State.models[url]
       return null unless model
 
@@ -143,7 +143,13 @@ Socket.addInitializer (opts) ->
 
       socket.emit 'state', url, mask
 
-    @listenTo State, 'state', stateHandler
+  # when a new socket connection is made
+  @listenTo @, 'connection', (socket, session) ->
+    dhInstance = dataHandler(socket, session)
+    @listenTo State, 'data', dhInstance
+
+    shInstance = stateHandler(socket, session)
+    @listenTo State, 'state', shInstance
 
 
 Socket.addFinalizer (opts) ->
