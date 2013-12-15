@@ -21,7 +21,7 @@ Models.Sessions::touchSession = (sess) ->
 Models.Round::_getActions = -> @padVotes()
 
 # Session middleware
-express              = require('express')
+express = require('express')
 
 MemoryStore = express.session.MemoryStore
 

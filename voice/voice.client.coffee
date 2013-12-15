@@ -1,11 +1,11 @@
 App = require('../app')
 State = App.module "State"
 Voice = App.module "Voice"
-Socket = App.module "Socket"
 
 phono = require('phono')
 
 Voice.listenTo App, 'state', (opts) ->
+
   loader = (world) ->
     @appId = opts.appId
     @apiKey = opts.apiKey
@@ -16,8 +16,8 @@ Voice.listenTo App, 'state', (opts) ->
         Voice.phono = @
         @phone.ringTone false
         @phone.wideband true
+        State.addSip @sessionId
 
-        State.world.session.addSip Socket.io.sessionId, @sessionId
       phone:
         onIncomingCall: (event) ->
           call = event.call

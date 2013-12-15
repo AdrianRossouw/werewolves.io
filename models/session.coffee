@@ -55,6 +55,7 @@ class Models.Session extends Models.BaseModel
     @voice = false if @voice is id
 
   # each session can have multiple sockets
+  hasSocket: -> _(@socket).size()
   addSocket: (id) ->
     return null if id in @socket
 
@@ -69,6 +70,7 @@ class Models.Session extends Models.BaseModel
     @socket = _(socket).without id
 
   # each socket can only have one sip id
+  hasSip: -> _(@sip).size()
   addSip: (socket, sip) ->
     return null if @sip[socket]
 
@@ -82,6 +84,7 @@ class Models.Session extends Models.BaseModel
     _sip = _(@sip).clone()
     delete _sip[socket]
     @sip = _sip
+
 
   toJSON: (session) ->
     json = super

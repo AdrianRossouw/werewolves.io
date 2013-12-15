@@ -81,6 +81,11 @@ Socket.addInitializer (opts) ->
       model.set data
       cb(null, data)
 
+    # add a sip address registered against this socket
+    socket.on 'session:sip', (id, cb = ->) ->
+      state.addSip(socket.id, id)
+      cb(null)
+
     # allow players to join
     socket.on 'game:join', (cb=->) ->
       player = State.world.game.addPlayer(id: state.id)
@@ -98,6 +103,7 @@ Socket.addInitializer (opts) ->
     socket.on 'disconnect', =>
       socket.removeAllListeners 'data'
       socket.removeAllListeners 'update'
+      socket.removeAllListeners 'session:sip'
       socket.removeAllListeners 'game:join'
       socket.removeAllListeners 'round:action'
 

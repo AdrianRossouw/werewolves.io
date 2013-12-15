@@ -5,6 +5,7 @@ express = require('express')
 request = require('request')
 debug = require('debug')('werewolves:voice:server')
 Voice = App.module "Voice"
+_ = require('underscore')
 
 Models.Session::signal = (signal) ->
   return false if not @voice
@@ -19,7 +20,7 @@ Models.Session::signal = (signal) ->
   request.post reqOpts, ->
 
 Models.Session::initVoice = ->
-  return false unless @sip and @socket
+  return false unless @hasSip() and @hasSocket()
 
   body = JSON.stringify
     token: Voice.token,
@@ -40,7 +41,7 @@ Models.Sessions::findVoice = (voice) ->
 
 Models.Sessions::findSip = (sip) ->
   return false if not sip
-  @findWhere sip: sip
+  @find (session) -> _(session.sip).include(sip)
 
 tropo  = require('tropo-webapi')
 
@@ -51,13 +52,6 @@ middleware = (opts) ->
   @use new express.static(__dirname + "/../bower_components/phono/deps/flensed/1.0")
 
 App.on 'middleware', middleware, App
-
-Voice.debug = (tropo, env) ->
-  tropo.say "session is #{env.session.state().name}" if env.session
-  tropo.say "world is #{env.world.state().name}" if env.world
-  tropo.say "game is #{env.game.state().name}" if env.game
-  tropo.say "round is #{env.round.state().name}" if env.round
-  tropo.say "player is #{env.player.state().name}" if env.player
 
 Voice.audio = (tropo, name) ->
   tropo.say "http://hosting.tropo.com/5010929/www/audio/#{name}.mp3"
@@ -182,7 +176,11 @@ Voice.listenTo App, 'before:routes', (opts) ->
       callState = req.body.session.parameters.callState
 
       if callState is 'init'
-        tropo.call session?.sip
+        # call all registered sip addresses,
+        # hoping one of them picks up.
+        sips = _(session?.sip).values()
+
+        tropo.call sips
 
     # gather env variables to handle the call correctly
     playerId = session?.id
@@ -221,13 +219,17 @@ Voice.listenTo App, 'before:routes', (opts) ->
     return res.send TropoJSON(tropo)
 
   downgrade = (req, res, next) ->
+    console.log req.body
     sessionId = req.body?.result?.sessionId
 
     # session.voice maps to this body property from tropo's backend
     session = State.world.sessions.findVoice(sessionId)
-    session.unset('voice') if session
+    res.set(500) unless session
 
-    res.send(500)
+    # remove the voice connection
+    session.removeVoice(sessionId)
+    res.send(200)
+
 
   App.post '/voice/hangup', downgrade
   App.post '/voice/incomplete', downgrade

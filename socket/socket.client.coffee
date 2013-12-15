@@ -14,8 +14,6 @@ registerHandlers = (opts) ->
 
 State.on 'load', registerHandlers, Socket
 Socket.addInitializer (opts) ->
-  @isSession = (url) -> url is State.world.session.getUrl()
-
   socketio.transports = ["websocket"]
   socketUrl = window.SOCKET_URL
 
@@ -26,12 +24,11 @@ Socket.addInitializer (opts) ->
 
   sessionUrl = _.result State.session, 'url'
   
-  State.on 'data', (event, url, model) =>
-    debug 'update session'
-    @io.emit 'update', url, model.toJSON() if @isSession(url)
-
   State.on 'choose', (id, target) =>
     @io.emit 'round:action', target
+
+  State.on 'session:sip', (id) =>
+    @io.emit 'session:sip', id
 
   @io.on 'data', (event, url, args...) ->
 

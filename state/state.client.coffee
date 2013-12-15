@@ -52,5 +52,7 @@ State.joinGame = ->
 State.choose = (id, target) ->
   @trigger 'choose', id, target
 
+State.addSip = (id) ->
+  @trigger 'session:sip', id
 
 module.exports = State
