@@ -35,4 +35,24 @@ App.stop = ->
 
   @off()
 
+# Named time settings, to avoid magic ints in the code
+
+App.time =
+  # wait up to 5 minutes for enough players to start the game
+  waitForPlayers: 300000
+
+  # wait 30s extra for each time another player joins
+  playerAdded: 30000
+
+  # we wait 30s for each vote we are waiting for
+  eachPlayerVote: 30000
+
+  # we only wait 30s after we have all votes 
+  allVotes: 30000
+
+  # we wait 30s after the game ends to go to lobby
+  gameCleanup: 30000
+
+
+
 module.exports = App

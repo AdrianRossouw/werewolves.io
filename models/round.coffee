@@ -58,7 +58,7 @@ class Models.Round extends Models.BaseModel
     @players ?= opts.players
     @actions = new Models.Actions []
     @actions.reset data.actions if data.actions
-    @timer.limit = @activeTotal * 30000
+    @timer.limit = @activeTotal * App.time.eachPlayerVote
     super
     @state().change(data._state or 'votes.none')
     @publish()
@@ -113,8 +113,9 @@ class Models.Round extends Models.BaseModel
       # we have all the votes
       all:
         enter: ->
-          if @timer.remaining() >= 30000
-            @timer.limit = 30000
+          allVoteTime = App.time.allVotes
+          if @timer.remaining() >= allVoteTime
+            @timer.limit = allVoteTime
             @timer.reset()
         admit:
           'some': ->

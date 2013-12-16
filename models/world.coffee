@@ -59,7 +59,7 @@ class Models.World extends Models.BaseModel
     # the first player joined
     startup:
       arrive: ->
-        @timer.limit = 30000
+        @timer.limit = App.time.playerAdded
 
         @listenTo @timer, 'end', @startGame
 
@@ -87,7 +87,7 @@ class Models.World extends Models.BaseModel
     cleanup:
       arrive: ->
         @listenTo @timer, 'end', => @go 'attract'
-        @timer.limit = 30000
+        @timer.limit = App.time.gameCleanup
         @timer.start()
 
       exit: ->
