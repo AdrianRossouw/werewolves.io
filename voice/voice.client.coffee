@@ -3,7 +3,6 @@ State = App.module "State"
 Voice = App.module "Voice"
 
 phono = require('phono')
-call = null
 
 Voice.addInitializer (opts) ->
   @appId = opts.appId
@@ -30,12 +29,5 @@ Voice.addInitializer (opts) ->
           alert "error #{reason}"
 
     @phone.setLogLevel("WARN")
-
-  $(window).on 'unload', ->
-    phono.connection.sync = true
-    phono.connection.flush()
-    call.hangup() if call
-
-    phono.connection.disconnect()
 
 module.exports = Voice
