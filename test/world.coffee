@@ -7,6 +7,11 @@ sinon   = require('sinon')
 _       = require('underscore')
 fixture = require('./fixture/game1.coffee')
 
+fiveMins = 300000
+thirtySecs = 30000
+oneSec = 1000
+oneMin = 60000
+
 it 'should have a world model', ->
   should.exist(Models.World)
 
@@ -80,7 +85,7 @@ describe 'start application', ->
       @game.state().path().should.equal 'recruit.ready'
 
     it 'should still be in startup state 29 seconds later', ->
-      @clock.tick(29000)
+      @clock.tick(thirtySecs - oneSec)
       @world.state().path().should.equal 'startup'
 
   describe 'starting game', ->
@@ -90,7 +95,7 @@ describe 'start application', ->
       @timer = @world.timer
 
     it 'should have started the game another second later', ->
-      @clock.tick(1000)
+      @clock.tick(oneSec)
       @world.state().path().should.equal 'gameplay'
 
     it 'should have assigned roles', ->
@@ -107,7 +112,7 @@ describe 'start application', ->
       @game.rounds.length.should.equal 1
 
     it 'should have set the timer limit', ->
-      @timer.limit.should.equal @game.players.activeTotal() * 30000
+      @timer.limit.should.equal @game.players.activeTotal() * thirtySecs
 
 
     it 'should have set the the correct activeTotal', ->
@@ -143,7 +148,6 @@ describe 'start application', ->
       # second day
       @victim4 = @wolf
 
-
     describe 'during the first night', ->
       before () ->
         @round = @game.currentRound()
@@ -176,9 +180,9 @@ describe 'start application', ->
         @timer.state().path().should.equal 'active'
 
       it 'should correctly count down with time passing', ->
-        @timer.remaining().should.equal 60000
-        @clock.tick(1000)
-        @timer.remaining().should.equal 59000
+        @timer.remaining().should.equal oneMin
+        @clock.tick(oneSec)
+        @timer.remaining().should.equal oneMin - oneSec
 
     describe 'wolf voting', ->
       before ->
@@ -216,7 +220,7 @@ describe 'start application', ->
         @round = @game.currentRound()
 
       it 'should have changed the timer length', ->
-        @timer.remaining().should.equal 30000
+        @timer.remaining().should.equal thirtySecs
 
       it 'should still be running', ->
         @timer.state().path().should.equal 'active'
@@ -236,7 +240,7 @@ describe 'start application', ->
       before (done) ->
         @round = @game.currentRound()
         @timer.once 'end', done
-        @clock.tick 30000
+        @clock.tick thirtySecs
         @nextRound = @game.currentRound()
 
       it 'should have moved the round to complete.died', ->
@@ -285,7 +289,7 @@ describe 'start application', ->
         @round = @game.currentRound()
 
       it 'should have changed the timer length', ->
-        @timer.remaining().should.equal 30000
+        @timer.remaining().should.equal thirtySecs
 
       it 'should still be running', ->
         @timer.state().path().should.equal 'active'
@@ -293,7 +297,7 @@ describe 'start application', ->
     describe 'ending the day', ->
       before ->
         @round = @game.currentRound()
-        @clock.tick 30000
+        @clock.tick thirtySecs
 
       it 'should have killed second victim', ->
         @victim2.state().path().should.equal 'dead'
@@ -335,7 +339,7 @@ describe 'start application', ->
         @round = @game.currentRound()
 
       it 'should have changed the timer length', ->
-        @timer.remaining().should.equal 30000
+        @timer.remaining().should.equal thirtySecs
 
       it 'should still be running', ->
         @timer.state().path().should.equal 'active'
@@ -370,7 +374,7 @@ describe 'start application', ->
         @spy = sinon.spy()
         @game.once 'game:end', @spy
         @round = @game.currentRound()
-        @clock.tick 30000
+        @clock.tick thirtySecs
 
       it 'should have killed a wolf', ->
         @wolf.state().path().should.equal 'dead'
@@ -391,11 +395,11 @@ describe 'start application', ->
         @spy.called.should.be.ok
 
       it 'should have given it 30 seconds before a new game', ->
-        @timer.remaining().should.equal 30000
+        @timer.remaining().should.equal thirtySecs
 
     describe 'ready for next game', ->
       before ->
-        @clock.tick 30000
+        @clock.tick thirtySecs
         @newGame = State.world.game
       
       it 'should go to attract mode again', ->
@@ -408,6 +412,7 @@ describe 'start application', ->
       it 'should have no players or rounds yet', ->
         @newGame.players.length.should.equal 0
         @newGame.rounds.length.should.equal 0
+
       it 'should be recruit.waiting state', ->
         @newGame.state().path().should.equal 'recruit.waiting'
 
@@ -420,6 +425,17 @@ describe 'start application', ->
 
       it 'should be recruit.waiting state', ->
         @newGame.state().path().should.equal 'recruit.waiting'
+
+      it.skip 'should have started a 5 minute timer', ->
+        @timer.state().path().should.equal 'active'
+        @timer.remaining().should.equal fiveMins
+
+    describe.skip 'should not reset the timer when another player joins', ->
+      before ->
+        @clock.tick(thirtySecs)
+        @world.game.addPlayer id: 'Gaylord'
+
+
 
 
 describe 'cleanup test', ->

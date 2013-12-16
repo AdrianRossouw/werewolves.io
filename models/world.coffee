@@ -60,7 +60,6 @@ class Models.World extends Models.BaseModel
     startup:
       arrive: ->
 
-
         @listenTo @game.state('recruit.ready'), 'arrive', =>
           @timer.limit = App.time.playerAdded
 
