@@ -426,16 +426,25 @@ describe 'start application', ->
       it 'should be recruit.waiting state', ->
         @newGame.state().path().should.equal 'recruit.waiting'
 
-      it.skip 'should have started a 5 minute timer', ->
+      it 'should have started a 5 minute timer', ->
         @timer.state().path().should.equal 'active'
         @timer.remaining().should.equal fiveMins
 
-    describe.skip 'should not reset the timer when another player joins', ->
+    describe 'another player joins', ->
       before ->
         @clock.tick(thirtySecs)
         @world.game.addPlayer id: 'Gaylord'
+        @newGame = State.world.game
 
+      it 'should not reset the game reset timer', ->
+        @timer.remaining().should.equal fiveMins - thirtySecs
 
+    describe 'game start timer runs out', ->
+      before ->
+        @clock.tick fiveMins - thirtySecs
+
+      it 'should be cleanup state', ->
+        @world.state().path().should.equal 'cleanup'
 
 
 describe 'cleanup test', ->

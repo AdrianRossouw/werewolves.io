@@ -60,10 +60,16 @@ class Models.World extends Models.BaseModel
     startup:
       arrive: ->
 
-        @listenTo @game.state('recruit.ready'), 'arrive', =>
-          @timer.limit = App.time.playerAdded
+        @listenTo @timer, 'end', -> @go 'cleanup'
+        @timer.limit = App.time.waitForPlayers
+        @timer.start()
 
-          @timer.start()
+        @listenTo @game.state('recruit.ready'), 'arrive', =>
+          # stop listening to the game reset timer
+          @stopListening @timer, 'end'
+
+          @timer.limit = App.time.playerAdded
+          @timer.reset()
 
           @listenTo @timer, 'end', @startGame
 
@@ -72,7 +78,7 @@ class Models.World extends Models.BaseModel
 
       exit: ->
         @stopListening @game.state('recruit.ready'), 'arrive'
-        @stopListening @game.timer, 'end'
+        @stopListening @timer, 'end'
         @stopListening @game.players, 'add'
 
     # there is an active game running
