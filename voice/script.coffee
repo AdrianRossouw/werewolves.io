@@ -49,12 +49,12 @@ Voice.audio = (tropo, name) ->
 
 # Session is placed in a conference where everyone is muted.
 Voice.asleep = (tropo) ->
-  tropo.say 'you go to sleep'
+  tropo.say 'microphone disabled'
   tropo.conference "asleep", true, "asleep", false, null, '#'
 
 # Session can listen and speak to others currently awake.
 Voice.awake = (tropo) ->
-  tropo.say 'you wake up'
+  tropo.say 'microphone enabled'
   tropo.conference "awake", null, "awake", false, null, '#'
 
 # Session can only listen in to conversations, not talk.
@@ -80,6 +80,19 @@ Voice.intro = (tropo, env) ->
   @audio tropo, "Introduction"
   @awake tropo
 
+Voice.nightInstruct = (tropo, env) ->
+  # for specific roles again
+  switch env?.player?.role
+    when 'villager'
+      tropo.say 'you are asleep in your bed'
+
+    when 'werewolf'
+      tropo.say 'you kill somebody'
+
+    when 'seer'
+      tropo.say 'you have a dream about somebody'
+
+
 # To be played on the first night
 Voice.firstNight = (tropo, env) ->
 
@@ -94,38 +107,33 @@ Voice.firstNight = (tropo, env) ->
       tropo.say 'you are the seer'
 
   # for everyone
-  tropo.say 'the first night'
+  tropo.say 'on the first night'
 
-  # for specific roles again
-  switch env?.player?.role
-    when 'villager'
-      tropo.say 'kill somebody'
-
-    when 'seer'
-      tropo.say 'dream about somebody'
+  @nightInstruct tropo, env
 
   @awakeByRole tropo, env.player
 
 # first day
 Voice.firstDay = (tropo, env) ->
-  tropo.say 'first day'
+  tropo.say 'on the first day, you pick somebody to lynch'
   @awake(tropo)
 
 # each subsequent night
 Voice.night = (tropo, env) ->
-  tropo.say 'next night'
+  tropo.say 'on the next night'
+  @nightInstruct tropo, env
   @awakeByRole(tropo, env.player)
 
 # each subsequent day
 Voice.day = (tropo, env) ->
-  tropo.say 'next day'
+  tropo.say 'on the first day, you pick nother person to lynch'
   @awake tropo
 
 ##### victory conditions
 Voice.wolvesWin = (tropo, env) ->
-  tropo.say 'wolves win'
+  tropo.say 'wolves have eaten all the villagers'
   @awake tropo
 
 Voice.villagersWin = (tropo, env) ->
-  tropo.say 'villagers win'
+  tropo.say 'villagers have lynched all of the wolves'
   @awake tropo

@@ -71,19 +71,16 @@ Voice.listenTo State, 'state', (url, state) ->
 # this is the url that tropo will hit when it calls us.
 Voice.listenTo App, 'before:routes', (opts) ->
   App.post '/voice', (req, res, next) =>
-    # determine the session to use
-    sessionId = req.body?.session?.id
-
-    console.log req.url, req.body
-
     tropo = new TropoWebAPI()
 
-
+    # determine the voice session to use
+    voiceId = req.body?.session?.id
+    voiceId ?= req.body?.result.sessionId
 
     # session.voice maps to this body property from tropo's backend
     sessions = State.world.sessions
-    session = sessions.findVoice(sessionId)
-    
+    session = sessions.findVoice(voiceId)
+
     # call all registered sip addresses, hoping one of them picks up.
     callState = req.body?.session?.parameters?.callState
 
@@ -93,13 +90,13 @@ Voice.listenTo App, 'before:routes', (opts) ->
       tropo.call sips if sips.length
 
     # gather env variables to handle the call correctly
-    playerId = session?.id
-    env =
-      session: session
-      world: State.world
-      game: State.world.game
-      round: State.world.game.currentRound()
-      player: State.getPlayer(playerId)
+    env = world: State.world
+    env.game = env.world.game
+    env.round = env.game.currentRound()
+    env.session = session
+    env.player = session?.player
+
+    debug 'env', env
 
     # run through main game script
     @script tropo, env
