@@ -59,15 +59,17 @@ class Models.World extends Models.BaseModel
     # the first player joined
     startup:
       arrive: ->
-        @timer.limit = App.time.playerAdded
 
-        @listenTo @timer, 'end', @startGame
-
-        @listenTo @game.players, 'add', ->
-          @timer.reset()
 
         @listenTo @game.state('recruit.ready'), 'arrive', =>
+          @timer.limit = App.time.playerAdded
+
           @timer.start()
+
+          @listenTo @timer, 'end', @startGame
+
+          @listenTo @game.players, 'add', ->
+            @timer.reset()
 
       exit: ->
         @stopListening @game.state('recruit.ready'), 'arrive'
