@@ -113,16 +113,16 @@ class Models.Session extends Models.BaseModel
       online: state 'abstract',
         session: state
           arrive: -> @updateState()
-          upgrade: -> @go 'socket' if @socket.length
+          upgrade: -> @go 'socket' if @hasSocket()
           downgrade: -> @go 'offline' if !@session
         socket:
           arrive: -> @updateState()
-          upgrade: -> @go 'sip' if _(@sip).size()
-          downgrade: -> @go 'session' if !@socket.length
+          upgrade: -> @go 'sip' if @hasSip()
+          downgrade: -> @go 'session' if !@hasSocket()
         sip:
           arrive: -> @updateState()
           upgrade: -> @go 'voice' if @voice
-          downgrade: -> @go 'socket' if !_(@sip).size()
+          downgrade: -> @go 'socket' if !@hasSip()
         voice:
           arrive: -> @updateState()
           upgrade: -> @go 'call' if @call
