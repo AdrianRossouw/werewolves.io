@@ -6,6 +6,12 @@ should   = require('should')
 sinon    = require('sinon')
 _ = require('underscore')
 
+fiveSecs = 5000
+tenSecs = 10000
+twentySecs = 20000
+thirtySecs = 30000
+oneMin = 60000
+
 $json = {}
 
 describe 'timer model', ->
@@ -35,17 +41,17 @@ describe 'timer model', ->
       @timer.state().path().should.equal 'inactive.stopped'
 
     it 'should allow a time limit to be set (in miliseconds)', ->
-      @timer.limit = 30000
-      @timer.limit.should.equal 30000
+      @timer.limit = thirtySecs
+      @timer.limit.should.equal thirtySecs
 
     it 'should always give me the deadline as $limit ms in the future', ->
       @timer.deadline().should.equal Date.now() + @timer.limit
-      @clock.tick 60000
+      @clock.tick oneMin
       @timer.deadline().should.equal Date.now() + @timer.limit
 
     it 'should always give me the remaining ms as the $limit', ->
       @timer.remaining().should.equal @timer.limit
-      @clock.tick 60000
+      @clock.tick oneMin
       @timer.remaining().should.equal @timer.limit
 
   describe 'resetting a stopped timer', ->
@@ -81,20 +87,20 @@ describe 'timer model', ->
       @spy = sinon.spy()
       @timer.on 'tick', @spy
 
-      @clock.tick(5000) # 5 seconds ahead in time
+      @clock.tick(fiveSecs) # 5 seconds ahead in time
 
     it 'should return the _endTime as the deadline', ->
       @timer.deadline().should.equal @timer._endTime
 
     it 'should subtract the time remaining correctly', ->
-      @timer.remaining().should.equal 25000
+      @timer.remaining().should.equal twentySecs + fiveSecs
 
     it 'should have emitted tick events', ->
       @spy.callCount.should.equal 5
 
     after ->
       @timer.off 'tick', @spy
-      @clock.tick 5000 # move another 5 seconds up in time
+      @clock.tick fiveSecs # move another 5 seconds up in time
 
   describe 'pausing the timer', ->
     before ->
@@ -103,7 +109,7 @@ describe 'timer model', ->
       @timer.pause()
       $json.paused = @timer.toJSON()
 
-      @clock.tick 5000 # move another 5 seconds up in time
+      @clock.tick fiveSecs # move another 5 seconds up in time
 
     it 'should be in paused state', ->
       @timer.state().path().should.equal 'inactive.paused'
@@ -122,7 +128,7 @@ describe 'timer model', ->
 
     it 'deadline should always be remaining ms from now', ->
       @timer.deadline().should.equal @remaining + Date.now()
-      @clock.tick 5000 # move another 5 seconds up in time
+      @clock.tick fiveSecs # move another 5 seconds up in time
       @timer.deadline().should.equal @remaining + Date.now()
 
 
@@ -139,13 +145,13 @@ describe 'timer model', ->
   describe 'once the timer is active again', ->
     before ->
       @remaining = @timer.remaining()
-      @clock.tick(5000) # move another 5 seconds up in time
+      @clock.tick(fiveSecs) # move another 5 seconds up in time
 
     it 'should return the _endTime as the deadline', ->
       @timer.deadline().should.equal @timer._endTime
 
     it 'should subtract the time remaining correctly', ->
-      @timer.remaining().should.equal @remaining - 5000
+      @timer.remaining().should.equal @remaining - fiveSecs
 
   describe 'stopping the timer', ->
     before ->
@@ -166,33 +172,33 @@ describe 'timer model', ->
 
     it 'should always return limit ms from now as the deadline', ->
       @timer.deadline().should.equal @timer.limit + Date.now()
-      @clock.tick 5000 # move another 5 seconds up in time
+      @clock.tick fiveSecs # move another 5 seconds up in time
       @timer.deadline().should.equal @timer.limit + Date.now()
 
   describe 'resetting the timer', ->
     before ->
       @timer.start()
-      @clock.tick(10000)
+      @clock.tick(tenSecs)
       @timer.reset()
 
     it 'should still be active after being reset', ->
       @timer.state().path().should.equal 'active'
 
     it 'should have reset the remaining time', ->
-      @timer.remaining().should.equal 30000
-      @clock.tick 5000
-      @timer.remaining().should.equal 25000
+      @timer.remaining().should.equal thirtySecs
+      @clock.tick fiveSecs
+      @timer.remaining().should.equal twentySecs + fiveSecs
 
     it 'should always return the _endTime as the deadline()', ->
       @timer.deadline().should.equal @timer._endTime
-      @clock.tick 5000
+      @clock.tick fiveSecs
       @timer.deadline().should.equal @timer._endTime
 
   describe 'trigger the timeout', ->
     before ->
       @spy = sinon.spy()
       @timer.on 'end', @spy
-      @clock.tick(20000)
+      @clock.tick(twentySecs)
 
     it 'should have triggered the end event', ->
       @spy.called.should.be.ok
@@ -215,7 +221,7 @@ describe 'timer model', ->
 
       it 'have a limit', ->
         should.exist $json.stopped.limit
-        $json.stopped.limit.should.equal 30000
+        $json.stopped.limit.should.equal thirtySecs
 
       it 'dont have an endTime or remaining', ->
         should.not.exist $json.stopped._endTime
@@ -232,7 +238,7 @@ describe 'timer model', ->
 
       it 'have a limit', ->
         should.exist $json.started.limit
-        $json.started.limit.should.equal 30000
+        $json.started.limit.should.equal thirtySecs
 
       it 'have an endTime and remaining', ->
         should.exist $json.started._endTime
@@ -249,7 +255,7 @@ describe 'timer model', ->
 
       it 'have a limit', ->
         should.exist $json.paused.limit
-        $json.paused.limit.should.equal 30000
+        $json.paused.limit.should.equal thirtySecs
 
       it 'have _remaining', ->
         should.exist $json.paused._remaining
@@ -268,7 +274,7 @@ describe 'timer model', ->
         @timer.state().path().should.equal 'inactive.stopped'
 
       it 'should have all their correct attributes', ->
-        @timer.limit.should.equal 30000
+        @timer.limit.should.equal thirtySecs
         should.not.exist @timer._endTime
         should.not.exist @timer._remaining
 
@@ -280,7 +286,7 @@ describe 'timer model', ->
         @timer.state().path().should.equal 'active'
 
       it 'should have all their correct attributes', ->
-        @timer.limit.should.equal 30000
+        @timer.limit.should.equal thirtySecs
         @timer._endTime.should.equal $json.started._endTime
         @timer._remaining.should.equal $json.started._remaining
 
@@ -292,7 +298,7 @@ describe 'timer model', ->
         @timer.state().path().should.equal 'inactive.paused'
 
       it 'should have all their correct attributes', ->
-        @timer.limit.should.equal 30000
+        @timer.limit.should.equal thirtySecs
         should.not.exist @timer._endTime
         @timer._remaining.should.equal $json.paused._remaining
 
