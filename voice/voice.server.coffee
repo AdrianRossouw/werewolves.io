@@ -87,7 +87,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
     if callState is 'init'
       sips = _(session?.sip).values()
       console.log('sips being called', sips)
-      tropo.call sips if sips.length
+      tropo.call sips[0] if sips.length
 
     # gather env variables to handle the call correctly
     env = world: State.world
@@ -95,8 +95,6 @@ Voice.listenTo App, 'before:routes', (opts) ->
     env.round = env.game.currentRound()
     env.session = session
     env.player = session?.player
-
-    debug 'env', _(env).invoke('toJSON', session)
 
     # run through main game script
     @script tropo, env

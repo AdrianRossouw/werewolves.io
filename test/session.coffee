@@ -369,3 +369,23 @@ describe 'downgrading connections', ->
       @m.removeSession 'session.id'
 
       @m.state().path().should.equal 'offline'
+
+  describe 'only socket removed first', ->
+    before ->
+      @m = cleanInstances().call
+      @m.removeSocket 'socket.id'
+
+    it 'should have dowgraded us to online.session', ->
+      @m.state().path().should.equal 'online.session'
+
+    it 'should not have sockets', ->
+      @m.hasSocket().should.equal false
+
+    it 'should have removed the relevant sip address', ->
+      should.not.exist @m.sip['socket.id']
+
+    it 'should have removed the call id if it was active', ->
+      @m.call.should.not.equal 'socket.id'
+
+    it 'should have removed the voice connection', ->
+      @m.voice.should.equal false

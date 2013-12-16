@@ -132,8 +132,10 @@ Voice.day = (tropo, env) ->
 ##### victory conditions
 Voice.wolvesWin = (tropo, env) ->
   tropo.say 'wolves have eaten all the villagers'
+  tropo.say 'game over!'
   @awake tropo
 
 Voice.villagersWin = (tropo, env) ->
   tropo.say 'villagers have lynched all of the wolves'
+  tropo.say 'game over!'
   @awake tropo

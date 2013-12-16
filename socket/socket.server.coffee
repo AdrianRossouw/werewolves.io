@@ -17,8 +17,7 @@ Socket.addInitializer (opts) ->
     sessions = State.world?.sessions
 
     cookieParser = new express.cookieParser(opts.secret)
-    opts.socket ?=
-      log: false
+    opts.socket ?= log: false
 
     @io = socketio.listen(App.server, opts.socket)
     @io.set("destroy upgrade",false)
@@ -31,15 +30,6 @@ Socket.addInitializer (opts) ->
       @trigger 'connection', socket, session
 
       socket.on 'disconnect', ->
-        # handles downgrading the voice connection
-        if session.call is socket.id
-          session.removeCall socket.id
-          session.removeVoice session.voice
-
-        # remove the sip address registered for this socket
-        session.removeSip socket.id
-
-        # remove the socket registered for this session
         session.removeSocket socket.id
 
 Socket.formatUrl = (opts) ->

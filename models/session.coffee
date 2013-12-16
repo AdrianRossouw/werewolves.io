@@ -55,7 +55,7 @@ class Models.Session extends Models.BaseModel
   removeCall: (id) -> @call = false if @call is id
 
   # each session can have multiple sockets
-  hasSocket: -> _(@socket).size()
+  hasSocket: -> !!_(@socket).size()
   addSocket: (id) ->
     return null if id in @socket
     socket = _(@socket).clone()
@@ -65,11 +65,13 @@ class Models.Session extends Models.BaseModel
   removeSocket: (id) ->
     return null unless id in @socket
 
+    @removeSip id
+
     socket = _(@socket).clone()
     @socket = _(socket).without id
 
   # each socket can only have one sip id
-  hasSip: -> _(@sip).size()
+  hasSip: -> !!_(@sip).size()
   addSip: (socket, sip) ->
     return null if @sip[socket]
 
@@ -79,6 +81,10 @@ class Models.Session extends Models.BaseModel
 
   removeSip: (socket) ->
     return null unless @sip[socket]
+
+    if @call is socket
+      @removeCall socket
+      @removeVoice @voice
 
     _sip = _(@sip).clone()
     delete _sip[socket]
