@@ -9,15 +9,6 @@ _ = require('underscore')
 Nonsense     = require('Nonsense')
 ns           = new Nonsense()
 
-Models.Sessions::findSession = (id) ->
-  State.world.sessions.findWhere session:id
-
-Models.Sessions::touchSession = (sess) ->
-  session = @findSession(sess.id)
-  session ?= @add {}
-  session.addSession sess.id
-  session
-
 Models.Round::_getActions = -> @padVotes()
 
 # Session middleware

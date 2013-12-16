@@ -18,6 +18,7 @@ Voice.addInitializer (opts) ->
         @phone.wideband true
         State.addSip @sessionId
       onUnready: (event) ->
+        alert event
 
       phone:
         onIncomingCall: (event) ->

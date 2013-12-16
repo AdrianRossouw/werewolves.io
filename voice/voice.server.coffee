@@ -35,13 +35,7 @@ Models.Session::initVoice = ->
   request.post reqOpts, (err, resp) =>
     @voice = resp.body.id.replace('\r\n', '')
 
-Models.Sessions::findVoice = (voice) ->
-  return false if not voice
-  @findWhere voice: voice
 
-Models.Sessions::findSip = (sip) ->
-  return false if not sip
-  @find (session) -> _(session.sip).include(sip)
 
 tropo  = require('tropo-webapi')
 
@@ -146,6 +140,7 @@ Voice.listenTo App, 'before:state', (opts) ->
 
 # Listen to the various states of the game flipping over
 Voice.listenTo State, 'state', (url, state) ->
+  sessions = State.world?.sessions
 
   # if a user gets up to the sip state, call them
   if state is 'online.sip'
@@ -154,7 +149,7 @@ Voice.listenTo State, 'state', (url, state) ->
 
   # end of a round, interrupt everyone.
   # tropo will call back to get the script
-  State.world.sessions.invoke 'signal', 'exit' if url == 'game'
+  sessions.invoke 'signal', 'exit' if url == 'game'
 
 # this is the url that tropo will hit when it calls us.
 Voice.listenTo App, 'before:routes', (opts) ->
@@ -227,7 +222,6 @@ Voice.listenTo App, 'before:routes', (opts) ->
     # remove the voice connection
     session.removeVoice(sessionId)
     res.send(200)
-
 
   App.post '/voice/hangup', downgrade
   App.post '/voice/incomplete', downgrade

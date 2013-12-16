@@ -142,3 +142,35 @@ class Models.Sessions extends Models.BaseCollection
         .compact()
         .where(id: session.id)
         .value()
+
+  #### Session ID's
+  findSession: (id) ->
+    @findWhere session:id
+
+  touchSession: (sess) ->
+    session = @findSession(sess.id)
+    session ?= @add {}
+    session.addSession sess.id
+    session
+
+  #### Socket ID's
+  findSocket: (id) ->
+    @find (session) -> id in session.socket
+
+  touchSocket: (socket, sess) ->
+    session = @touchSession(sess) if sess
+    session ?= @findSocket(socket.id)
+    session ?= @add {}
+    session.addSocket socket.id
+    session
+
+  #### Sip ID's
+  findSip: (id) ->
+    return false if not id
+    @find (session) ->
+      _(session.sip).include(id)
+
+  #### Voice ID's
+  findVoice: (voice) ->
+    return false if not voice
+    @findWhere voice: voice

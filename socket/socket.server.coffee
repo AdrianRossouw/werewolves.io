@@ -10,21 +10,12 @@ Models    = App.module "Models"
 Socket    = App.module "Socket",
   startWithParent: false
 
-Models.Sessions::findSocket = (id) ->
-  State.world.sessions.find (session) ->
-    id in session.socket
-
-Models.Sessions::touchSocket = (socket, sess) ->
-  session = @touchSession(sess) if sess
-  session ?= @findSocket(socket.id)
-  session ?= @add {}
-  session.addSocket socket.id
-  session
-
 # Initialize the socket.io library, with the
 # session handler wrapper.
 Socket.addInitializer (opts) ->
   @listenTo App, 'listen', (opts = {}) ->
+    sessions = State.world?.sessions
+
     cookieParser = new express.cookieParser(opts.secret)
     opts.socket ?=
       log: false
@@ -34,7 +25,7 @@ Socket.addInitializer (opts) ->
 
     @sio = new SessionIo @io, State.sessionStore, cookieParser
     @sio.on 'connection', (err, socket, _session) =>
-      session = State.world.sessions.touchSocket socket, _session
+      session = sessions.touchSocket socket, _session
       socket.join('game')
 
       @trigger 'connection', socket, session
@@ -42,7 +33,6 @@ Socket.addInitializer (opts) ->
       socket.on 'disconnect', ->
         # handles downgrading the voice connection
         if session.call is socket.id
-          console.log 'kill active call'
           session.removeCall socket.id
           session.removeVoice session.voice
 
@@ -51,7 +41,6 @@ Socket.addInitializer (opts) ->
 
         # remove the socket registered for this session
         session.removeSocket socket.id
-
 
 Socket.formatUrl = (opts) ->
   return opts.socketUrl if opts.socketUrl
