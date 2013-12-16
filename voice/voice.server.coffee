@@ -96,7 +96,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
     env.session = session
     env.player = session?.player
 
-    debug 'env', env
+    debug 'env', _(env).invoke('toJSON', session)
 
     # run through main game script
     @script tropo, env

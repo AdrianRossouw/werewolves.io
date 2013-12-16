@@ -12,7 +12,7 @@ tropo = require('tropo-webapi')
 Voice.script = (tropo, env) ->
 
   switch env.world.state().path()
-    when 'attract', 'startup'
+    when 'startup'
       @intro tropo, env
 
     when 'gameplay'
@@ -49,17 +49,17 @@ Voice.audio = (tropo, name) ->
 
 # Session is placed in a conference where everyone is muted.
 Voice.asleep = (tropo) ->
-  tropo.say 'microphone disabled'
+  tropo.say 'voice chat disabled'
   tropo.conference "asleep", true, "asleep", false, null, '#'
 
 # Session can listen and speak to others currently awake.
 Voice.awake = (tropo) ->
-  tropo.say 'microphone enabled'
+  tropo.say 'voice chat enabled'
   tropo.conference "awake", null, "awake", false, null, '#'
 
 # Session can only listen in to conversations, not talk.
 Voice.spectate = (tropo) ->
-  tropo.say 'you are spectating'
+  tropo.say 'you are muted'
   tropo.conference "awake", true, "awake", false, null, '#'
 
 # switch the players to the mute/active conference
