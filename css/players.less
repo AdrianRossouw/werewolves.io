@@ -136,9 +136,24 @@
   @spun: spin(@baseColor, @n * 110);
 }
 
+.number-block(@n) {
+  content: "@{n}";
+  font-size: 14px;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
+  top: 0px;
+  left: 0px;
+  text-align: center;
+}
 .loop-through(@n) when (@n > 0) {
   .color-@{n} {
     .spin-color(@n);
+    position: relative;
+    &::before {
+      position: absolute;
+      .number-block(@n);
+    }
     background-color: @spun;
     color: contrast(@spun);
   }
