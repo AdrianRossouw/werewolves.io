@@ -94,8 +94,8 @@ App.addInitializer ->
   @listenTo State, "data", (event, coll, url, state) ->
     @state().change 'game' if (event is 'add') and (coll is 'player')
 
-  $('.play-now.active').click ->
-    App.State.joinGame()
+  $('.play-now').click ->
+    App.State.joinGame() if State.world.session.state().name is 'call'
 
 #if env is 'development'
 require('../wolfbots')

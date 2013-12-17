@@ -95,9 +95,33 @@ Voice.nightInstruct = (tropo, env) ->
     when 'seer'
       @say tropo, 'The Seer awakes, having had a a dream concerning the true nature of one person …'
 
+Voice.voteResult = (tropo, env) ->
+  if env.player?.id is env.death?.id
+    return @say tropo, "The final counts for most-likely-to-dance-on-the-end-of-a-rope are in, and the winner is … you!"
+
+  if env.lastRound?.state().name is 'survived'
+    return @say tropo, "Unable to reach a decision, the villagers return to their homes. The upside of this is that no one died today, sadly, the downside is the same."
+
+  # for specific roles again
+  switch env?.player?.role
+    when 'villager'
+      @say tropo, 'Having sent one of your own to an untimely demise, you return to your homes, grief-stricken and down-hearted, unless of course you never liked them in the first place.'
+
+    when 'werewolf'
+      @say tropo, "As the trap opens below them, the villager's screams become savage growls, sharp teeth appear and then swiftly recede as their neck is broken. You have rooted out a wolf. Celebrate cautiously, there may yet be more."
+
+    when 'seer'
+      @say tropo, 'Strung up your Seer? Oh dear, oh dear, oh dear.'
+
+Voice.killResult = (tropo, env) ->
+  if env.lastRound?.state().name is 'survived'
+    return @say tropo, "Unable to agree on their victim, the werewolves slip back into their human disguises and disperse for the night. For once, a peaceful night passes in the village of Fangley."
+
 
 # To be played on the first night
 Voice.firstNight = (tropo, env) ->
+  # for everyone
+  @say tropo, "Night falls on the Village, and all are struck with an urgent need to lie down and sleep, a well-know side-effect of the locally brewed cider, which is not called Narcolep's Nectar for nothing."
 
   switch env?.player?.role
     when 'villager'
@@ -109,8 +133,6 @@ Voice.firstNight = (tropo, env) ->
     when 'seer'
       @say tropo, 'If you were dealt a card that looks like this, you have been given the power to tell the food from the feeders. Every night you will have a dream, revealing the true nature of one of the other players. Be careful with how you share the knowledge gained, an obvious Seer will receive special attention from those who wish to remain unseen.'
 
-  # for everyone
-  @say tropo, "Night falls on the Village, and all are struck with an urgent need to lie down and sleep, a well-know side-effect of the locally brewed cider, which is not called Narcolep's Nectar for nothing."
 
   @nightInstruct tropo, env
 
@@ -118,11 +140,13 @@ Voice.firstNight = (tropo, env) ->
 
 # first day
 Voice.firstDay = (tropo, env) ->
+  @killResult tropo, env
   @say tropo, 'The effects of the local tipple wear off, and you all awake to find one of you number has been brutally mangled and enthusiastically munched upon during the course of the night. The rational explanation is that they were attacked by wild animals. For every rational explanation, there is also an irrational one. The killers are among you, cast your votes now …'
   @awake(tropo)
 
 # each subsequent night
 Voice.night = (tropo, env) ->
+  @voteResult tropo, env
   @say tropo, 'Dark, brooding clouds blot out the sun, a storm is brewing to the North. Perhaps the rain will wash away the stains of terror and apprehension, or only hide the movements of those who mean you harm … most of you will only know by dawn, after a dreamless, fitful sleep.'
   @nightInstruct tropo, env
   @awakeByRole(tropo, env.player)

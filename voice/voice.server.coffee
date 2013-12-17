@@ -96,6 +96,10 @@ Voice.listenTo App, 'before:routes', (opts) ->
     env.session = session
     env.player = session?.player
 
+    env.lastRound = env.game.lastRound()
+    if env.lastRound?.death
+      env.death = State.getPlayer(env.lastRound.death)
+
     # run through main game script
     @script tropo, env
 
