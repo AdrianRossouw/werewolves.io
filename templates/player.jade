@@ -3,4 +3,5 @@
     img(src="/assets/player_#{role}_default.svg")
   .info
     .name= name
-    .occupation= occupation
+    - if (occupation)
+      .occupation The #{occupation}

@@ -262,7 +262,6 @@ describe 'socket can connect', ->
     it 'should have right defaults', ->
       $io.wolf.role.should.equal 'villager'
       $io.wolf.name.should.be.ok
-      $io.wolf.occupation.should.be.ok
 
     it 'should have the same id as session', ->
       $io.wolf.id.should.equal $state.session.id
@@ -337,7 +336,6 @@ describe 'socket can connect', ->
     it 'should have right defaults', ->
       $io.seer.role.should.equal 'villager'
       $io.seer.name.should.be.ok
-      $io.seer.occupation.should.be.ok
 
   describe 'adding a villager to the game', ->
     before (done) ->
@@ -368,7 +366,6 @@ describe 'socket can connect', ->
     it 'should have right defaults', ->
       $io.villager.role.should.equal 'villager'
       $io.villager.name.should.be.ok
-      $io.villager.occupation.should.be.ok
 
   # only this part uses fake timers
   describe 'starting the game', ->
@@ -418,6 +415,10 @@ describe 'socket can connect', ->
         $spy.state.calledWith('state', $state.game.getUrl(), 'round.firstNight').should.be.ok
         $state.players.each (p) ->
           $spy.state.calledWith('state', p.getUrl(), p.state().path()).should.be.ok
+
+      it 'gave all players occupations', ->
+        $state.players.each (p) ->
+          p.has('occupation').should.be.ok
 
     describe 'all players got roles', ->
       before ->

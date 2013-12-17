@@ -27,6 +27,45 @@ Models._getRoles = (numPlayers) ->
   roles = _.shuffle roles
   roles
 
+Models._getJobs = (numPlayers) ->
+  jobs = [
+    'Village Bicycle',
+    'Vicar',
+    'Apothecary',
+    'Ashman',
+    'Auger Maker',
+    'Bobbin Turner',
+    'Bodger',
+    'Decretist',
+    'Distiller',
+    'Eremite',
+    'Fawkner',
+    'Furbisher',
+    'Freemason',
+    'Haberdasher',
+    'Harlot',
+    'Hosteller',
+    'Iron Master',
+    'Journeyman',
+    'Lumberjack',
+    'Chimney Sweep',
+    'Mule Minder',
+    'Night Soilman',
+    'Ostiary',
+    'Pettifogger',
+    'Phrenologist',
+    'Traveling Loom Saleman',
+    'Proctor',
+    'Seamstress',
+    'Soap Boiler',
+    'Staymaker',
+    'Street Orderly',
+    'Steeple Jacker'
+  ]
+  _.shuffle jobs
+
+
+
 # A player who has joined an active or upcoming
 # game.
 class Models.Player extends Models.BaseModel
@@ -41,8 +80,10 @@ class Models.Player extends Models.BaseModel
     @id = @id or App.ns.uuid()
     super
     @set('name', App.ns.name()) unless @name
-    @set('occupation', App.ns.jobTitle()) unless @occupation
     @set('role', 'villager') unless @role
+    _occupation = _(Models._getJobs()).sample()
+
+    @set('occupation', _occupation) unless @occupation
     @seen = data.seen or []
     @state().change(data._state or 'alive')
     @trigger('state', @state().path())
@@ -150,7 +191,8 @@ class Models.Players extends Models.BaseCollection
   assignRoles: (roles) ->
     roles = _.clone(Models._getRoles(@length))
     @each (player) ->
-      player.set('role', roles.shift())
+      player.set
+        role: roles.shift()
 
   kill: (id) ->
     @get(id).kill()
