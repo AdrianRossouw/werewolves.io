@@ -126,7 +126,7 @@ Voice.night = (tropo, env) ->
 
 # each subsequent day
 Voice.day = (tropo, env) ->
-  tropo.say 'on the first day, you pick nother person to lynch'
+  tropo.say 'on the next day, you pick another person to lynch'
   @awake tropo
 
 ##### victory conditions
