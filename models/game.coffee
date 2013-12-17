@@ -88,6 +88,7 @@ class Models.Game extends Models.BaseModel
       firstNight: state
         arrive: -> @addRound 'night'
         next: 'round.firstDay'
+        lastRound: -> debug 'no rounds yet'
 
       firstDay: state
         arrive: -> @addRound 'day'
@@ -117,6 +118,11 @@ class Models.Game extends Models.BaseModel
 
       currentRound: ->
         @rounds.last()
+      lastRound: ->
+        return null unless @rounds.length >= 2
+
+        index = @rounds.length - 2
+        @rounds.at(index)
 
     # victory conditions
     victory: state 'abstract',
@@ -132,10 +138,11 @@ class Models.Game extends Models.BaseModel
           'initial, round.*': ->
             return true if !App.server
             !@owner.players.aliveByRole().werewolf
+      lastRound: -> @rounds.last()
 
     cleanup: state 'final'
 
     # default addplayer method
     addPlayer: -> debug 'can not add player any more'
     currentRound: -> debug 'no rounds yet'
-
+    lastRound: -> debug 'no rounds yet'

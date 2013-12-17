@@ -151,6 +151,13 @@ describe 'start application', ->
     describe 'during the first night', ->
       before () ->
         @round = @game.currentRound()
+        @lastRound = @game.lastRound()
+
+      it 'should not have a lastRound', ->
+        should.not.exist @lastRound
+
+      it 'should have a current round', ->
+        should.exist @round
 
       it 'should only have 2 active players', ->
         @game.players.activeTotal().should.equal 2
@@ -242,6 +249,7 @@ describe 'start application', ->
         @timer.once 'end', done
         @clock.tick thirtySecs
         @nextRound = @game.currentRound()
+        @lastRound = @game.lastRound()
 
       it 'should have moved the round to complete.died', ->
         @round.state().path().should.equal 'complete.died'
@@ -257,6 +265,10 @@ describe 'start application', ->
 
       it 'should be in a day phase', ->
         @game.currentRound().phase.should.equal 'day'
+
+      it 'should return the previous round with lastRound', ->
+        should.exist @lastRound
+        @lastRound.should.equal @round
 
     describe 'during the first day', ->
 
@@ -375,6 +387,8 @@ describe 'start application', ->
         @game.once 'game:end', @spy
         @round = @game.currentRound()
         @clock.tick thirtySecs
+        @lastRound = @game.lastRound()
+
 
       it 'should have killed a wolf', ->
         @wolf.state().path().should.equal 'dead'
@@ -396,6 +410,10 @@ describe 'start application', ->
 
       it 'should have given it 30 seconds before a new game', ->
         @timer.remaining().should.equal thirtySecs
+
+      it 'should return the currentRound as the lastRound', ->
+        should.exist @lastRound
+        @round.should.equal @lastRound
 
     describe 'ready for next game', ->
       before ->
