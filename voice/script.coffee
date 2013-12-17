@@ -43,23 +43,26 @@ Voice.script = (tropo, env) ->
 
     else @awake tropo
 
+Voice.say = (tropo, text) ->
+  tropo.say text, null, null, null, null, "simon"
+
 # Play an audio file over the voip channel.
 Voice.audio = (tropo, name) ->
-  tropo.say "http://hosting.tropo.com/5010929/www/audio/#{name}.mp3"
+  @say tropo, "http://hosting.tropo.com/5010929/www/audio/#{name}.mp3"
 
 # Session is placed in a conference where everyone is muted.
 Voice.asleep = (tropo) ->
-  tropo.say 'voice chat disabled'
+  @say tropo, 'voice chat disabled'
   tropo.conference "asleep", true, "asleep", false, null, '#'
 
 # Session can listen and speak to others currently awake.
 Voice.awake = (tropo) ->
-  tropo.say 'voice chat enabled'
+  @say tropo, 'voice chat enabled'
   tropo.conference "awake", null, "awake", false, null, '#'
 
 # Session can only listen in to conversations, not talk.
 Voice.spectate = (tropo) ->
-  tropo.say 'you are muted'
+  @say tropo, 'you are muted'
   tropo.conference "awake", true, "awake", false, null, '#'
 
 # switch the players to the mute/active conference
@@ -84,13 +87,13 @@ Voice.nightInstruct = (tropo, env) ->
   # for specific roles again
   switch env?.player?.role
     when 'villager'
-      tropo.say 'you are asleep in your bed'
+      @say tropo, 'you are asleep in your bed'
 
     when 'werewolf'
-      tropo.say 'you kill somebody'
+      @say tropo, 'The werewolves shed their human skin and choose their unwitting meal for the night ...'
 
     when 'seer'
-      tropo.say 'you have a dream about somebody'
+      @say tropo, 'The Seer awakes, having had a a dream concerning the true nature of one person …'
 
 
 # To be played on the first night
@@ -98,16 +101,16 @@ Voice.firstNight = (tropo, env) ->
 
   switch env?.player?.role
     when 'villager'
-      tropo.say 'you are a villager'
+      @say tropo, 'If you were dealt a card that looks like this, and are wondering where you are on the food chain, it grieves me to inform you: you are it., though you are not without a voice. Each morning a vote shall be called to determine which of your fellow citizens could be shape-shifting abominations. Use your vote wisely, consult with your peers, and shave that beard off right now!'
 
     when 'werewolf'
-      tropo.say 'you are a werewolf'
+      @say tropo, "If you were dealt a card that look like this, you are one of the shape-shifting abominations plaguing this picturesque little village. Each night you and your fellow monsters will be asked to choose a suitable snack. Move stealthily and don't forget to floss. Also, shave that beard off right now!"
 
     when 'seer'
-      tropo.say 'you are the seer'
+      @say tropo, 'If you were dealt a card that looks like this, you have been given the power to tell the food from the feeders. Every night you will have a dream, revealing the true nature of one of the other players. Be careful with how you share the knowledge gained, an obvious Seer will receive special attention from those who wish to remain unseen.'
 
   # for everyone
-  tropo.say 'on the first night'
+  @say tropo, "Night falls on the Village, and all are struck with an urgent need to lie down and sleep, a well-know side-effect of the locally brewed cider, which is not called Narcolep's Nectar for nothing."
 
   @nightInstruct tropo, env
 
@@ -115,27 +118,25 @@ Voice.firstNight = (tropo, env) ->
 
 # first day
 Voice.firstDay = (tropo, env) ->
-  tropo.say 'on the first day, you pick somebody to lynch'
+  @say tropo, 'The effects of the local tipple wear off, and you all awake to find one of you number has been brutally mangled and enthusiastically munched upon during the course of the night. The rational explanation is that they were attacked by wild animals. For every rational explanation, there is also an irrational one. The killers are among you, cast your votes now …'
   @awake(tropo)
 
 # each subsequent night
 Voice.night = (tropo, env) ->
-  tropo.say 'on the next night'
+  @say tropo, 'Dark, brooding clouds blot out the sun, a storm is brewing to the North. Perhaps the rain will wash away the stains of terror and apprehension, or only hide the movements of those who mean you harm … most of you will only know by dawn, after a dreamless, fitful sleep.'
   @nightInstruct tropo, env
   @awakeByRole(tropo, env.player)
 
 # each subsequent day
 Voice.day = (tropo, env) ->
-  tropo.say 'on the next day, you pick another person to lynch'
+  @say tropo, 'The sun rises lazily this day, poking feeble rays through the early morning mist. The mist parts to reveal a mangled hand, a severed leg, and another headless torso, covered in bite-marks and what appears to be barbecue sauce. These furry bastards have become as bold as brass. Stern measures, dear ladies and gentlemen, will definitely need to be taken.'
   @awake tropo
 
 ##### victory conditions
 Voice.wolvesWin = (tropo, env) ->
-  tropo.say 'wolves have eaten all the villagers'
-  tropo.say 'game over!'
+  @say tropo, 'After greedily crunching on the bones of the very last villager, the Wolves turn their gazes north, where, in the distance, they see a whisp of chimney smoke spiralling up into the night sky. The Wolves slip into the woods, and follow the smell of the woodsmoke. Food, glorious food.'
   @awake tropo
 
 Voice.villagersWin = (tropo, env) ->
-  tropo.say 'villagers have lynched all of the wolves'
-  tropo.say 'game over!'
+  @say tropo, 'As the final werewolf breathes its last on the gallows, the remaining villagers dance for joy, singing jubilantly, each vowing to themselves never to forget the lessons they have learned: Facial hair marks you for extermination, and sometimes wild speculation is as effective as actual information.'
   @awake tropo
