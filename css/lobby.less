@@ -50,11 +50,15 @@
   }
 
   .play-now {
-    background-color: #e8521f;
+    .disabled;
+    &.active {
+      background-color: @joinColor;
+      border: 3px solid darken(@joinColor, 10%);
+    }
+    border: 3px solid #999;
     color: #fff;
     font-size: 30px;
     padding: 10px 40px;
-    border: 3px solid #f05a23;
     margin: 10px 0;
 
     max-width: 220px;

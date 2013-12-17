@@ -83,6 +83,9 @@ App.addInitializer ->
           true if myPlayer or (worldState is 'gameplay')
 
   @listenTo State, "state", (url, state) ->
+    if state is 'online.call'
+      $('.play-now').addClass('active')
+
     if State.isWorld(url)
       return @state().change 'lobby' if state == 'attract'
       @state().change 'game'
@@ -91,7 +94,8 @@ App.addInitializer ->
   @listenTo State, "data", (event, coll, url, state) ->
     @state().change 'game' if (event is 'add') and (coll is 'player')
 
-  $('.play-now').click -> App.State.joinGame()
+  $('.play-now.active').click ->
+    App.State.joinGame()
 
 #if env is 'development'
 require('../wolfbots')
