@@ -51,8 +51,11 @@ class Models.Session extends Models.BaseModel
   removeVoice: (id) -> @voice = false if @voice is id
 
   # each session has one of it's open windows being active
+  hangup: ->
   addCall: (id) -> @call ?= id if id in @socket
-  removeCall: (id) -> @call = false if @call is id
+  removeCall: (id) ->
+    @call = false if @call is id
+    @hangup()
 
   # each session can have multiple sockets
   hasSocket: -> !!_(@socket).size()
