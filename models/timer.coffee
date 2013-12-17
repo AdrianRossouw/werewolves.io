@@ -114,7 +114,7 @@ class Models.Timer extends Models.BaseModel
         # calculate the deadline based on
         # time remaining.
         arrive: ->
-          @_interval = setInterval @tick, 1000
+          @_interval = setInterval @tick, 100
           @_timeout = setTimeout @end, @_remaining
           @_endTime ?= Date.now() + @_remaining
 
@@ -132,4 +132,3 @@ class Models.Timer extends Models.BaseModel
 
           clearInterval @_interval
           delete @_interval
-

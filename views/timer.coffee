@@ -5,9 +5,7 @@ Views = App.module "Views"
 class Views.Timer extends Backbone.Marionette.ItemView
   tagName: 'span'
   className: 'timer'
-  template: =>
-    return 'stopped' if @model.state().name is 'stopped'
-    "#{Math.round(@model.remaining() / 1000)} seconds remaining"
+  template: => ''
 
   modelEvents:
     'tick': 'render'
@@ -17,3 +15,10 @@ class Views.Timer extends Backbone.Marionette.ItemView
     @$el.toggleClass 'paused', @model.state().name == 'paused'
     @$el.toggleClass 'stopped', @model.state().name == 'stopped'
     @$el.toggleClass 'active', @model.state().name == 'active'
+
+    if @model.state().name == 'active'
+      pcnt = @model.remaining() / @model.limit * 100
+      @$el.toggleClass 'much-time', pcnt >= 50
+      @$el.toggleClass 'some-time', 50 > pcnt > 25
+      @$el.toggleClass 'little-time', pcnt <= 25
+      @$el.css 'width', "#{pcnt}%"

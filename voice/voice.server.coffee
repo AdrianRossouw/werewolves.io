@@ -85,7 +85,7 @@ Voice.listenTo App, 'before:routes', (opts) ->
     callState = req.body?.session?.parameters?.callState
 
     if callState is 'init'
-      sips = _(session?.sip).values()
+      sips = _(session?.sip or {}).values()
       console.log('sips being called', sips)
       tropo.call sips[0] if sips.length
 
@@ -108,6 +108,8 @@ Voice.listenTo App, 'before:routes', (opts) ->
     return res.send TropoJSON(tropo)
 
   downgrade = (req, res, next) ->
+    console.log(req.body)
+
     sessionId = req.body?.result?.sessionId
 
     # session.voice maps to this body property from tropo's backend

@@ -96,7 +96,7 @@ describe 'timer model', ->
       @timer.remaining().should.equal twentySecs + fiveSecs
 
     it 'should have emitted tick events', ->
-      @spy.callCount.should.equal 5
+      @spy.callCount.should.equal 50
 
     after ->
       @timer.off 'tick', @spy
