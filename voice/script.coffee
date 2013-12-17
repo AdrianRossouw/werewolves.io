@@ -103,7 +103,7 @@ Voice.voteResult = (tropo, env) ->
     return @say tropo, "Unable to reach a decision, the villagers return to their homes. The upside of this is that no one died today, sadly, the downside is the same."
 
   # for specific roles again
-  switch env?.player?.role
+  switch env?.death?.role
     when 'villager'
       @say tropo, 'Having sent one of your own to an untimely demise, you return to your homes, grief-stricken and down-hearted, unless of course you never liked them in the first place.'
 
