@@ -30,6 +30,7 @@ class Models.Session extends Models.BaseModel
 
     @socket = data.socket or []
     @sip = data.sip or {}
+    @name = data.name if data.name
 
     @state().change(data._state or 'offline')
     @publish()

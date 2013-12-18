@@ -42,8 +42,12 @@ App.addInitializer ->
   @$body = $('body')
   
   @addRegions
+    'overlay': '#overlay'
     'game': '#game-area'
     'status': '#status-area'
+
+  @overlay.on 'show', -> @$el.addClass('active')
+  @overlay.on 'close', -> @$el.removeClass('active')
 
   state App,
     lobby: state 'initial',
