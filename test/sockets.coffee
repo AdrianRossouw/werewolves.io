@@ -178,6 +178,23 @@ describe 'socket can connect', ->
       $io.session.id.should.equal $server.id
       $io.session._state.should.equal $state.session.state().path()
 
+  describe 'setting a session name from the client', ->
+    before (done) ->
+      $io.session.name = 'test user 1'
+
+      $io.wolfSocket.emit 'session:name', 'test user 1', done
+
+    it 'should have changed the server records', ->
+      $server.session.name.should.equal $io.session.name
+      $state.session.name.should.equal $io.session.name
+
+    it 'State should have fired a data change event', ->
+      $spy.state.calledWith('data', 'change', $state.url).should.be.ok
+
+    it 'IO should have caught a data change event', ->
+      $spy.wolfIoData.calledWith('change', $state.url).should.be.ok
+
+
   describe 'upgrading session to sip from client', ->
     before (done) ->
       $io.session.sip[$io.session.socket[0]] = 'test@test.com'
@@ -268,6 +285,11 @@ describe 'socket can connect', ->
       $io.wolf.id.should.equal $io.session.id
       $state.wolf.id.should.equal $io.wolf.id
  
+    it 'should have the same name as session', ->
+      $io.wolf.name.should.equal $state.session.name
+      $io.wolf.name.should.equal $io.session.name
+      $state.wolf.name.should.equal $io.wolf.name
+
     it 'should have an initial player state', ->
       $io.wolf._state.should.equal 'alive'
       $state.wolf.state().path().should.equal 'alive'

@@ -22,6 +22,7 @@ class Models.Session extends Models.BaseModel
   @attribute 'sip'
   @attribute 'voice'
   @attribute 'call'
+  @attribute 'name'
 
   initialize: (data={}, opts={}) ->
     @id = data.id or App.ns.uuid()

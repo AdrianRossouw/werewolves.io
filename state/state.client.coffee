@@ -49,6 +49,9 @@ State.load = (data) ->
 State.joinGame = ->
   @trigger 'game:join'
 
+State.addName = (name) ->
+  @trigger 'session:name', name
+
 State.choose = (id, target) ->
   @trigger 'choose', id, target
 

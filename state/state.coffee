@@ -75,8 +75,6 @@ Models.BaseCollection::publish = ->
   State.listenTo @, 'remove', removeListener
   State.listenTo @, 'reset', resetListener
 
-
-
 Models.BaseModel::unpublish = ->
   State.stopListening @
 

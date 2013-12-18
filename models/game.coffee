@@ -60,8 +60,10 @@ class Models.Game extends Models.BaseModel
       startGame: -> @next()
 
       addPlayer: (player) ->
+        session = State.getSession(player.id)
         # order player joined in.
         player.seqId = @players.length + 1
+        player.name = session.name if session?.name
         result = @players.add(player)
         @lastPlayerAdded = Date.now()
         @go('ready')

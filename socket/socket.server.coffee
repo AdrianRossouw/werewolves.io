@@ -76,6 +76,11 @@ Socket.addInitializer (opts) ->
       state.addCall(socket.id)
       cb(null)
 
+    # set the username to use for the whole session 
+    socket.on 'session:name', (name, cb = ->) ->
+      state.name = name
+      cb(null, state.name)
+
     # allow players to join
     socket.on 'game:join', (cb=->) ->
       player = State.world.game.addPlayer(id: state.id)
