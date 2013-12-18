@@ -18,6 +18,28 @@ class Views.Player extends Backbone.Marionette.ItemView
     data.stateClass = @model.state().path().replace(/\./g,' ')
     data
 
+class Views.Session extends Backbone.Marionette.ItemView
+  className: 'session'
+  template: require('../templates/session.jade')
+  ui:
+    input: 'input[name="name"]'
+  events:
+    'keypress input[name="name"]': 'keypress'
+  keypress: (e) ->
+    switch e.which
+      when 27 # escape
+        App.overlay.close()
+      when 13 # enter
+        val = $(e.currentTarget).val()
+        State.addName val if val.length
+        App.overlay.close()
+
+  onShow: ->
+    @ui.input.focus()
+  onClose: ->
+    State.joinGame()
+
+
 class Views.Opponent extends Views.Player
   triggers:
     'click .alive.card': 'choose'

@@ -33,7 +33,7 @@ Socket.addInitializer (opts) ->
     @io.emit 'session:call'
 
   State.on 'session:name', (id) =>
-    @io.emit 'session:name'
+    @io.emit 'session:name', id
 
   @io.on 'data', (event, url, args...) ->
 

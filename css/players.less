@@ -41,7 +41,8 @@
   }
 }
 
-#overlay .player {
+#overlay .session {
+  .player;
   width: 200px;
   margin: 0 auto;
   margin-top: 10%;
@@ -159,9 +160,13 @@
   border-radius: 4px;
 }
 
-@baseColor: #c00;
+@baseColor: green;
 .spin-color(@n) {
   @spun: spin(@baseColor, @n * 110);
+}
+.color-0 {
+  background-color: @baseColor;
+  color: contrast(@baseColor);
 }
 
 .number-block(@n) {

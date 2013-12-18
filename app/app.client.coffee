@@ -46,8 +46,13 @@ App.addInitializer ->
     'game': '#game-area'
     'status': '#status-area'
 
-  @overlay.on 'show', -> @$el.addClass('active')
-  @overlay.on 'close', -> @$el.removeClass('active')
+  @overlay.on 'close', (view) ->
+    @$el.removeClass('active')
+
+  @overlay.on 'show', (view) ->
+    @$el.addClass('active')
+    view.on 'close', ->  App.overlay.close()
+
 
   state App,
     lobby: state 'initial',
@@ -99,7 +104,14 @@ App.addInitializer ->
     @state().change 'game' if (event is 'add') and (coll is 'player')
 
   $('.play-now').click ->
-    App.State.joinGame() if State.world.session.state().name is 'call'
+    session = State.world.session
+
+    return null unless session.state().is 'online.call'
+
+    return App.State.joinGame() if session.name
+
+    App.overlay.show new Views.Session(model:session)
+
 
 #if env is 'development'
 require('../wolfbots')
