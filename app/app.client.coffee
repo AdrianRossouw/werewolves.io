@@ -91,9 +91,14 @@ App.addInitializer ->
 
           true if myPlayer or (worldState is 'gameplay')
 
-  @listenTo State, "state", (url, state) ->
-    if state is 'online.call'
+  @activateJoin = ->
+    _state = State.world.session.state().path()
+    if _state is 'online.call'
       $('.play-now').addClass('active')
+
+
+  @listenTo State, "state", (url, state) ->
+    @activateJoin()
 
     if State.isWorld(url)
       return @state().change 'lobby' if state == 'attract'
@@ -128,4 +133,5 @@ App.bootstrap = (world) ->
   @trigger 'bootstrap'
   @state().change('game')
 
+  @activateJoin()
 window.App = App

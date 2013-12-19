@@ -17,7 +17,7 @@ Socket.addInitializer (opts) ->
     sessions = State.world?.sessions
 
     cookieParser = new express.cookieParser(opts.secret)
-    opts.socket ?= log: false
+    opts.socket ?= log: true
 
     @io = socketio.listen(App.server, opts.socket)
     @io.set("destroy upgrade",false)

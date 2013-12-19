@@ -245,9 +245,48 @@ describe 'socket can connect', ->
       resetSpies()
       $io.wolfSocket.emit 'session:call', done
 
+    it 'should have changed the state on the server', ->
+      $server.session.state().path().should.equal 'online.call'
+
+    it 'State should have fired a data change event', ->
+      $spy.state.calledWith('data', 'change', $state.url).should.be.ok
+
+    it 'State should have fired a state event', ->
+      $spy.state.calledWith('state', $state.url, 'online.call').should.be.ok
+
+    it 'IO should have caught a data change event', ->
+      $spy.wolfIoData.calledWith('change', $state.url).should.be.ok
+
+    it 'IO should have caught a state event', ->
+      $spy.wolfIoState.calledWith($state.url, 'online.call').should.be.ok
+
+  describe 'downgrading session to voice from server', ->
+    before ->
+      resetSpies()
+      $server.session.removeCall($server.session.call)
+
     it 'should have changed the server records', ->
-      $server.session.sip.should.include $io.session.sip
-      $state.session.sip.should.include $io.session.sip
+      $server.session.call.should.equal false
+
+    it 'should have changed the state on the server', ->
+      $server.session.state().path().should.equal 'online.voice'
+
+    it 'State should have fired a data change event', ->
+      $spy.state.calledWith('data', 'change', $state.url).should.be.ok
+
+    it 'State should have fired a state event', ->
+      $spy.state.calledWith('state', $state.url, 'online.voice').should.be.ok
+
+    it 'IO should have caught a data change event', ->
+      $spy.wolfIoData.calledWith('change', $state.url).should.be.ok
+
+    it 'IO should have caught a state event', ->
+      $spy.wolfIoState.calledWith($state.url, 'online.voice').should.be.ok
+
+  describe 're-upgrading session to call from client', ->
+    before (done) ->
+      resetSpies()
+      $io.wolfSocket.emit 'session:call', done
 
     it 'should have changed the state on the server', ->
       $server.session.state().path().should.equal 'online.call'
@@ -263,6 +302,7 @@ describe 'socket can connect', ->
 
     it 'IO should have caught a state event', ->
       $spy.wolfIoState.calledWith($state.url, 'online.call').should.be.ok
+
 
   describe 'it should allow us to join the game', ->
     before (done) ->

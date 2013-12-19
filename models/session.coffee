@@ -54,7 +54,10 @@ class Models.Session extends Models.BaseModel
 
   # each session has one of it's open windows being active
   hangup: ->
-  addCall: (id) -> @call ?= id if id in @socket
+  addCall: (id) ->
+    return false if @call
+    @call = id if id in @socket
+
   removeCall: (id) ->
     @call = false if @call is id
     @hangup()

@@ -389,3 +389,30 @@ describe 'downgrading connections', ->
 
     it 'should have removed the voice connection', ->
       @m.voice.should.equal false
+
+  describe 'call -> voice -> call', ->
+    before ->
+      @m = cleanInstances().call
+
+    describe 'downgrade to voice', ->
+      before ->
+        @m.removeCall 'socket.id'
+
+      it 'should have dowgraded us to online.voice', ->
+        @m.state().path().should.equal 'online.voice'
+
+      it 'should not have call', ->
+        @m.call.should.equal false
+
+      it.skip 'should have removed the voice connection', ->
+        @m.voice.should.equal false
+
+    describe 'upgrade to call', ->
+      before ->
+        @m.addCall 'socket.id'
+
+      it 'should have dowgraded us to online.voice', ->
+        @m.state().path().should.equal 'online.call'
+
+      it 'should not have call', ->
+        @m.call.should.equal 'socket.id'
