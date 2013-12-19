@@ -45,7 +45,7 @@ class Views.Status extends Backbone.Marionette.Layout
     @$el.find('.last').removeClass('last')
     @$el.find('.status:visible').eq(-1).addClass('last')
     @$el.find('.first').removeClass('first')
-    @$el.find('.status:visible').eq(-1).addClass('first')
+    @$el.find('.status:visible').eq(0).addClass('first')
 
   actionStatus: ->
     text = switch @model.state().name

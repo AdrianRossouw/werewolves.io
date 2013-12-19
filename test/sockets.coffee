@@ -194,9 +194,9 @@ describe 'socket can connect', ->
     it 'IO should have caught a data change event', ->
       $spy.wolfIoData.calledWith('change', $state.url).should.be.ok
 
-
   describe 'upgrading session to sip from client', ->
     before (done) ->
+      resetSpies()
       $io.session.sip[$io.session.socket[0]] = 'test@test.com'
 
       $io.wolfSocket.emit 'session:sip', 'test@test.com', done
@@ -222,6 +222,7 @@ describe 'socket can connect', ->
 
   describe 'upgrading session to voice from server', ->
     before ->
+      resetSpies()
       $state.session.voice = 'voice@test.com'
 
     it 'should have changed the state on the server', ->
@@ -237,10 +238,11 @@ describe 'socket can connect', ->
       $spy.wolfIoData.calledWith('change', $state.url).should.be.ok
 
     it 'IO should have caught a state event', ->
-      $spy.wolfIoState.calledWith($state.url, 'online.sip').should.be.ok
+      $spy.wolfIoState.calledWith($state.url, 'online.voice').should.be.ok
 
   describe 'upgrading session to call from client', ->
     before (done) ->
+      resetSpies()
       $io.wolfSocket.emit 'session:call', done
 
     it 'should have changed the server records', ->
@@ -254,13 +256,13 @@ describe 'socket can connect', ->
       $spy.state.calledWith('data', 'change', $state.url).should.be.ok
 
     it 'State should have fired a state event', ->
-      $spy.state.calledWith('state', $state.url, 'online.sip').should.be.ok
+      $spy.state.calledWith('state', $state.url, 'online.call').should.be.ok
 
     it 'IO should have caught a data change event', ->
       $spy.wolfIoData.calledWith('change', $state.url).should.be.ok
 
     it 'IO should have caught a state event', ->
-      $spy.wolfIoState.calledWith($state.url, 'online.sip').should.be.ok
+      $spy.wolfIoState.calledWith($state.url, 'online.call').should.be.ok
 
   describe 'it should allow us to join the game', ->
     before (done) ->
