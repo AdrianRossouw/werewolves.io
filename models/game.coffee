@@ -117,7 +117,6 @@ class Models.Game extends Models.BaseModel
           timer: @timer
           players: @players
 
-
       currentRound: ->
         @rounds.last()
       lastRound: ->

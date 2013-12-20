@@ -10,7 +10,6 @@ tropo = require('tropo-webapi')
 # world state, and will pass in a normalized
 # state, relative to the session.
 Voice.script = (tropo, env) ->
-
   switch env.world.state().path()
     when 'startup'
       @intro tropo, env
@@ -99,13 +98,13 @@ Voice.nightInstruct = (tropo, env) ->
   # for specific roles again
   switch env?.player?.role
     when 'villager'
-      @say tropo, 'villagerInstruct'
+      @audio tropo, 'villagerInstruct'
 
     when 'werewolf'
-      @say tropo, 'wolfInstruct'
+      @audio tropo, 'wolfInstruct'
 
     when 'seer'
-      @say tropo, 'seerInstruct'
+      @audio tropo, 'seerInstruct'
 
 Voice.voteResult = (tropo, env) ->
   if env.player?.id is env.death?.id
@@ -130,15 +129,15 @@ Voice.killResult = (tropo, env) ->
 
 # To be played on the first night
 Voice.firstNight = (tropo, env) ->
-  @say tropo, 'firstNight'
+  @audio tropo, 'firstNight'
 
   switch env?.player?.role
     when 'villager'
-      @say tropo, 'villagerTutorial'
+      @audio tropo, 'villagerTutorial'
     when 'werewolf'
-      @say tropo, 'wolfTutorial'
+      @audio tropo, 'wolfTutorial'
     when 'seer'
-      @say tropo, 'seerTutorial'
+      @audio tropo, 'seerTutorial'
 
   @nightInstruct tropo, env
   @awakeNight tropo, env.player
