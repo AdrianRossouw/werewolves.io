@@ -28,6 +28,6 @@ Voice.addInitializer (opts) ->
         onError: (reason) ->
           alert "error #{reason}"
 
-    @phone.setLogLevel("WARN")
+    @phone.setLogLevel("ALL")
 
 module.exports = Voice

@@ -5310,7 +5310,7 @@ function FlashAudio(phono, config, callback) {
 
     wmodeSetting = "opaque";
     
-    if ((navigator.appVersion.indexOf("X11")!=-1) || (navigator.appVersion.indexOf("Linux")!=-1) || ($.browser.opera)) {
+    if ((navigator.appVersion.indexOf("X11")!=-1) || (navigator.appVersion.indexOf("Linux")!=-1)) {
         wmodeSetting = "window";
     }
 
